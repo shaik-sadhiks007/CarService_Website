@@ -1,0 +1,21 @@
+.placeholder-white::placeholder{
+    color: white !important;
+}
+
+.placeholder-white:focus::placeholder{
+    color: #ffc107 !important;
+}
+
+.placeholder-white{
+    border: 1px solid #3d4453 !important;
+}
+
+.table{
+    --bs-table-bg: transparent !important;
+    --bs-table-color: white !important;
+    --bs-table-border-color : #3d4453 !important;
+}
+
+.input-dashboard{
+    background-color: #15191F !important;
+}

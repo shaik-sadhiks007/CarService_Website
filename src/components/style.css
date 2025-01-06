@@ -1,0 +1,58 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .login-container {
+    height: 100vh;
+    background: linear-gradient(to right, #111, #333), url('./src/assets/Banner7.jpg');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
+  }
+
+  
+  .form-box {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 30px;
+    border-radius: 10px;
+    color: white;
+    width: 400px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); 
+    outline: none !important; 
+    box-shadow: 'none' !important;
+  }
+
+  .input-box {
+    background: transparent !important; 
+    border: 1px solid white !important;
+    color: white !important; 
+    outline: none !important; 
+    box-shadow: 'none' !important;
+  }
+  
+  .input-box:focus {
+    background: transparent !important; 
+    border: 1px solid #ffc107 !important;
+    color: white !important; 
+    outline: none !important; 
+    box-shadow: 'none' !important;
+  }
+  
+  .input-box::placeholder {
+    color: white !important; 
+  }
+  
+  .input-box:focus::placeholder {
+    color: #ffc107 !important;
+  }
+
+
+.form-control:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #ffc107 !important; 
+  color: #ffc107 !important;
+}

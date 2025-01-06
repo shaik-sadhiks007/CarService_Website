@@ -1,0 +1,218 @@
+[
+    {
+        "id": 1,
+        "serviceCategory": "Brake system",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 2,
+        "serviceCategory": "Hand Break",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 3,
+        "serviceCategory": "Antilock Break System",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 4,
+        "serviceCategory": "Break Pad",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 5,
+        "serviceCategory": "Break Disc Check",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 6,
+        "serviceCategory": "Weel Alignment",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 7,
+        "serviceCategory": "Wheel Balancing",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 8,
+        "serviceCategory": "Check Tyres",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 9,
+        "serviceCategory": "AC Check",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 10,
+        "serviceCategory": "Oil Filters Check",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 11,
+        "serviceCategory": "Power Straring",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 12,
+        "serviceCategory": "Gear Box",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 13,
+        "serviceCategory": "Suspention ",
+        "avtive": false,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 14,
+        "serviceCategory": "Battery Check",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 15,
+        "serviceCategory": "Engine Oil Change",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 16,
+        "serviceCategory": "Coolent totup/change",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 17,
+        "serviceCategory": "Break Fluid Topup/Change",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 18,
+        "serviceCategory": "Head Lights",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 19,
+        "serviceCategory": "Indicator",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 20,
+        "serviceCategory": "Horn Check",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 21,
+        "serviceCategory": "Interior Cleaning",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 22,
+        "serviceCategory": "Exterior Cleaning",
+        "avtive": true,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 23,
+        "serviceCategory": "Polishing",
+        "avtive": false,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    },
+    {
+        "id": 24,
+        "serviceCategory": "Water wash",
+        "avtive": false,
+        "createdBy": "SYSTEM",
+        "createdDate": "2024-12-28T17:42:50Z",
+        "modifiedBy": null,
+        "modifiedDate": "2024-12-28T17:42:50Z"
+    }
+]
