@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Sidebar from './Sidebar';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { CarDataContext } from './CarDataContext';
 
-function Pending({ carData, setCarData }) {
-  const [selectedCarIndex, setSelectedCarIndex] = useState(null); // Track selected car index
-  const [selectedMechanic, setSelectedMechanic] = useState(""); // Track selected mechanic
-  const [showModal, setShowModal] = useState(false); // Modal visibility
+function Pending() {
+  
+  const { carData, setCarData } = useContext(CarDataContext);
+  const [selectedCarIndex, setSelectedCarIndex] = useState(null);
+  const [selectedMechanic, setSelectedMechanic] = useState(""); 
+  const [showModal, setShowModal] = useState(false); 
 
-  const mechanics = ["John Doe", "Jane Smith", "Alex Brown"]; // List of mechanics
+  const mechanics = ["John Doe", "Jane Smith", "Alex Brown"]; 
+
+  // Filter data with status "P"
+  const pendingCars = carData.filter((car) => car.status === "P");
 
   // Open Modal
   const handleAssign = (index) => {
@@ -41,38 +46,41 @@ function Pending({ carData, setCarData }) {
         <div className="col-10">
           <div className="container-fluid">
             <h1 className="text-white">Pending</h1>
-            {/* Table */}
-            <table className="table table-dark table-striped mt-4">
-              <thead>
-                <tr>
-                  <th>Customer Name</th>
-                  <th>Contact No</th>
-                  <th>Selected Services</th>
-                  <th>Status</th>
-                  <th>Mechanic</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {carData.map((car, index) => (
-                  <tr key={index}>
-                    <td>{car.custName}</td>
-                    <td>{car.custContactNo}</td>
-                    <td>{car.selectedServices.join(", ")}</td>
-                    <td>{car.status}</td>
-                    <td>{car.mechanic || "Not Assigned"}</td>
-                    <td>
-                      <button
-                        className="btn btn-primary btn-sm"
-                        onClick={() => handleAssign(index)}
-                      >
-                        Assign
-                      </button>
-                    </td>
+            {pendingCars.length > 0 ? (
+              <table className="table table-dark table-striped mt-4">
+                <thead>
+                  <tr>
+                    <th>Customer Name</th>
+                    <th>Contact No</th>
+                    <th>Selected Services</th>
+                    <th>Status</th>
+                    <th>Mechanic</th>
+                    <th>Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {pendingCars.map((car, index) => (
+                    <tr key={index}>
+                      <td>{car.custName}</td>
+                      <td>{car.custContactNo}</td>
+                      <td>{car.selectedServices.join(", ")}</td>
+                      <td>{car.status}</td>
+                      <td>{car.mechanic || "Not Assigned"}</td>
+                      <td>
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => handleAssign(index)}
+                        >
+                          Assign
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="text-white mt-4">No pending tasks</div>
+            )}
 
             {/* Modal */}
             {showModal && (

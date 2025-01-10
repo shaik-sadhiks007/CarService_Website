@@ -1,10 +1,7 @@
 import React from "react";
 import Sidebar from "./Sidebar";
-import DashboardComp from "./DashboardComp";
 
-function Dashboard() {
-
-  
+function Accepted({ carData, setCarData }) {
   return (
     <div className="container-fluid">
       <div className="row">
@@ -15,21 +12,17 @@ function Dashboard() {
             minHeight: "100vh",
             backgroundColor: "#212632",
           }}
-        
         >
-          {/* Sidebar component */}
           <Sidebar />
-
         </div>
         <div className="col-10">
-
-          {/* Main content */}
-          <DashboardComp />
-          
+          <div className="container-fluid">
+            <h1 className="text-white">Accepted</h1>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default Dashboard;
+export default Accepted;

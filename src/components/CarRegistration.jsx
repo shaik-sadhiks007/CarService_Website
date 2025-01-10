@@ -1,41 +1,26 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Sidebar from "./Sidebar";
+import './new.css';
+import { CarDataContext } from "./CarDataContext";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-function CarRegistration({carData,setCarData}) {
+
+function CarRegistration() {
   const services = [
-    {
-      id: 1,
-      serviceCategory: "Brake system",
-      active: true,
-    },
-    {
-      id: 2,
-      serviceCategory: "Hand Break",
-      active: true,
-    },
-    {
-      id: 3,
-      serviceCategory: "test1",
-      active: false, 
-    },
-    {
-      id: 4,
-      serviceCategory: "test2",
-      active: true,
-    },
-    {
-      id: 5,
-      serviceCategory: "test3",
-      active: true,
-    },
-    {
-      id: 6,
-      serviceCategory: "test4",
-      active: false, 
-    },
+    { id: 1, serviceCategory: "Brake system", active: true },
+    { id: 2, serviceCategory: "Hand Break", active: true },
+    { id: 3, serviceCategory: "test1", active: false },
+    { id: 4, serviceCategory: "test2", active: true },
+    { id: 5, serviceCategory: "test3", active: true },
+    { id: 6, serviceCategory: "test4", active: false },
   ];
 
-  const activeServices = services.filter((service) => service.active);
+  const {setCarData } = useContext(CarDataContext);
+
+  const [availableServices, setAvailableServices] = useState(
+    services.filter((service) => service.active)
+  );
 
   const [newData, setNewData] = useState({
     custName: "",
@@ -46,34 +31,54 @@ function CarRegistration({carData,setCarData}) {
     paymentDetails: "",
     invoiceNo: "",
     dateTime: new Date().toISOString().slice(0, 16),
-    status: "Pending",
+    status: "P",
     selectedServices: [],
   });
 
-  // Handle adding selected services
   const handleServiceChange = (e) => {
     const selectedValue = e.target.value;
-
     if (!newData.selectedServices.includes(selectedValue)) {
       setNewData({
         ...newData,
         selectedServices: [...newData.selectedServices, selectedValue],
       });
+      setAvailableServices(availableServices.filter(service => service.serviceCategory !== selectedValue));
     }
   };
 
-  // Handle removing services
   const handleRemoveService = (service) => {
     setNewData({
       ...newData,
       selectedServices: newData.selectedServices.filter((s) => s !== service),
     });
+    const removedService = services.find(s => s.serviceCategory === service);
+    if (removedService) {
+      setAvailableServices([...availableServices, removedService]);
+    }
   };
 
   const handleSave = () => {
-    setCarData((prevData) => [...prevData, newData]);
+    setCarData((prevData) => [...prevData, newData]); 
     console.log("New Data Saved:", newData);
+  
+    toast.success("Car Registration Successful!");
+  
+    setNewData({
+      custName: "",
+      custContactNo: "",
+      email: "",
+      address: "",
+      remarks: "",
+      paymentDetails: "",
+      invoiceNo: "",
+      dateTime: new Date().toISOString().slice(0, 16),
+      status: "P",
+      selectedServices: [],
+    });
+  
+    setAvailableServices(services.filter((service) => service.active));
   };
+  
 
   return (
     <div className="container-fluid">
@@ -92,98 +97,112 @@ function CarRegistration({carData,setCarData}) {
                 <p>New Car Registration</p>
               </div>
 
-              <div className="col-6">
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  placeholder="Customer Name"
-                  value={newData.custName}
-                  onChange={(e) => setNewData({ ...newData, custName: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  placeholder="Contact No"
-                  value={newData.custContactNo}
-                  onChange={(e) => setNewData({ ...newData, custContactNo: e.target.value })}
-                />
-                <input
-                  type="email"
-                  className="form-control mb-2"
-                  placeholder="Email"
-                  value={newData.email}
-                  onChange={(e) => setNewData({ ...newData, email: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  placeholder="Address"
-                  value={newData.address}
-                  onChange={(e) => setNewData({ ...newData, address: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  placeholder="Remarks"
-                  value={newData.remarks}
-                  onChange={(e) => setNewData({ ...newData, remarks: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  placeholder="Payment Details"
-                  value={newData.paymentDetails}
-                  onChange={(e) => setNewData({ ...newData, paymentDetails: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  placeholder="Invoice No"
-                  value={newData.invoiceNo}
-                  onChange={(e) => setNewData({ ...newData, invoiceNo: e.target.value })}
-                />
-                <input
-                  type="datetime-local"
-                  className="form-control mb-2"
-                  value={newData.dateTime}
-                  onChange={(e) => setNewData({ ...newData, dateTime: e.target.value })}
-                />
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <input
+                    type="text"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    placeholder="Customer Name"
+                    value={newData.custName}
+                    onChange={(e) => setNewData({ ...newData, custName: e.target.value })}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <input
+                    type="text"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    placeholder="Contact No"
+                    value={newData.custContactNo}
+                    onChange={(e) => setNewData({ ...newData, custContactNo: e.target.value })}
+                  />
+                </div>
 
-                {/* Multi-Select Dropdown */}
-                <select
-                  className="form-control mb-2"
-                  value=""
-                  onChange={handleServiceChange}
-                >
-                  <option value="" disabled>
-                    Select Services
-                  </option>
-                  {activeServices.map((service) => (
-                    <option key={service.id} value={service.serviceCategory}>
-                      {service.serviceCategory}
-                    </option>
-                  ))}
-                </select>
+                <div className="col-md-6">
+                  <input
+                    type="email"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    placeholder="Email"
+                    value={newData.email}
+                    onChange={(e) => setNewData({ ...newData, email: e.target.value })}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <input
+                    type="text"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    placeholder="Address"
+                    value={newData.address}
+                    onChange={(e) => setNewData({ ...newData, address: e.target.value })}
+                  />
+                </div>
 
-                {/* Display Selected Services as Chips */}
-                <div className="mb-2">
-                  {newData.selectedServices.map((service, index) => (
-                    <span
-                      key={index}
-                      className="badge bg-primary me-2 p-2 rounded-pill"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleRemoveService(service)}
-                    >
-                      {service} &times;
-                    </span>
-                  ))}
+                <div className="col-md-6">
+                  <input
+                    type="text"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    placeholder="Payment Details"
+                    value={newData.paymentDetails}
+                    onChange={(e) => setNewData({ ...newData, paymentDetails: e.target.value })}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <input
+                    type="text"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    placeholder="Invoice No"
+                    value={newData.invoiceNo}
+                    onChange={(e) => setNewData({ ...newData, invoiceNo: e.target.value })}
+                  />
+                </div>
+
+                <div className="col-md-6">
+                  <input
+                    type="datetime-local"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    value={newData.dateTime}
+                    onChange={(e) => setNewData({ ...newData, dateTime: e.target.value })}
+                  />
+                </div>
+
+                <div className="col-md-6">
+                  <select
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    value=""
+                    onChange={handleServiceChange}
+                  >
+                    <option value="" disabled>Select Services</option>
+                    {availableServices.map((service) => (
+                      <option key={service.id} value={service.serviceCategory}>
+                        {service.serviceCategory}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
+              <div className="mb-2">
+                {newData.selectedServices.map((service, index) => (
+                  <span
+                    key={index}
+                    className="badge bg-warning me-2 p-2 rounded-pill"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleRemoveService(service)}
+                  >
+                    {service} &times;
+                  </span>
+                ))}
+              </div>
+
+              <textarea
+                className="form-control mb-2 placeholder-white py-2"
+                rows="4"
+                placeholder="Remarks"
+                value={newData.remarks}
+                onChange={(e) => setNewData({ ...newData, remarks: e.target.value })}
+              />
+
               <div className="mt-4">
-                <button type="button" className="btn btn-primary" onClick={handleSave}>
-                  Save
-                </button>
+                <button type="button" className="btn btn-primary" onClick={handleSave}>Save</button>
               </div>
             </div>
           </div>

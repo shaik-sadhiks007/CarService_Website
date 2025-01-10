@@ -1,33 +1,58 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './style.css'; 
+import React, { useEffect, useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { CarDataContext } from "./CarDataContext";
+import "./style.css";
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // const apiUrl = process.env.REACT_APP_API_URL;
-  // console.log(apiUrl,'url')
+  const { setUserRole,logout } = useContext(CarDataContext);
+
+  // Function to check if token is expired
+  const isTokenExpired = (token) => {
+    try {
+      const decoded = jwtDecode(token);
+      console.log(decoded,'de')
+      const currentTime = Date.now() / 1000;
+      return decoded.exp < currentTime;
+    } catch (err) {
+      return true;
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token || isTokenExpired(token)) {
+      logout(); 
+    } else {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
-      const response = await axios.post('http://localhost:8080/CarServiceMaintenance/api/auth/login', {
-        username,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:8080/CarServiceMaintenance/api/auth/login",
+        {
+          username,
+          password,
+        }
+      );
 
-      if (response.data && response.data.token) {
-
-        localStorage.setItem('token', response.data.token);
-        navigate('/dashboard'); 
+      if (response.data && response.data.jwt) {
+        localStorage.setItem("token", response.data.jwt);
+        setUserRole(response.data.userRole);
+        navigate("/dashboard");
       }
     } catch (err) {
-      setError('Invalid credentials or server error.');
+      setError("Invalid credentials or server error.");
     }
   };
 
@@ -37,30 +62,31 @@ const Login = () => {
         <h3 className="text-center mb-4">Login</h3>
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="mb-3">
-          <input 
-            type="text" 
-            name="username" 
-            className="form-control input-box rounded-pill px-3 py-2 fs-5" 
-            placeholder="Username" 
+          <input
+            type="text"
+            name="username"
+            className="form-control input-box rounded-pill px-3 py-2 fs-5"
+            placeholder="Username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)} 
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div className="mb-3">
-          <input 
-            type="password" 
-            name="password" 
-            className="form-control input-box rounded-pill px-3 py-2 fs-5" 
-            placeholder="Password" 
+          <input
+            type="password"
+            name="password"
+            className="form-control input-box rounded-pill px-3 py-2 fs-5"
+            placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)} 
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit" className="btn btn-warning w-100 rounded-pill px-3 py-2 fs-5 text-white">Login</button>
-        {/* Uncomment if you want a signup link */}
-        {/* <div className="text-center mt-3">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
-        </div> */}
+        <button
+          type="submit"
+          className="btn btn-warning w-100 rounded-pill px-3 py-2 fs-5 text-white"
+        >
+          Login
+        </button>
       </form>
     </div>
   );

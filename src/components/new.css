@@ -8,6 +8,8 @@
 
 .placeholder-white{
     border: 1px solid #3d4453 !important;
+    background-color: #15191F !important;
+    color: white !important;
 }
 
 .table{

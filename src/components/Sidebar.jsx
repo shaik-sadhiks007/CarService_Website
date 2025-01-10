@@ -1,7 +1,11 @@
+import { jwtDecode } from "jwt-decode";
 import { useLocation, Link } from "react-router-dom"; 
 
 function Sidebar() {
   const location = useLocation(); 
+
+  const decodeToken = jwtDecode(localStorage.getItem('token'));
+
 
   return (
     <>
@@ -11,7 +15,7 @@ function Sidebar() {
           alt="profile"
           className="rounded-circle me-2"
         />
-        <span className="text-white fs-4 mb-0">Rajesh</span>
+        <span className="text-white fs-4 mb-0 text-capitalize">Hi {decodeToken.sub}</span>
       </div>
 
       <ul className="nav nav-pills flex-column mb-auto">
@@ -31,7 +35,7 @@ function Sidebar() {
             style={{ color: "inherit" }}
           >
             <i className="bi bi-grid-1x2-fill me-2"></i>
-            Dashboard
+            Car Service Entry
           </Link>
         </li>
         <li
@@ -93,21 +97,21 @@ function Sidebar() {
         </li>
         <li
           className={`nav-item my-2 rounded-2 ${
-            location.pathname === "/admins" ? "active" : ""
+            location.pathname === "/accepted" ? "active" : ""
           }`}
           style={{
             backgroundColor:
-              location.pathname === "/admins" ? "#FFC107" : "#2E3543",
-            color: location.pathname === "/admins" ? "#000" : "#fff",
+              location.pathname === "/accepted" ? "#FFC107" : "#2E3543",
+            color: location.pathname === "/accepted" ? "#000" : "#fff",
           }}
         >
           <Link
-            to="/admins"
+            to="/accepted"
             className="nav-link d-flex align-items-center"
             style={{ color: "inherit" }}
           >
             <i className="bi bi-gear-fill me-2 fw-semibold"></i>
-            <span className="fw-semibold">Admins</span>
+            <span className="fw-semibold">Accepted</span>
           </Link>
         </li>
       </ul>

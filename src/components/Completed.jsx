@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import Sidebar from "./Sidebar";
+import { CarDataContext } from "./CarDataContext";
 
-function Completed({ carData }) {
-  const completedData = carData.filter((item) => item.status === "Completed");
+function Completed() {
+
+  const { carData } = useContext(CarDataContext);
+  
+  const completedData = carData.filter((item) => item.status === "D");
 
   return (
     <div className="container-fluid">
