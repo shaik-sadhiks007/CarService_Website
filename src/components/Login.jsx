@@ -6,18 +6,49 @@ import { CarDataContext } from "./CarDataContext";
 import "./style.css";
 
 const Login = () => {
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const { setUserRole,logout } = useContext(CarDataContext);
+  const { setUserRole, logout, apiUrl, setMechanics} = useContext(CarDataContext);
 
-  // Function to check if token is expired
+  const fetchAndSetUserRole = async (token) => {
+    const decodedToken = jwtDecode(token);
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/v1/carService/getUserInfo`, {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
+
+      if (response.data) {
+
+        const mechanics = response.data.find( (user) => user.userRole === 'user')
+
+        const user = response.data.find(
+          (user) => user.username === decodedToken.sub
+        );
+
+        if (user) {
+          setUserRole(user);
+          setMechanics(mechanics);
+          navigate("/dashboard");
+        } else {
+          setError("User not found.");
+        }
+      }
+    } catch (err) {
+      setError("Error fetching user information.");
+    }
+  };
+
   const isTokenExpired = (token) => {
     try {
       const decoded = jwtDecode(token);
-      console.log(decoded,'de')
       const currentTime = Date.now() / 1000;
       return decoded.exp < currentTime;
     } catch (err) {
@@ -26,29 +57,28 @@ const Login = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token || isTokenExpired(token)) {
-      logout(); 
+      logout();
+      navigate('/')
     } else {
-      navigate('/dashboard');
+      fetchAndSetUserRole(token);
+      navigate("/dashboard");
     }
-  }, [navigate]);
-  
+  }, [navigate, logout]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8080/CarServiceMaintenance/api/auth/login",
-        {
-          username,
-          password,
-        }
-      );
+      const response = await axios.post(`${apiUrl}/api/auth/login`, {
+        username,
+        password,
+      });
 
       if (response.data && response.data.jwt) {
-        localStorage.setItem("token", response.data.jwt);
-        setUserRole(response.data.userRole);
+        const token = response.data.jwt;
+        localStorage.setItem("token", token);
+        fetchAndSetUserRole(token);
         navigate("/dashboard");
       }
     } catch (err) {

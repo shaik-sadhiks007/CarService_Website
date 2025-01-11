@@ -1,10 +1,11 @@
-import { jwtDecode } from "jwt-decode";
+import { useContext } from "react";
 import { useLocation, Link } from "react-router-dom"; 
+import { CarDataContext } from "./CarDataContext";
 
 function Sidebar() {
   const location = useLocation(); 
 
-  const decodeToken = jwtDecode(localStorage.getItem('token'));
+  const {userRole} = useContext(CarDataContext);
 
 
   return (
@@ -15,7 +16,7 @@ function Sidebar() {
           alt="profile"
           className="rounded-circle me-2"
         />
-        <span className="text-white fs-4 mb-0 text-capitalize">Hi {decodeToken.sub}</span>
+        <span className="text-white fs-4 mb-0 text-capitalize">Hi {userRole.username} </span>
       </div>
 
       <ul className="nav nav-pills flex-column mb-auto">

@@ -1,18 +1,49 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import { CarDataContext } from './CarDataContext';
+import axios from 'axios';
 
 function Pending() {
-  
-  const { carData, setCarData } = useContext(CarDataContext);
+  const { carData, setCarData, mechanics, userRole,apiUrl } = useContext(CarDataContext);
   const [selectedCarIndex, setSelectedCarIndex] = useState(null);
-  const [selectedMechanic, setSelectedMechanic] = useState(""); 
-  const [showModal, setShowModal] = useState(false); 
+  const [selectedMechanic, setSelectedMechanic] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
-  const mechanics = ["John Doe", "Jane Smith", "Alex Brown"]; 
+  const token = localStorage.getItem("token");
 
-  // Filter data with status "P"
-  const pendingCars = carData.filter((car) => car.status === "P");
+  useEffect(() => {
+    const fetchPendingCars = async () => {
+      try {
+        const url =
+          userRole.userRole === 'admin'
+            ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
+            : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
+
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        });
+
+        const customerData = response.data.custInformationList || [];
+        const serviceData = response.data.carServiceInfromationList || [];
+
+        // Filter the service data to include only those with status "P"
+        const filteredServiceData = serviceData.filter(service => service.status === 'P');
+        
+        const combinedData = filteredServiceData.map((service) => {
+          const customer = customerData.find((cust) => cust.customerId === service.customerId);
+          return { ...service, ...customer };
+        });
+
+        setCarData(combinedData);
+      } catch (error) {
+        console.error('Error fetching pending cars:', error);
+      }
+    };
+
+    fetchPendingCars();
+  }, [userRole, setCarData]);
 
   // Open Modal
   const handleAssign = (index) => {
@@ -26,11 +57,11 @@ function Pending() {
       const updatedCarData = [...carData];
       updatedCarData[selectedCarIndex] = {
         ...updatedCarData[selectedCarIndex],
-        mechanic: selectedMechanic, // Add assigned mechanic
+        mechanic: selectedMechanic,
       };
-      setCarData(updatedCarData); // Update car data
-      setShowModal(false); // Close modal
-      setSelectedMechanic(""); // Reset mechanic selection
+      setCarData(updatedCarData);
+      setShowModal(false);
+      setSelectedMechanic('');
     }
   };
 
@@ -46,7 +77,7 @@ function Pending() {
         <div className="col-10">
           <div className="container-fluid">
             <h1 className="text-white">Pending</h1>
-            {pendingCars.length > 0 ? (
+            {carData.length > 0 ? (
               <table className="table table-dark table-striped mt-4">
                 <thead>
                   <tr>
@@ -55,25 +86,27 @@ function Pending() {
                     <th>Selected Services</th>
                     <th>Status</th>
                     <th>Mechanic</th>
-                    <th>Action</th>
+                    {userRole.userRole === 'admin' && <th>Action</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {pendingCars.map((car, index) => (
+                  {carData.map((car, index) => (
                     <tr key={index}>
                       <td>{car.custName}</td>
                       <td>{car.custContactNo}</td>
-                      <td>{car.selectedServices.join(", ")}</td>
+                      <td>{car.selectedServices?.join(', ') || 'N/A'}</td>
                       <td>{car.status}</td>
-                      <td>{car.mechanic || "Not Assigned"}</td>
-                      <td>
-                        <button
-                          className="btn btn-primary btn-sm"
-                          onClick={() => handleAssign(index)}
-                        >
-                          Assign
-                        </button>
-                      </td>
+                      <td>{car.mechanic || 'Not Assigned'}</td>
+                      {userRole.userRole === 'admin' && (
+                        <td>
+                          <button
+                            className="btn btn-primary btn-sm"
+                            onClick={() => handleAssign(index)}
+                          >
+                            Assign
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -103,8 +136,8 @@ function Pending() {
                       >
                         <option value="">Select Mechanic</option>
                         {mechanics.map((mechanic, index) => (
-                          <option key={index} value={mechanic}>
-                            {mechanic}
+                          <option key={index} value={mechanic.username}>
+                            {mechanic.username}
                           </option>
                         ))}
                       </select>

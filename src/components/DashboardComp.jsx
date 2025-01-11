@@ -1,46 +1,54 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import axios from "axios";
 import "./new.css";
 import Logout from "./Logout";
+import { CarDataContext } from "./CarDataContext";
 
 function DashboardComp() {
-  const sampleData = {
-    custInformation: {
-      vehicleRegNo: "SLW3355K",
-      custName: "John Paul",
-      custContactNo: "98456345",
-      email: "john.paul@mail.com",
-      address: "BLK-135,#05-254, Tampines Street 12, Singapore - 521135",
-      vehicleModel: "BMW-X3",
-      manufactureYear: "2020",
-      vehicleColor: "Silver",
-      engineNo: "ALK56533HJE",
-      chasisNo: "TUBBEF65733MGF56YK",
-    },
-    carServiceInfromation: {
-      vehicleRegNo: "SLW3355K",
-      dateIn: "2025-01-01T13:39:50.000+08:00",
-      entryType: "Customer Dropped",
-      mileage: "01034224",
-      fuelLevel: "0.25 Tank",
-      fuelLevelImage: "image",
-      remarks: "Service completed.",
-      status: "D",
-      technitionName: "Joshua How",
-      managerName: null,
-    },
-  };
-
   const [carPlate, setCarPlate] = useState("");
   const [matchedData, setMatchedData] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
+  const [editedData, setEditedData] = useState({
+    custInformation: {},
+    carServiceInfromation: {},
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSearch = () => {
-    if (carPlate.toLowerCase() === sampleData.custInformation.vehicleRegNo.toLowerCase()) {
-      setMatchedData(sampleData);
-      setEditedData(sampleData);
-    } else {
-      setMatchedData(null);
+  const token = localStorage.getItem("token");
+  const { apiUrl } = useContext(CarDataContext);
+
+  const handleSearch = async () => {
+    setLoading(true);
+    setError(null);
+    setMatchedData(null);
+
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/v1/carService/getCustomerDetails`,
+        {
+          params: { vehicleRegNo: carPlate },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data) {
+        const data = {
+          ...response.data,
+          custInformation: response.data.custInformation || {}, 
+          carServiceInfromation: response.data.carServiceInfromation || {},
+        };
+        setMatchedData(data);
+        setEditedData(data);
+      } else {
+        setError("No data found for the provided registration number.");
+      }
+    } catch (err) {
+      setError("Failed to fetch data. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,6 +70,7 @@ function DashboardComp() {
       },
     }));
   };
+
 
   return (
     <div className="container-fluid">
@@ -90,10 +99,12 @@ function DashboardComp() {
             <button
               className="btn btn-warning py-2 ms-3 text-white"
               onClick={handleSearch}
+              disabled={loading}
             >
-              Search
+              {loading ? "Loading..." : "Search"}
             </button>
           </div>
+          {error && <p className="text-danger mt-3">{error}</p>}
         </div>
 
         {matchedData && (
@@ -103,22 +114,30 @@ function DashboardComp() {
               <h4>Customer Information</h4>
               <table className="table table-bordered">
                 <tbody>
-                  {Object.entries(matchedData.custInformation).map(([key, value]) => (
-                    <tr key={key}>
-                      <th>{key}</th>
-                      <td>
-                        {editMode ? (
-                          <input
-                            type="text"
-                            value={editedData.custInformation[key] || ""}
-                            onChange={(e) => handleChange("custInformation", key, e.target.value)}
-                          />
-                        ) : (
-                          value || "N/A"
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {Object.entries(matchedData.custInformation || {}).map(
+                    ([key, value]) => (
+                      <tr key={key}>
+                        <th>{key}</th>
+                        <td>
+                          {editMode ? (
+                            <input
+                              type="text"
+                              value={editedData.custInformation[key] || ""}
+                              onChange={(e) =>
+                                handleChange(
+                                  "custInformation",
+                                  key,
+                                  e.target.value
+                                )
+                              }
+                            />
+                          ) : (
+                            value || "N/A"
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             </div>
@@ -128,22 +147,32 @@ function DashboardComp() {
               <h4>Car Service Information</h4>
               <table className="table table-bordered">
                 <tbody>
-                  {Object.entries(matchedData.carServiceInfromation).map(([key, value]) => (
-                    <tr key={key}>
-                      <th>{key}</th>
-                      <td>
-                        {editMode ? (
-                          <input
-                            type="text"
-                            value={editedData.carServiceInfromation[key] || ""}
-                            onChange={(e) => handleChange("carServiceInfromation", key, e.target.value)}
-                          />
-                        ) : (
-                          value || "N/A"
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {Object.entries(matchedData.carServiceInfromation || {}).map(
+                    ([key, value]) => (
+                      <tr key={key}>
+                        <th>{key}</th>
+                        <td>
+                          {editMode ? (
+                            <input
+                              type="text"
+                              value={
+                                editedData.carServiceInfromation[key] || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  "carServiceInfromation",
+                                  key,
+                                  e.target.value
+                                )
+                              }
+                            />
+                          ) : (
+                            value || "N/A"
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             </div>

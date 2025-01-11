@@ -1,12 +1,45 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import { CarDataContext } from "./CarDataContext";
+import axios from "axios";
 
 function Completed() {
+  const { userRole,apiUrl } = useContext(CarDataContext);
+  const [completedData, setCompletedData] = useState([]);
+  const token = localStorage.getItem('token');
 
-  const { carData } = useContext(CarDataContext);
-  
-  const completedData = carData.filter((item) => item.status === "D");
+  useEffect(() => {
+    const fetchCompletedCars = async () => {
+      try {
+        const url =
+          userRole.userRole === 'admin'
+          ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
+          : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
+
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const customerData = response.data.custInformationList || [];
+        const serviceData = response.data.carServiceInfromationList || [];
+
+        const filteredServiceData = serviceData.filter(service => service.status === 'D');
+        
+        const combinedData = filteredServiceData.map((service) => {
+          const customer = customerData.find((cust) => cust.customerId === service.customerId);
+          return { ...service, ...customer };
+        });
+
+        setCompletedData(combinedData);
+      } catch (error) {
+        console.error('Error fetching completed cars:', error);
+      }
+    };
+
+    fetchCompletedCars();
+  }, [userRole]);
 
   return (
     <div className="container-fluid">
@@ -46,7 +79,7 @@ function Completed() {
                       <td>{item.email}</td>
                       <td>{item.invoiceNo}</td>
                       <td>{item.dateTime}</td>
-                      <td>{item.selectedServices.join(", ")}</td>
+                      <td>{item.selectedServices?.join(", ") || "N/A"}</td>
                       <td>{item.remarks}</td>
                     </tr>
                   ))}
