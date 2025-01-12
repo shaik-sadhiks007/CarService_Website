@@ -1,121 +1,128 @@
-import { useContext } from "react";
-import { useLocation, Link } from "react-router-dom"; 
+import React, { useContext, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { CarDataContext } from "./CarDataContext";
 
 function Sidebar() {
-  const location = useLocation(); 
+  const location = useLocation();
 
-  const {userRole} = useContext(CarDataContext);
+  const {showOffcanvas, setShowOffcanvas} = useContext(CarDataContext);
+  
+  const menuItems = [
+    { path: "/dashboard", iconClass: "bi bi-grid-1x2-fill", label: "Car Service Entry" },
+    { path: "/car-registration", iconClass: "bi bi-car-front-fill", label: "Car Registration" },
+    { path: "/pending", iconClass: "bi bi-hourglass-split", label: "Pending" },
+    { path: "/completed", iconClass: "bi bi-check-circle-fill", label: "Completed" },
+    { path: "/accepted", iconClass: "bi bi-gear-fill", label: "Accepted" },
+  ];
 
+  const toggleOffcanvas = () => {
+    setShowOffcanvas(!showOffcanvas);
+  };
 
   return (
     <>
-      <div className="profile mb-4 d-flex align-items-center">
-        <img
-          src="https://via.placeholder.com/40"
-          alt="profile"
-          className="rounded-circle me-2"
-        />
-        <span className="text-white fs-4 mb-0 text-capitalize">Hi {userRole.username} </span>
+      {/* Button to toggle offcanvas */}
+      <button
+        className="btn btn-primary d-md-none mb-3"
+        type="button"
+        onClick={toggleOffcanvas}
+      >
+        <i className="bi bi-list"></i> 
+      </button>
+
+      {/* Offcanvas Sidebar */}
+      <div
+        className={`offcanvas offcanvas-start ${showOffcanvas ? "show" : ""}`}
+        style={{
+          visibility: showOffcanvas ? "visible" : "hidden",
+          backgroundColor: "#2E3543", 
+          color: "#fff", 
+        }}
+        tabIndex="-1"
+        onClick={toggleOffcanvas}
+      >
+        <div className="offcanvas-header">
+          <h5 className="offcanvas-title text-white">Menu</h5>
+          <button
+            type="button"
+            className="btn-close btn-close-white text-reset"
+            onClick={toggleOffcanvas}
+          ></button>
+        </div>
+        <div className="offcanvas-body p-3">
+          <div className="profile mb-4 d-flex align-items-center">
+            <img
+              src="https://via.placeholder.com/40"
+              alt="profile"
+              className="rounded-circle me-2"
+            />
+            <span className="text-white fs-5 mb-0 text-capitalize">Hi</span>
+          </div>
+
+          <ul className="nav nav-pills flex-column mb-auto">
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <li
+                  key={item.path}
+                  className={`nav-item my-2 rounded-2 ${isActive ? "active" : ""}`}
+                  style={{
+                    backgroundColor: isActive ? "#FFC107" : "#2E3543",
+                    color: isActive ? "#000" : "#fff",
+                  }}
+                >
+                  <Link
+                    to={item.path}
+                    className="nav-link d-flex align-items-center"
+                    style={{ color: "inherit" }}
+                    onClick={toggleOffcanvas}
+                  >
+                    <i className={`${item.iconClass} me-2`}></i>
+                    <span className="fw-semibold">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
 
-      <ul className="nav nav-pills flex-column mb-auto">
-        <li
-          className={`nav-item my-2 rounded-2 ${
-            location.pathname === "/dashboard" ? "active" : ""
-          }`}
-          style={{
-            backgroundColor:
-              location.pathname === "/dashboard" ? "#FFC107" : "#2E3543",
-            color: location.pathname === "/dashboard" ? "#000" : "#fff",
-          }}
-        >
-          <Link
-            to="/dashboard"
-            className="nav-link d-flex align-items-center"
-            style={{ color: "inherit" }}
-          >
-            <i className="bi bi-grid-1x2-fill me-2"></i>
-            Car Service Entry
-          </Link>
-        </li>
-        <li
-          className={`nav-item my-2 rounded-2 ${
-            location.pathname === "/car-registration" ? "active" : ""
-          }`}
-          style={{
-            backgroundColor:
-              location.pathname === "/car-registration" ? "#FFC107" : "#2E3543",
-            color: location.pathname === "/car-registration" ? "#000" : "#fff",
-          }}
-        >
-          <Link
-            to="/car-registration"
-            className="nav-link d-flex align-items-center"
-            style={{ color: "inherit" }}
-          >
-            <i className="bi bi-car-front-fill me-2 fw-semibold"></i>
-            <span className="fw-semibold">Car Registration</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item my-2 rounded-2 ${
-            location.pathname === "/pending" ? "active" : ""
-          }`}
-          style={{
-            backgroundColor:
-              location.pathname === "/pending" ? "#FFC107" : "#2E3543",
-            color: location.pathname === "/pending" ? "#000" : "#fff",
-          }}
-        >
-          <Link
-            to="/pending"
-            className="nav-link d-flex align-items-center"
-            style={{ color: "inherit" }}
-          >
-            <i className="bi bi-hourglass-split me-2 fw-semibold"></i>
-            <span className="fw-semibold">Pending</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item my-2 rounded-2 ${
-            location.pathname === "/completed" ? "active" : ""
-          }`}
-          style={{
-            backgroundColor:
-              location.pathname === "/completed" ? "#FFC107" : "#2E3543",
-            color: location.pathname === "/completed" ? "#000" : "#fff",
-          }}
-        >
-          <Link
-            to="/completed"
-            className="nav-link d-flex align-items-center"
-            style={{ color: "inherit" }}
-          >
-            <i className="bi bi-check-circle-fill me-2 fw-semibold"></i>
-            <span className="fw-semibold">Completed</span>
-          </Link>
-        </li>
-        <li
-          className={`nav-item my-2 rounded-2 ${
-            location.pathname === "/accepted" ? "active" : ""
-          }`}
-          style={{
-            backgroundColor:
-              location.pathname === "/accepted" ? "#FFC107" : "#2E3543",
-            color: location.pathname === "/accepted" ? "#000" : "#fff",
-          }}
-        >
-          <Link
-            to="/accepted"
-            className="nav-link d-flex align-items-center"
-            style={{ color: "inherit" }}
-          >
-            <i className="bi bi-gear-fill me-2 fw-semibold"></i>
-            <span className="fw-semibold">Accepted</span>
-          </Link>
-        </li>
-      </ul>
+      {/* Regular Sidebar for Desktop */}
+      <div className="d-none d-md-block">
+        <div className="profile mb-4 d-flex align-items-center">
+          <img
+            src="https://via.placeholder.com/40"
+            alt="profile"
+            className="rounded-circle me-2"
+          />
+          <span className="text-white fs-4 mb-0 text-capitalize">Hi</span>
+        </div>
+
+        <ul className="nav nav-pills flex-column mb-auto">
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li
+                key={item.path}
+                className={`nav-item my-2 rounded-2 ${isActive ? "active" : ""}`}
+                style={{
+                  backgroundColor: isActive ? "#FFC107" : "#2E3543",
+                  color: isActive ? "#000" : "#fff",
+                }}
+              >
+                <Link
+                  to={item.path}
+                  className="nav-link d-flex align-items-center"
+                  style={{ color: "inherit" }}
+                >
+                  <i className={`${item.iconClass} me-2`}></i>
+                  <span className="fw-semibold">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </>
   );
 }

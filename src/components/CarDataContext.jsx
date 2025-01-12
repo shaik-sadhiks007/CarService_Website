@@ -26,9 +26,12 @@ export const CarDataProvider = ({ children }) => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
 
-  const [userRole, setUserRole] = useState(null);
+  const [userRole, setUserRole] = useState({});
 
-  const [mechanics,setMechanics] = useState(null);
+  const [mechanics,setMechanics] = useState([]);
+
+  const [showOffcanvas, setShowOffcanvas] = useState(false);
+  
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -80,7 +83,7 @@ export const CarDataProvider = ({ children }) => {
   };
 
   return (
-    <CarDataContext.Provider value={{ carData, setCarData, userRole, setUserRole, logout, apiUrl, mechanics, setMechanics }}>
+    <CarDataContext.Provider value={{ carData, setCarData, userRole, setUserRole, logout, apiUrl, mechanics, setMechanics ,showOffcanvas, setShowOffcanvas }}>
       {children}
     </CarDataContext.Provider>
   );

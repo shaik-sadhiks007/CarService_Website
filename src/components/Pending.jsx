@@ -1,12 +1,21 @@
-import React, { useContext, useState, useEffect } from 'react';
-import Sidebar from './Sidebar';
-import { CarDataContext } from './CarDataContext';
-import axios from 'axios';
+import React, { useContext, useState, useEffect } from "react";
+import Sidebar from "./Sidebar";
+import { CarDataContext } from "./CarDataContext";
+import axios from "axios";
+import Logout from "./Logout";
 
 function Pending() {
-  const { carData, setCarData, mechanics, userRole,apiUrl } = useContext(CarDataContext);
+  const {
+    carData,
+    setCarData,
+    mechanics,
+    userRole,
+    apiUrl,
+    showOffcanvas,
+    setShowOffcanvas,
+  } = useContext(CarDataContext);
   const [selectedCarIndex, setSelectedCarIndex] = useState(null);
-  const [selectedMechanic, setSelectedMechanic] = useState('');
+  const [selectedMechanic, setSelectedMechanic] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const token = localStorage.getItem("token");
@@ -15,13 +24,13 @@ function Pending() {
     const fetchPendingCars = async () => {
       try {
         const url =
-          userRole.userRole === 'admin'
+          userRole.userRole === "admin"
             ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
             : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
 
         const response = await axios.get(url, {
           headers: {
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -29,16 +38,20 @@ function Pending() {
         const serviceData = response.data.carServiceInfromationList || [];
 
         // Filter the service data to include only those with status "P"
-        const filteredServiceData = serviceData.filter(service => service.status === 'P');
-        
+        const filteredServiceData = serviceData.filter(
+          (service) => service.status === "P"
+        );
+
         const combinedData = filteredServiceData.map((service) => {
-          const customer = customerData.find((cust) => cust.customerId === service.customerId);
+          const customer = customerData.find(
+            (cust) => cust.customerId === service.customerId
+          );
           return { ...service, ...customer };
         });
 
         setCarData(combinedData);
       } catch (error) {
-        console.error('Error fetching pending cars:', error);
+        console.error("Error fetching pending cars:", error);
       }
     };
 
@@ -61,56 +74,80 @@ function Pending() {
       };
       setCarData(updatedCarData);
       setShowModal(false);
-      setSelectedMechanic('');
+      setSelectedMechanic("");
     }
+  };
+
+  const toggleOffcanvas = () => {
+    setShowOffcanvas(!showOffcanvas);
   };
 
   return (
     <div className="container-fluid">
       <div className="row">
         <div
-          className="col-2 p-3"
-          style={{ height: 'auto', minHeight: '100vh', backgroundColor: '#212632' }}
+          className={`col-2 col-md-3 col-lg-2 p-3 ${
+            showOffcanvas ? "d-block" : "d-none d-md-block"
+          }`}
+          style={{
+            height: "auto",
+            minHeight: "100vh",
+            backgroundColor: "#212632",
+          }}
         >
           <Sidebar />
         </div>
-        <div className="col-10">
+        <div className="col-12 col-md-9 col-lg-10 p-3">
           <div className="container-fluid">
-            <h1 className="text-white">Pending</h1>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <div className="d-flex">
+                <div
+                  className="d-md-none me-2"
+                  onClick={toggleOffcanvas}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="bi bi-list text-light fs-2"></i>
+                </div>
+                <h1 className="text-white">Pending</h1>
+              </div>
+              <Logout />
+            </div>
             {carData.length > 0 ? (
-              <table className="table table-dark table-striped mt-4">
-                <thead>
-                  <tr>
-                    <th>Customer Name</th>
-                    <th>Contact No</th>
-                    <th>Selected Services</th>
-                    <th>Status</th>
-                    <th>Mechanic</th>
-                    {userRole.userRole === 'admin' && <th>Action</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {carData.map((car, index) => (
-                    <tr key={index}>
-                      <td>{car.custName}</td>
-                      <td>{car.custContactNo}</td>
-                      <td>{car.selectedServices?.join(', ') || 'N/A'}</td>
-                      <td>{car.status}</td>
-                      <td>{car.mechanic || 'Not Assigned'}</td>
-                      {userRole.userRole === 'admin' && (
-                        <td>
-                          <button
-                            className="btn btn-primary btn-sm"
-                            onClick={() => handleAssign(index)}
-                          >
-                            Assign
-                          </button>
-                        </td>
-                      )}
+              <div style={{ overflowX: "auto" }}>
+                <table className="table table-dark table-striped mt-4">
+                  <thead>
+                    <tr>
+                      <th>Customer Name</th>
+                      <th>Contact No</th>
+                      <th>Selected Services</th>
+                      <th>Status</th>
+                      <th>Mechanic</th>
+                      {userRole.userRole === "admin" && <th>Action</th>}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {carData.map((car, index) => (
+                      <tr key={index}>
+                        <td>{car.custName}</td>
+                        <td>{car.custContactNo}</td>
+                        <td>{car.selectedServices?.join(", ") || "N/A"}</td>
+                        <td>{car.status}</td>
+                        <td>{car.mechanic || "Not Assigned"}</td>
+                        {userRole.userRole === "admin" && (
+                          <td>
+                            <button
+                              className="btn btn-primary btn-sm"
+                              onClick={() => handleAssign(index)}
+                            >
+                              Assign
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div className="text-white mt-4">No pending tasks</div>
             )}

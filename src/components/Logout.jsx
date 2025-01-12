@@ -1,23 +1,27 @@
-import React, { useContext } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { CarDataContext } from './CarDataContext';
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { CarDataContext } from "./CarDataContext";
 
 function Logout() {
+  const navigate = useNavigate();
 
-    const navigate = useNavigate()
+  const { logout } = useContext(CarDataContext);
 
-    const {logout} = useContext(CarDataContext)
-
-    const handleLogout = () => {
-        logout()
-        navigate('/')
-    }
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <>
-      <button className='btn btn-primary' onClick={() => handleLogout()}>Logout</button>
+      <button
+        className="btn btn-outline-warning text-white"
+        onClick={() => handleLogout()}
+      >
+        <span className="fw-semibold">Logout</span>
+      </button>
     </>
-  )
+  );
 }
 
-export default Logout
+export default Logout;

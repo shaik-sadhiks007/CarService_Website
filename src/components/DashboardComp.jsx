@@ -4,7 +4,7 @@ import "./new.css";
 import Logout from "./Logout";
 import { CarDataContext } from "./CarDataContext";
 
-function DashboardComp() {
+function DashboardComp({apiUrl, showOffcanvas, setShowOffcanvas}) {
   const [carPlate, setCarPlate] = useState("");
   const [matchedData, setMatchedData] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -16,7 +16,11 @@ function DashboardComp() {
   const [error, setError] = useState(null);
 
   const token = localStorage.getItem("token");
-  const { apiUrl } = useContext(CarDataContext);
+
+
+  const toggleOffcanvas = () => {
+    setShowOffcanvas(!showOffcanvas);
+  };
 
   const handleSearch = async () => {
     setLoading(true);
@@ -37,7 +41,7 @@ function DashboardComp() {
       if (response.data) {
         const data = {
           ...response.data,
-          custInformation: response.data.custInformation || {}, 
+          custInformation: response.data.custInformation || {},
           carServiceInfromation: response.data.carServiceInfromation || {},
         };
         setMatchedData(data);
@@ -71,11 +75,19 @@ function DashboardComp() {
     }));
   };
 
-
   return (
     <div className="container-fluid">
-      <div className="d-flex justify-content-between align-items-center mb-3 mt-2">
-        <h1 className="text-white">Car Service Entry</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div className="d-flex">
+          <div
+            className="d-md-none me-2"
+            onClick={toggleOffcanvas}
+            style={{ cursor: "pointer" }}
+          >
+            <i className="bi bi-list text-light fs-2"></i>
+          </div>
+          <h1 className="text-white">Car Service Entry</h1>
+        </div>
         <Logout />
       </div>
 
@@ -87,7 +99,7 @@ function DashboardComp() {
           <p>Car registration number</p>
         </div>
 
-        <div className="col-6">
+        <div className="col-12 col-md-9 col-lg-6">
           <div className="d-flex justify-content-between">
             <input
               type="text"
@@ -138,13 +150,13 @@ function DashboardComp() {
                       </tr>
                     )
                   )}
-                </tbody>
+                </tbody>Car Service Information
               </table>
             </div>
 
             {/* Car Service Information Table */}
             <div className="col-md-6">
-              <h4>Car Service Information</h4>
+              <h4></h4>
               <table className="table table-bordered">
                 <tbody>
                   {Object.entries(matchedData.carServiceInfromation || {}).map(
