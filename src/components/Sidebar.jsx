@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext} from "react";
 import { Link, useLocation } from "react-router-dom";
 import { CarDataContext } from "./CarDataContext";
 
@@ -9,7 +9,6 @@ function Sidebar() {
   
   const menuItems = [
     { path: "/dashboard", iconClass: "bi bi-grid-1x2-fill", label: "Car Service Entry" },
-    { path: "/car-registration", iconClass: "bi bi-car-front-fill", label: "Car Registration" },
     { path: "/pending", iconClass: "bi bi-hourglass-split", label: "Pending" },
     { path: "/completed", iconClass: "bi bi-check-circle-fill", label: "Completed" },
     { path: "/accepted", iconClass: "bi bi-gear-fill", label: "Accepted" },

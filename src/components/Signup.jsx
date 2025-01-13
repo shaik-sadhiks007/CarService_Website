@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './style.css'; // Custom styles
+import './style.css';
 
 const Signup = () => {
   return (

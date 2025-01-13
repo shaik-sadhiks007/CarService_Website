@@ -7,12 +7,52 @@ import "react-toastify/dist/ReactToastify.css";
 import CarRegistration from "./CarRegistration";
 
 function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
-
   const [carPlate, setCarPlate] = useState("");
- 
-  const [found , setFound] = useState(false);
+
+  const [found, setFound] = useState(false);
 
   const [loading, setLoading] = useState(false);
+
+  const [cId, setCId] = useState(null);
+
+  const customerData = {
+    vehicleRegNo: "",
+    custName: "",
+    custContactNo: "",
+    email: "",
+    address: "",
+    vehicleModel: "",
+    manufactureYear: "",
+    vehicleColor: "",
+    engineNo: "",
+    chasisNo: "",
+    createdBy: null,
+    createdDate: null,
+    modifiedBy: null,
+    modifiedDate: null,
+  };
+
+  const carInfo = {
+    vehicleRegNo: "",
+    dateIn: new Date().toISOString().slice(0, 16),
+    entryType: "",
+    mileage: "",
+    fuelLevel: "",
+    fuelLevelImage: null,
+    carImage: null,
+    remarks: "",
+    status: "P",
+    technitionName: "",
+    managerName: null,
+    createdBy: "",
+    createdDate: new Date().toISOString(),
+    modifiedBy: null,
+    modifiedDate: null,
+  };
+
+  const [customerInfo, setCustomerInfo] = useState(customerData);
+
+  const [carServiceInfo, setCarServiceInfo] = useState(carInfo);
 
   const token = localStorage.getItem("token");
 
@@ -39,19 +79,41 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
       );
 
       if (response.data !== "No Customer Information Found") {
+        setCustomerInfo({
+          ...customerInfo,
+          vehicleRegNo: response.data.vehicleRegNo,
+          custName: response.data.custName,
+          custContactNo: response.data.custContactNo,
+          email: response.data.email,
+          address: response.data.address,
+          vehicleModel: response.data.vehicleModel,
+          manufactureYear: response.data.manufactureYear,
+          vehicleColor: response.data.vehicleColor,
+          engineNo: response.data.engineNo,
+          chasisNo: response.data.chasisNo,
+          createdBy: response.data.createdBy,
+          createdDate: response.data.createdDate,
+          modifiedBy: response.data.modifiedBy,
+          modifiedDate: response.data.modifiedDate,
+        });
+
+        setFound(true);
+        setCId(response.data.customerId);
+
         toast.success("Customer information found!");
       } else {
+        setFound(false);
+        setCId(null);
         toast.error("No data found for the provided registration number.");
       }
     } catch (err) {
+      setFound(false);
+      setCId(null);
       toast.error("Failed to fetch data. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
-
-
 
   return (
     <div className="container-fluid">
@@ -97,7 +159,19 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
         </div>
       </div>
 
-      <CarRegistration carPlate = {carPlate} setFound={setFound} />
+      <CarRegistration
+        carPlate={carPlate}
+        setFound={setFound}
+        found={found}
+        carServiceInfo={carServiceInfo}
+        customerInfo={customerInfo}
+        setCarServiceInfo={setCarServiceInfo}
+        setCustomerInfo={setCustomerInfo}
+        cId={cId}
+        carInfo = {customerData}
+        customerData = {customerData}
+        setCarPlate = {setCarPlate}
+      />
     </div>
   );
 }
