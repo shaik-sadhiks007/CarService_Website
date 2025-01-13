@@ -8,11 +8,14 @@ import CarRegistration from "./components/CarRegistration";
 import Pending from "./components/Pending";
 import Completed from "./components/Completed";
 import Accepted from "./components/Accepted";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   
   return (
     <Router>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

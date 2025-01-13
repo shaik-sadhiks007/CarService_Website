@@ -32,44 +32,45 @@ export const CarDataProvider = ({ children }) => {
 
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   
+  const initializeUser = async () => {
+    const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    const initializeUser = async () => {
-      console.log("initialize")
-      const token = localStorage.getItem("token");
-    
-      try {
-        console.log("2")
+    if(!token){
+      return;
+    }
+  
+    try {
 
-        const decodedToken = jwtDecode(token);
-        if (decodedToken.exp * 1000 < Date.now()) {
-          logout();
-          return;
-        }
-  
-        const response = await axios.get(`${apiUrl}/api/v1/carService/getUserInfo`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-  
-        console.log("yes")
-  
-        const user = response.data.find((user) => user.username === decodedToken.sub);
-        const mechanicsData = response.data.filter((user) => user.userRole === "user");
-  
-        if (user) {
-          setUserRole(user);
-          setMechanics(mechanicsData);
-        } else {
-          logout();
-        }
-      } catch (err) {
-        console.log('3')
-        console.error("Error fetching user info:", err);
+      const decodedToken = jwtDecode(token);
+      if (decodedToken.exp * 1000 < Date.now()) {
+        logout();
+        return;
+      }
+
+      const response = await axios.get(`${apiUrl}/api/v1/carService/getUserInfo`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+
+      const user = response.data.find((user) => user.username === decodedToken.sub);
+      const mechanicsData = response.data.filter((user) => user.userRole === "user");
+
+      if (user) {
+        setUserRole(user);
+        setMechanics(mechanicsData);
+      } else {
         logout();
       }
-    };
+    } catch (err) {
+      console.error("Error fetching user info:", err);
+      logout();
+    }
+  };
+
+  useEffect(() => {
 
     initializeUser();
+
 
   }, []);
 
@@ -77,8 +78,8 @@ export const CarDataProvider = ({ children }) => {
   console.log(mechanics,'mic')
 
   const logout = () => {
-    setUserRole(null);
-    setMechanics(null);
+    setUserRole({});
+    setMechanics([]);
     localStorage.removeItem("token"); 
   };
 

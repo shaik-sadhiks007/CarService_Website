@@ -7,13 +7,16 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Logout from "./Logout";
 
-function CarRegistration() {
-  const { apiUrl, showOffcanvas, setShowOffcanvas } =
-    useContext(CarDataContext);
+function CarRegistration({ carPlate,setFound, }) {
 
-  const toggleOffcanvas = () => {
-    setShowOffcanvas(!showOffcanvas);
-  };
+  console.log(carPlate, "carplate");
+  const { apiUrl, userRole } = useContext(CarDataContext);
+
+  const [images, setImages] = useState({
+    fuelLevelImage: null,
+    carImage: null,
+  });
+
   const [customerInfo, setCustomerInfo] = useState({
     vehicleRegNo: "",
     custName: "",
@@ -38,7 +41,7 @@ function CarRegistration() {
     fuelLevelImage: null,
     carImage: null,
     remarks: "",
-    status: "D",
+    status: "P",
     technitionName: "",
     managerName: null,
     createdBy: "Rajesh",
@@ -49,16 +52,22 @@ function CarRegistration() {
 
   const handleSave = async () => {
     try {
-      const formData = new FormData();
-      formData.append("fuelLevelImage", carServiceInfo.fuelLevelImage);
-      formData.append("carImage", carServiceInfo.carImage);
-      formData.append(
-        "data",
-        JSON.stringify({
-          custInformation: customerInfo,
-          carServiceInfromation: carServiceInfo,
-        })
-      );
+      const data = {
+        custInformation: {
+          ...customerInfo,
+          vehicleRegNo: carPlate,
+          createdBy: userRole.username,
+        },
+        carServiceInfromation: {
+          ...carServiceInfo,
+          fuelLevelImage: images.fuelLevelImage,
+          carImage: images.carImage,
+          vehicleRegNo: carPlate,
+          createdBy: userRole.username,
+        },
+      };
+
+      console.log(data, "dataincar");
 
       const token = localStorage.getItem("token");
       if (!token) {
@@ -66,13 +75,14 @@ function CarRegistration() {
         return;
       }
 
+      // Send JSON data instead of FormData
       await axios.post(
         `${apiUrl}/api/v1/carService/saveServiceInformation`,
-        formData,
+        data,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
@@ -84,110 +94,105 @@ function CarRegistration() {
     }
   };
 
-  return (
-    <div className="container-fluid">
-      <div className="row">
-        <div
-          className={`col-2 col-md-3 col-lg-2 p-3 ${
-            showOffcanvas ? "d-block" : "d-none d-md-block"
-          }`}
-          style={{
-            height: "auto",
-            minHeight: "100vh",
-            backgroundColor: "#212632",
-          }}
-        >
-          <Sidebar />
-        </div>
-        <div className="col-12 col-md-9 col-lg-10 p-3">
-          <div className="container-fluid">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <div className="d-flex">
-                <div
-                  className="d-md-none me-2"
-                  onClick={toggleOffcanvas}
-                  style={{ cursor: "pointer" }}
-                >
-                  <i className="bi bi-list text-light fs-2"></i>
-                </div>
-                <h1 className="text-white">Car Registration</h1>
-              </div>
-              <Logout />
-            </div>
-            <div
-              className="text-white w-100 p-4 rounded-2"
-              style={{ backgroundColor: "#212632" }}
-            >
-              {/* Customer Information */}
-              <div className="mb-4">
-                <h4>Customer Information</h4>
-                {Object.keys(customerInfo).map(
-                  (key) =>
-                    key !== "createdBy" &&
-                    key !== "createdDate" && (
-                      <input
-                        key={key}
-                        type="text"
-                        className="form-control mb-2 rounded-pill placeholder-white py-2"
-                        placeholder={key}
-                        value={customerInfo[key]}
-                        onChange={(e) =>
-                          setCustomerInfo({
-                            ...customerInfo,
-                            [key]: e.target.value,
-                          })
-                        }
-                      />
-                    )
-                )}
-              </div>
+  const handleFileChange = (e, key) => {
+    const file = e.target.files[0];
 
-              {/* Car Service Information */}
-              <div className="mb-4">
-                <h4>Car Service Information</h4>
-                {Object.keys(carServiceInfo).map((key) =>
-                  ["fuelLevelImage", "carImage"].includes(key) ? (
-                    <input
-                      key={key}
-                      type="file"
-                      className="form-control mb-2 rounded-pill placeholder-white py-2"
-                      onChange={(e) =>
-                        setCarServiceInfo({
-                          ...carServiceInfo,
-                          [key]: e.target.files[0],
-                        })
-                      }
-                    />
-                  ) : key !== "createdBy" &&
-                    key !== "createdDate" &&
-                    key !== "modifiedBy" &&
-                    key !== "modifiedDate" ? (
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // const base64String = reader.result.split(",")[1];
+        const base64String = reader.result;
+        const cleanedBase64 = base64String.replace(/^data:/, '');
+        setImages((prevState) => ({
+          ...prevState,
+          [key]: cleanedBase64,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <div className="row px-0">
+      <div className="col-12 py-3">
+        <div className="container-fluid px-0">
+          <div
+            className="text-white w-100 p-4 rounded-2"
+            style={{ backgroundColor: "#212632" }}
+          >
+            {/* Customer Information */}
+            <div className="mb-4">
+              <h4>Customer Information</h4>
+              {Object.keys(customerInfo).map(
+                (key) =>
+                  key !== "createdBy" &&
+                  key !== "createdDate" &&
+                  key !== "vehicleRegNo" && (
                     <input
                       key={key}
                       type="text"
                       className="form-control mb-2 rounded-pill placeholder-white py-2"
                       placeholder={key}
-                      value={carServiceInfo[key]}
+                      value={customerInfo[key] || ""}
                       onChange={(e) =>
-                        setCarServiceInfo({
-                          ...carServiceInfo,
+                        setCustomerInfo({
+                          ...customerInfo,
                           [key]: e.target.value,
                         })
                       }
                     />
-                  ) : null
-                )}
-              </div>
+                  )
+              )}
+            </div>
 
-              <div className="mt-4">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleSave}
-                >
-                  Save
-                </button>
-              </div>
+            {/* Car Service Information */}
+            <div className="mb-4">
+              <h4>Car Service Information</h4>
+              {Object.keys(carServiceInfo).map((key) =>
+                ["fuelLevelImage", "carImage"].includes(key) ? (
+                  <input
+                    key={key}
+                    type="file"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    onChange={(e) => handleFileChange(e, key)}
+                  />
+                ) : key !== "createdBy" &&
+                  key !== "createdDate" &&
+                  key !== "modifiedBy" &&
+                  key !== "modifiedDate" &&
+                  key !== "vehicleRegNo" ? (
+                  <input
+                    key={key}
+                    type="text"
+                    className="form-control mb-2 rounded-pill placeholder-white py-2"
+                    placeholder={key}
+                    value={carServiceInfo[key]}
+                    onChange={(e) =>
+                      setCarServiceInfo({
+                        ...carServiceInfo,
+                        [key]: e.target.value,
+                      })
+                    }
+                  />
+                ) : null
+              )}
+            </div>
+
+            {images.fuelLevelImage && (
+              <img src={`data:${images.fuelLevelImage}`} alt="Fuel Level" width="200px" />
+            )}
+            {images.carImage && (
+              <img src={`data:${images.carImage}`} alt="Car" width="200px" />
+            )}
+
+            <div className="mt-4">
+              <button
+                type="button"
+                className="btn btn-outline-warning text-white"
+                onClick={handleSave}
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>

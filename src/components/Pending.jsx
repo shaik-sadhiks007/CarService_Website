@@ -114,7 +114,7 @@ function Pending() {
             </div>
             {carData.length > 0 ? (
               <div style={{ overflowX: "auto" }}>
-                <table className="table table-dark table-striped mt-4">
+                <table className="table table-dark table-striped ">
                   <thead>
                     <tr>
                       <th>Customer Name</th>

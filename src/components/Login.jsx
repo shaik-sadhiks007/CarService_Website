@@ -1,48 +1,51 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { CarDataContext } from "./CarDataContext";
 import "./style.css";
+import { toast } from "react-toastify";
 
 const Login = () => {
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const { setUserRole, logout, apiUrl, setMechanics} = useContext(CarDataContext);
+  const { setUserRole, logout, apiUrl, setMechanics } =
+    useContext(CarDataContext);
 
   const fetchAndSetUserRole = async (token) => {
     const decodedToken = jwtDecode(token);
     try {
       const response = await axios.get(
-        `${apiUrl}/api/v1/carService/getUserInfo`, {
+        `${apiUrl}/api/v1/carService/getUserInfo`,
+        {
           headers: {
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       if (response.data) {
+        const mechanics = response.data.find(
+          (user) => user.userRole === "user"
+        );
 
-        const mechanics = response.data.find( (user) => user.userRole === 'user')
-
-        const user = response.data.find(
+        const userinfo = response.data.find(
           (user) => user.username === decodedToken.sub
         );
 
-        if (user) {
-          setUserRole(user);
+        if (userinfo) {
+          setUserRole(userinfo);
           setMechanics(mechanics);
+          toast.success("Login successful!");
           navigate("/dashboard");
         } else {
-          setError("User not found.");
+          toast.error("User not found.");
         }
       }
     } catch (err) {
-      setError("Error fetching user information.");
+      toast.error("Error fetching user information.");
     }
   };
 
@@ -60,12 +63,12 @@ const Login = () => {
     const token = localStorage.getItem("token");
     if (!token || isTokenExpired(token)) {
       logout();
-      navigate('/')
+      navigate("/");
     } else {
       fetchAndSetUserRole(token);
       navigate("/dashboard");
     }
-  }, [navigate, logout]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +85,7 @@ const Login = () => {
         navigate("/dashboard");
       }
     } catch (err) {
-      setError("Invalid credentials or server error.");
+      toast.error("Invalid credentials or server error");
     }
   };
 
@@ -90,7 +93,6 @@ const Login = () => {
     <div className="container-fluid login-container d-flex align-items-center justify-content-center">
       <form className="form-box" onSubmit={handleSubmit}>
         <h3 className="text-center mb-4">Login</h3>
-        {error && <div className="alert alert-danger">{error}</div>}
         <div className="mb-3">
           <input
             type="text"
