@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { CarDataContext } from "./CarDataContext";
-import './style.css';
+import "./style.css";
 import { toast } from "react-toastify";
 
 const Login = () => {
@@ -11,43 +11,9 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const { setUserRole, logout, apiUrl, setMechanics } =
+  const { setUserRole, logout, apiUrl, setMechanics, initializeUser } =
     useContext(CarDataContext);
 
-  const fetchAndSetUserRole = async (token) => {
-    const decodedToken = jwtDecode(token);
-    try {
-      const response = await axios.get(
-        `${apiUrl}/api/v1/carService/getUserInfo`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data) {
-        const mechanics = response.data.find(
-          (user) => user.userRole === "user"
-        );
-
-        const userinfo = response.data.find(
-          (user) => user.username === decodedToken.sub
-        );
-
-        if (userinfo) {
-          setUserRole(userinfo);
-          setMechanics(mechanics);
-          toast.success("Login successful!");
-          navigate("/dashboard");
-        } else {
-          toast.error("User not found.");
-        }
-      }
-    } catch (err) {
-      toast.error("Error fetching user information.");
-    }
-  };
 
   const isTokenExpired = (token) => {
     try {
@@ -65,7 +31,8 @@ const Login = () => {
       logout();
       navigate("/");
     } else {
-      fetchAndSetUserRole(token);
+      initializeUser()
+      toast.success("Login successful!");
       navigate("/dashboard");
     }
   }, []);
@@ -81,7 +48,8 @@ const Login = () => {
       if (response.data && response.data.jwt) {
         const token = response.data.jwt;
         localStorage.setItem("token", token);
-        fetchAndSetUserRole(token);
+        initializeUser();
+        toast.success("Login successful!");
         navigate("/dashboard");
       }
     } catch (err) {

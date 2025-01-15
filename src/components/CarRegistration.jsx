@@ -51,8 +51,6 @@ function CarRegistration({
     managerName: "Manager Name",
   };
 
-  console.log(found, "found");
-  console.log(cId,"cId")
 
   const handleSave = async () => {
     try {
@@ -144,9 +142,6 @@ function CarRegistration({
       reader.readAsDataURL(file);
     }
   };
-
-
-  
 
   return (
     <div className="row px-0">
@@ -292,7 +287,7 @@ function CarRegistration({
               </button>
             </div>
 
-            <HistoryTable/>
+            { found && <HistoryTable/>}
           </div>
         </div>
       </div>

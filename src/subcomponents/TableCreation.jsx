@@ -7,7 +7,7 @@ function TableCreation({ historyData, keyMapping }) {
   };
 
   return (
-    <div className="mt-3">
+    <div className="mt-3 " style={{ overflowX: "auto" }}>
       <table className="table table-bordered">
         <thead>
           <tr>

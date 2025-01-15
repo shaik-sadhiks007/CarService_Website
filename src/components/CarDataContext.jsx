@@ -1,11 +1,11 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import React, { createContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export const CarDataContext = createContext();
 
 export const CarDataProvider = ({ children }) => {
-
   const [carData, setCarData] = useState([
     {
       address: "",
@@ -22,69 +22,83 @@ export const CarDataProvider = ({ children }) => {
     },
   ]);
 
-
   const apiUrl = import.meta.env.VITE_API_URL;
-
 
   const [userRole, setUserRole] = useState({});
 
-  const [mechanics,setMechanics] = useState([]);
+  const [mechanics, setMechanics] = useState([]);
 
   const [showOffcanvas, setShowOffcanvas] = useState(false);
-  
+
   const initializeUser = async () => {
     const token = localStorage.getItem("token");
+    console.log(token, "token");
 
-    if(!token){
+    if (!token) {
+      console.log("there is no token");
       return;
     }
-  
-    try {
 
+    try {
       const decodedToken = jwtDecode(token);
+
+      console.log("1");
       if (decodedToken.exp * 1000 < Date.now()) {
         logout();
         return;
       }
 
-      const response = await axios.get(`${apiUrl}/api/v1/carService/getUserInfo`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      console.log("2");
+      const response = await axios.get(
+        `${apiUrl}/api/v1/carService/getUserInfo`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { username: decodedToken.sub },
+        }
+      );
 
+      console.log("3");
 
-      const user = response.data.find((user) => user.username === decodedToken.sub);
-      const mechanicsData = response.data.filter((user) => user.userRole === "user");
+      console.log(response.data,"data")
 
-      if (user) {
-        setUserRole(user);
-        setMechanics(mechanicsData);
-      } else {
-        logout();
-      }
+      setUserRole(response.data);
+      
     } catch (err) {
       console.error("Error fetching user info:", err);
-      logout();
+      toast.error("Error fetching user info")
+      // logout();
     }
   };
 
   useEffect(() => {
-
     initializeUser();
-
-
   }, []);
 
-  console.log(userRole,'user')
-  console.log(mechanics,'mic')
+  console.log(userRole, "user");
+  console.log(mechanics, "mic");
 
   const logout = () => {
     setUserRole({});
     setMechanics([]);
-    localStorage.removeItem("token"); 
+    localStorage.removeItem("token");
   };
 
   return (
-    <CarDataContext.Provider value={{ carData, setCarData, userRole, setUserRole, logout, apiUrl, mechanics, setMechanics ,showOffcanvas, setShowOffcanvas }}>
+    <CarDataContext.Provider
+      value={{
+        carData,
+        setCarData,
+        userRole,
+        setUserRole,
+        logout,
+        apiUrl,
+        mechanics,
+        setMechanics,
+        showOffcanvas,
+        setShowOffcanvas,
+        initializeUser,
+      }}
+    >
       {children}
     </CarDataContext.Provider>
   );

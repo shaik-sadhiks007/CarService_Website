@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import { CarDataContext } from "./CarDataContext";
 import axios from "axios";
 import Logout from "./Logout";
+import { toast } from "react-toastify";
 
 function Pending() {
   const {
@@ -13,73 +14,193 @@ function Pending() {
     apiUrl,
     showOffcanvas,
     setShowOffcanvas,
+    setMechanics,
   } = useContext(CarDataContext);
   const [selectedCarIndex, setSelectedCarIndex] = useState(null);
   const [selectedMechanic, setSelectedMechanic] = useState("");
   const [showModal, setShowModal] = useState(false);
 
+  const [fullData, setFullData] = useState(null);
+
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    const fetchPendingCars = async () => {
-      try {
-        const url =
-          userRole.userRole === "admin"
-            ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
-            : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
+  const fetchPendingCars = async () => {
+    try {
+      const url =
+        userRole.userRole === "admin"
+          ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
+          : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
 
-        const response = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const customerData = response.data.custInformationList || [];
-        const serviceData = response.data.carServiceInfromationList || [];
+      setFullData(response.data);
 
-        // Filter the service data to include only those with status "P"
-        const filteredServiceData = serviceData.filter(
-          (service) => service.status === "P"
+      const customerData = response.data.custInformationList || [];
+      const serviceData = response.data.carServiceInfromationList || [];
+
+      // Filter the service data to include only those with status "P"
+      const filteredServiceData = serviceData.filter(
+        (service) => service.status === "P"
+      );
+
+      const combinedData = filteredServiceData.map((service) => {
+        const customer = customerData.find(
+          (cust) => cust.customerId === service.customerId
         );
+        return { ...service, ...customer };
+      });
 
-        const combinedData = filteredServiceData.map((service) => {
-          const customer = customerData.find(
-            (cust) => cust.customerId === service.customerId
-          );
-          return { ...service, ...customer };
-        });
+      setCarData(combinedData);
+    } catch (error) {
+      console.error("Error fetching pending cars:", error);
+    }
+  };
 
-        setCarData(combinedData);
-      } catch (error) {
-        console.error("Error fetching pending cars:", error);
-      }
-    };
+  const fetchMechanics = async () => {
+    try {
+      const url = `${apiUrl}/api/v1/carService/getAllUserInfo`;
 
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const mech = response.data.filter((user) => user.userRole === "user");
+      setMechanics(mech);
+    } catch (error) {
+      console.error("Error fetching mechanics:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchPendingCars();
+    if (userRole.userRole == "admin") {
+      fetchMechanics();
+    }
   }, [userRole, setCarData]);
 
   // Open Modal
-  const handleAssign = (index) => {
-    setSelectedCarIndex(index);
+  const handleAssign = (vehicle) => {
+    setSelectedCarIndex(vehicle);
+
+    console.log(vehicle, "assign");
+
     setShowModal(true);
   };
 
   // Handle mechanic selection and save
-  const handleSaveMechanic = () => {
+  const handleSaveMechanic = async () => {
+
+    console.log("car",selectedCarIndex)
+    console.log("mech",selectedMechanic)
+
     if (selectedMechanic && selectedCarIndex !== null) {
-      const updatedCarData = [...carData];
-      updatedCarData[selectedCarIndex] = {
-        ...updatedCarData[selectedCarIndex],
-        mechanic: selectedMechanic,
+      const cuInfo = fullData.custInformationList.find(
+        (item) => item.vehicleRegNo === selectedCarIndex
+      );
+      const carInfo = fullData.carServiceInfromationList.find(
+        (item) => item.vehicleRegNo === selectedCarIndex
+      );
+
+      const data = {
+        custInformation: cuInfo,
+        carServiceInfromation: { ...carInfo, technitionName: selectedMechanic },
       };
-      setCarData(updatedCarData);
-      setShowModal(false);
-      setSelectedMechanic("");
+
+      try {
+        await axios.post(
+          `${apiUrl}/api/v1/carService/saveServiceInformation`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        fetchPendingCars();
+        setSelectedMechanic("");
+        setShowModal(false);
+        toast.success("Assigned successfully!");
+      } catch (error) {
+        toast.error("Failed to Assign. Please try again.");
+        console.error(error);
+      }
     }
   };
 
   const toggleOffcanvas = () => {
     setShowOffcanvas(!showOffcanvas);
+  };
+
+  const handleAccept = async (vehicle) => {
+    const cuInfo = fullData.custInformationList.find(
+      (item) => item.vehicleRegNo === vehicle
+    );
+    const carInfo = fullData.carServiceInfromationList.find(
+      (item) => item.vehicleRegNo === vehicle
+    );
+
+    const data = {
+      custInformation: cuInfo,
+      carServiceInfromation: { ...carInfo, status: "A" },
+    };
+
+    try {
+      await axios.post(
+        `${apiUrl}/api/v1/carService/saveServiceInformation`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      fetchPendingCars();
+      toast.success("Accepted successfully!");
+    } catch (error) {
+      toast.error("Failed to Accept service information. Please try again.");
+      console.error(error);
+    }
+  };
+
+  const handleReject = async (vehicle) => {
+    const cuInfo = fullData.custInformationList.find(
+      (item) => item.vehicleRegNo === vehicle
+    );
+    const carInfo = fullData.carServiceInfromationList.find(
+      (item) => item.vehicleRegNo === vehicle
+    );
+
+    const data = {
+      custInformation: cuInfo,
+      carServiceInfromation: { ...carInfo, status: "R" },
+    };
+
+    try {
+      await axios.post(
+        `${apiUrl}/api/v1/carService/saveServiceInformation`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      fetchPendingCars();
+      toast.success("Rejected successfully!");
+    } catch (error) {
+      toast.error("Failed to reject service information. Please try again.");
+      console.error(error);
+    }
   };
 
   return (
@@ -112,45 +233,66 @@ function Pending() {
               </div>
               <Logout />
             </div>
-            {carData.length > 0 ? (
-              <div style={{ overflowX: "auto" }}>
-                <table className="table table-dark table-striped ">
-                  <thead>
-                    <tr>
-                      <th>Customer Name</th>
-                      <th>Contact No</th>
-                      <th>Selected Services</th>
-                      <th>Status</th>
-                      <th>Mechanic</th>
-                      {userRole.userRole === "admin" && <th>Action</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {carData.map((car, index) => (
-                      <tr key={index}>
-                        <td>{car.custName}</td>
-                        <td>{car.custContactNo}</td>
-                        <td>{car.selectedServices?.join(", ") || "N/A"}</td>
-                        <td>{car.status}</td>
-                        <td>{car.mechanic || "Not Assigned"}</td>
-                        {userRole.userRole === "admin" && (
-                          <td>
-                            <button
-                              className="btn btn-primary btn-sm"
-                              onClick={() => handleAssign(index)}
-                            >
-                              Assign
-                            </button>
-                          </td>
-                        )}
+
+            <div>
+              {carData.length > 0 ? (
+                <div style={{ overflowX: "auto" }}>
+                  <table className="table table-bordered ">
+                    <thead>
+                      <tr>
+                        <th>Customer Name</th>
+                        <th>Contact No</th>
+                        <th>Selected Services</th>
+                        <th>Status</th>
+                        <th>Mechanic</th>
+                        <th>Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="text-white mt-4">No pending tasks</div>
-            )}
+                    </thead>
+                    <tbody>
+                      {carData.map((car, index) => (
+                        <tr key={index}>
+                          <td>{car.custName}</td>
+                          <td>{car.custContactNo}</td>
+                          <td>{car.selectedServices?.join(", ") || "N/A"}</td>
+                          <td>{car.status}</td>
+                          <td>{car.technitionName || "Not Assigned"}</td>
+                          {userRole.userRole === "admin" && (
+                            <td>
+                              <button
+                                className="btn btn-primary btn-sm"
+                                onClick={() => handleAssign(car.vehicleRegNo)}
+                              >
+                                Assign
+                              </button>
+                            </td>
+                          )}
+                          {userRole.userRole === "user" && (
+                            <td>
+                              <div className="d-flex ">
+                                <button
+                                  className="btn btn-success btn-sm me-2 "
+                                  onClick={() => handleAccept(car.vehicleRegNo)}
+                                >
+                                  <span className="fw-semibold">Accept</span>
+                                </button>
+                                <button
+                                  className="btn btn-danger btn-sm"
+                                  onClick={() => handleReject(car.vehicleRegNo)}
+                                >
+                                  <span className="fw-semibold">Reject</span>
+                                </button>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-white mt-4">No pending tasks</div>
+              )}
+            </div>
 
             {/* Modal */}
             {showModal && (
