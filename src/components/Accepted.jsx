@@ -4,7 +4,7 @@ import axios from "axios";
 import { CarDataContext } from "./CarDataContext";
 import Logout from "./Logout";
 import { toast } from "react-toastify";
-import TableCreation from "../subcomponents/TableCreation";
+import TableOne from "../subcomponents/TableOne";
 
 function Accepted() {
   const { userRole, apiUrl, showOffcanvas, setShowOffcanvas } =
@@ -13,7 +13,7 @@ function Accepted() {
 
   const [clicked, setClicked] = useState({
     click: false,
-    data: [],
+    data: {},
   });
 
   const token = localStorage.getItem("token");
@@ -96,15 +96,6 @@ function Accepted() {
     }
   };
 
-  const handleFullTable = (item) => {
-    if (item) {
-      setClicked({ click: true, data: item });
-    } else {
-      console.warn("handleFullTable received an undefined or null item");
-    }
-  };
-
-  console.log(clicked,"cliked")
   return (
     <div className="container-fluid">
       <div className="row">
@@ -138,7 +129,7 @@ function Accepted() {
 
             {acceptedData.length > 0 && !clicked.click ? (
               <div style={{ overflowX: "auto" }}>
-                <table className="table table-bordered">
+                <table className="table table-bordered text-center">
                   <thead>
                     <tr>
                       <th>Customer Name</th>
@@ -155,7 +146,14 @@ function Accepted() {
                     {acceptedData.map((item, index) => (
                       <tr key={index}>
                         <td>
-                          <span onClick={() => handleFullTable(item)}>
+                          <span
+                            onClick={() => setClicked({ click: true, data: item })}
+                            style={{
+                              color: "blue",
+                              textDecoration: "underline",
+                              cursor: "pointer",
+                            }}
+                          >
                             {item.custName}
                           </span>
                         </td>
@@ -179,14 +177,21 @@ function Accepted() {
                 </table>
               </div>
             ) : (
-              <p className="text-white">No accepted data available.</p>
-            )}
-
-            {
-              clicked.click && (
-                <TableCreation historyData={clicked.click}/>
+              !clicked.click && (
+                <p className="text-white">No accepted data available.</p>
               )
-            }
+            )}
+            {clicked.click && (
+              <>
+                <TableOne historyData={clicked.data} />
+                <button
+                  className="btn btn-outline-warning text-white"
+                  onClick={() => setClicked({ click: false, data: {} })}
+                >
+                  <span className="fw-semibold">Back</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

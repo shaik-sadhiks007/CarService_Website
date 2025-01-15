@@ -4,6 +4,7 @@ import { CarDataContext } from "./CarDataContext";
 import axios from "axios";
 import Logout from "./Logout";
 import { toast } from "react-toastify";
+import TableOne from "../subcomponents/TableOne";
 
 function Pending() {
   const {
@@ -19,7 +20,10 @@ function Pending() {
   const [selectedCarIndex, setSelectedCarIndex] = useState(null);
   const [selectedMechanic, setSelectedMechanic] = useState("");
   const [showModal, setShowModal] = useState(false);
-
+  const [clicked, setClicked] = useState({
+    click: false,
+    data: {},
+  });
   const [fullData, setFullData] = useState(null);
 
   const token = localStorage.getItem("token");
@@ -95,9 +99,8 @@ function Pending() {
 
   // Handle mechanic selection and save
   const handleSaveMechanic = async () => {
-
-    console.log("car",selectedCarIndex)
-    console.log("mech",selectedMechanic)
+    console.log("car", selectedCarIndex);
+    console.log("mech", selectedMechanic);
 
     if (selectedMechanic && selectedCarIndex !== null) {
       const cuInfo = fullData.custInformationList.find(
@@ -235,9 +238,9 @@ function Pending() {
             </div>
 
             <div>
-              {carData.length > 0 ? (
+              {carData.length > 0 && !clicked.click ? (
                 <div style={{ overflowX: "auto" }}>
-                  <table className="table table-bordered ">
+                  <table className="table table-bordered text-center">
                     <thead>
                       <tr>
                         <th>Customer Name</th>
@@ -251,7 +254,20 @@ function Pending() {
                     <tbody>
                       {carData.map((car, index) => (
                         <tr key={index}>
-                          <td>{car.custName}</td>
+                          <td>
+                            <span
+                              onClick={() =>
+                                setClicked({ click: true, data: car })
+                              }
+                              style={{
+                                color: "blue",
+                                textDecoration: "underline",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {car.custName}
+                            </span>
+                          </td>
                           <td>{car.custContactNo}</td>
                           <td>{car.selectedServices?.join(", ") || "N/A"}</td>
                           <td>{car.status}</td>
@@ -268,7 +284,7 @@ function Pending() {
                           )}
                           {userRole.userRole === "user" && (
                             <td>
-                              <div className="d-flex ">
+                              <div className="d-flex justify-content-center">
                                 <button
                                   className="btn btn-success btn-sm me-2 "
                                   onClick={() => handleAccept(car.vehicleRegNo)}
@@ -290,7 +306,21 @@ function Pending() {
                   </table>
                 </div>
               ) : (
-                <div className="text-white mt-4">No pending tasks</div>
+                !clicked.click && (
+                  <div className="text-white mt-4">No pending tasks</div>
+                )
+              )}
+
+              {clicked.click && (
+                <>
+                  <TableOne historyData={clicked.data} />
+                  <button
+                    className="btn btn-outline-warning text-white"
+                    onClick={() => setClicked({ click: false, data: {} })}
+                  >
+                    <span className="fw-semibold">Back</span>
+                  </button>
+                </>
               )}
             </div>
 

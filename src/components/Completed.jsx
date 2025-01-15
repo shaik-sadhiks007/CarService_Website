@@ -3,12 +3,18 @@ import Sidebar from "./Sidebar";
 import { CarDataContext } from "./CarDataContext";
 import axios from "axios";
 import Logout from "./Logout";
+import TableOne from "../subcomponents/TableOne";
 
 function Completed() {
   const { userRole, apiUrl, showOffcanvas, setShowOffcanvas } =
     useContext(CarDataContext);
   const [completedData, setCompletedData] = useState([]);
   const token = localStorage.getItem("token");
+
+  const [clicked, setClicked] = useState({
+    click: false,
+    data: {},
+  });
 
   useEffect(() => {
     const fetchCompletedCars = async () => {
@@ -82,9 +88,9 @@ function Completed() {
               <Logout />
             </div>
 
-            {completedData.length > 0 ? (
+            {completedData.length > 0 && !clicked.click ? (
               <div style={{ overflowX: "auto" }}>
-                <table className="table table-striped table-dark">
+                <table className="table table-bordered text-center">
                   <thead>
                     <tr>
                       <th>Customer Name</th>
@@ -99,7 +105,20 @@ function Completed() {
                   <tbody>
                     {completedData.map((item, index) => (
                       <tr key={index}>
-                        <td>{item.custName}</td>
+                        <td>
+                          <span
+                            onClick={() =>
+                              setClicked({ click: true, data: item })
+                            }
+                            style={{
+                              color: "blue",
+                              textDecoration: "underline",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {item.custName}
+                          </span>
+                        </td>
                         <td>{item.custContactNo}</td>
                         <td>{item.email}</td>
                         <td>{item.invoiceNo}</td>
@@ -112,7 +131,21 @@ function Completed() {
                 </table>
               </div>
             ) : (
-              <p className="text-white">No completed data available.</p>
+              !clicked.click && (
+                <p className="text-white">No completed data available.</p>
+              )
+            )}
+
+            {clicked.click && (
+              <>
+                <TableOne historyData={clicked.data} />
+                <button
+                  className="btn btn-outline-warning text-white"
+                  onClick={() => setClicked({ click: false, data: {} })}
+                >
+                  <span className="fw-semibold">Back</span>
+                </button>
+              </>
             )}
           </div>
         </div>
