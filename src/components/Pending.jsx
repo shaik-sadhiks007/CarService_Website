@@ -9,15 +9,16 @@ import Pagination from "../subcomponents/Pagination";
 
 function Pending() {
   const {
-    carData,
-    setCarData,
     mechanics,
     userRole,
     apiUrl,
     showOffcanvas,
     setShowOffcanvas,
-    setMechanics,
+    fetchMechanics,
+    calculateItemsPerPage,
   } = useContext(CarDataContext);
+  const [sortedData, setSortedData] = useState([]);
+  const [sortOrder, setSortOrder] = useState("desc");
   const [selectedCarIndex, setSelectedCarIndex] = useState(null);
   const [selectedMechanic, setSelectedMechanic] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -27,13 +28,6 @@ function Pending() {
   });
   const [fullData, setFullData] = useState(null);
 
-  const calculateItemsPerPage = () => {
-    const screenHeight = window.innerHeight;
-
-    console.log(screenHeight, "height");
-    if (screenHeight > 600) return 10;
-    return 8;
-  };
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(calculateItemsPerPage);
 
@@ -57,42 +51,34 @@ function Pending() {
       const customerData = response.data.custInformationList || [];
       const serviceData = response.data.carServiceInfromationList || [];
 
-      const filteredServiceData = serviceData.filter(
-        (service) => service.status === "P"
+      const filteredServiceData = serviceData.filter((service) =>
+        ["P", "R"].includes(service.status)
       );
 
       const combinedData = filteredServiceData.map((service) => {
         const customer = customerData.find(
           (cust) => cust.customerId === service.customerId
         );
-        return { ...service, ...customer };
+        return { ...customer, ...service };
       });
 
-      setCarData(combinedData);
+      setSortedData(sortByDate(combinedData, "desc"));
+
     } catch (error) {
       console.error("Error fetching pending cars:", error);
     }
   };
 
-  const fetchMechanics = async () => {
-    try {
-      const url = `${apiUrl}/api/v1/carService/getAllUserInfo`;
-
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const mech = response.data.filter((user) => user.userRole === "user");
-      setMechanics(mech);
-    } catch (error) {
-      console.error("Error fetching mechanics:", error);
-    }
+  const sortByDate = (data, order) => {
+    return data.sort((a, b) => {
+      const dateA = new Date(a.dateIn);
+      const dateB = new Date(b.dateIn);
+      return order === "asc" ? dateA - dateB : dateB - dateA;
+    });
   };
 
   useEffect(() => {
-    // fetchPendingCars();
+    fetchPendingCars();
     const handleResize = () => {
       setItemsPerPage(calculateItemsPerPage());
     };
@@ -102,7 +88,7 @@ function Pending() {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [userRole, setCarData]);
+  }, [userRole]);
 
   // Open Modal
   const handleAssign = (vehicle) => {
@@ -151,7 +137,22 @@ function Pending() {
     setShowOffcanvas(!showOffcanvas);
   };
 
+  const formatDate = (dateString) => {
+    return new Intl.DateTimeFormat("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(dateString));
+  };
+
+  const toggleSortOrder = () => {
+    const newOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newOrder);
+    setSortedData(sortByDate([...sortedData], newOrder));
+  };
+
   const handleAccept = async (vehicle) => {
+    
     const cuInfo = fullData.custInformationList.find(
       (item) => item.vehicleRegNo === vehicle
     );
@@ -219,7 +220,7 @@ function Pending() {
     setCurrentPage(pageNumber);
   };
 
-  const paginatedData = carData.slice(
+  const paginatedData = sortedData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -256,74 +257,110 @@ function Pending() {
             </div>
 
             <div>
-              {carData.length > 0 && !clicked.click ? (
+              {sortedData.length > 0 && !clicked.click ? (
                 <div style={{ overflowX: "auto" }}>
                   <table className="table table-bordered text-center">
                     <thead>
                       <tr>
+                        <th
+                          onClick={toggleSortOrder}
+                          style={{ cursor: "pointer" }}
+                        >
+                          Date{" "}
+                          <i
+                            className={` mt-4 bi bi-caret-${
+                              sortOrder === "asc" ? "up-fill " : "down-fill"
+                            }`}
+                          ></i>
+                        </th>
                         <th>Customer Name</th>
                         <th>Contact No</th>
-                        <th>Selected Services</th>
+                        <th>Services</th>
                         <th>Status</th>
                         <th>Mechanic</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {paginatedData.map((car, index) => (
-                        <tr key={index}>
-                          <td>
-                            <span
-                              onClick={() =>
-                                setClicked({ click: true, data: car })
-                              }
-                              style={{
-                                color: "blue",
-                                textDecoration: "underline",
-                                cursor: "pointer",
-                              }}
-                            >
-                              {car.custName}
-                            </span>
-                          </td>
-                          <td>{car.custContactNo}</td>
-                          <td>{car.selectedServices?.join(", ") || "N/A"}</td>
-                          <td>{car.status}</td>
-                          <td>{car.technitionName || "Not Assigned"}</td>
-                          {userRole.userRole === "admin" && (
-                            <td>
-                              <button
-                                className="btn btn-primary btn-sm"
-                                onClick={() => handleAssign(car.vehicleRegNo)}
-                              >
-                                Assign
-                              </button>
-                            </td>
-                          )}
-                          {userRole.userRole === "user" && (
-                            <td>
-                              <div className="d-flex justify-content-center">
-                                <button
-                                  className="btn btn-success btn-sm me-2 "
-                                  onClick={() => handleAccept(car.vehicleRegNo)}
+                      {(() => {
+                        let lastDate = null;
+                        return paginatedData.map((item, index) => {
+                          const currentDate = formatDate(item.dateIn);
+                          const showDate = currentDate !== lastDate;
+                          lastDate = currentDate;
+                          return (
+                            <tr key={index}>
+                              <td>
+                                {showDate && (
+                                  <span className="badge bg-danger">
+                                    {currentDate}
+                                  </span>
+                                )}
+                              </td>
+                              <td>
+                                <span
+                                  onClick={() =>
+                                    setClicked({ click: true, data: item })
+                                  }
+                                  style={{
+                                    color: "#ffc107",
+                                    textDecoration: "underline",
+                                    cursor: "pointer",
+                                  }}
                                 >
-                                  <span className="fw-semibold">Accept</span>
-                                </button>
-                                <button
-                                  className="btn btn-danger btn-sm"
-                                  onClick={() => handleReject(car.vehicleRegNo)}
-                                >
-                                  <span className="fw-semibold">Reject</span>
-                                </button>
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      ))}
+                                  {item.custName || "N/A"}
+                                </span>
+                              </td>
+                              <td>{item.custContactNo}</td>
+                              <td>{item.serviceTypes || "N/A"}</td>
+                              <td>{item.status}</td>
+                              <td>{item.technitionName || "Not Assigned"}</td>
+                              {userRole.userRole === "admin" && (
+                                <td>
+                                  <button
+                                    className="btn btn-primary btn-sm"
+                                    onClick={() =>
+                                      handleAssign(item.vehicleRegNo)
+                                    }
+                                  >
+                                    Assign
+                                  </button>
+                                </td>
+                              )}
+                              {userRole.userRole === "user" && (
+                                <td>
+                                  <div className="d-flex justify-content-center">
+                                    <button
+                                      className="btn btn-success btn-sm me-2 "
+                                      onClick={() =>
+                                        handleAccept(item.vehicleRegNo)
+                                      }
+                                    >
+                                      <span className="fw-semibold">
+                                        Accept
+                                      </span>
+                                    </button>
+                                    <button
+                                      className="btn btn-danger btn-sm"
+                                      onClick={() =>
+                                        handleReject(item.vehicleRegNo)
+                                      }
+                                    >
+                                      <span className="fw-semibold">
+                                        Reject
+                                      </span>
+                                    </button>
+                                  </div>
+                                </td>
+                              )}
+                            </tr>
+                          );
+                        });
+                      })()}
                     </tbody>
                   </table>
 
-                  {carData.length > itemsPerPage && (
+                  {sortedData.length > itemsPerPage && (
                     <div
                       style={{
                         width: "100%",
@@ -339,7 +376,7 @@ function Pending() {
                         }}
                       >
                         <Pagination
-                          totalItems={carData.length}
+                          totalItems={sortedData.length}
                           itemsPerPage={itemsPerPage}
                           currentPage={currentPage}
                           onPageChange={handlePageChange}

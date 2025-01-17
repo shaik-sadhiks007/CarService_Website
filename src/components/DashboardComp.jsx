@@ -104,6 +104,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
         toast.success("Customer information found!");
       } else {
         setFound(false);
+        setCustomerInfo(customerData);
         setCId(null);
         toast.error("No data found for the provided registration number.");
       }

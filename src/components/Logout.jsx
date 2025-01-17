@@ -8,8 +8,8 @@ function Logout() {
   const { logout } = useContext(CarDataContext);
 
   const handleLogout = () => {
-    logout();
     navigate("/");
+    logout();
   };
 
   return (

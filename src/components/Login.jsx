@@ -11,9 +11,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const { setUserRole, logout, apiUrl, setMechanics, initializeUser } =
+  const { userRole, logout, apiUrl, initializeUser } =
     useContext(CarDataContext);
-
 
   const isTokenExpired = (token) => {
     try {
@@ -26,15 +25,27 @@ const Login = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token || isTokenExpired(token)) {
-      logout();
-      navigate("/");
-    } else {
-      initializeUser()
-      toast.success("Login successful!");
-      navigate("/dashboard");
-    }
+    const handleInitialization = async () => {
+      const token = localStorage.getItem("token");
+      if (!token || isTokenExpired(token)) {
+        logout();
+        navigate("/");
+      } else {
+        try {
+          await initializeUser();
+          console.log("loginedddddd");
+          toast.success("Login successful!");
+          navigate("/dashboard");
+        } catch (error) {
+          console.error("Error initializing user:", error);
+          toast.error("Failed to initialize user. Please try again.");
+          logout();
+          navigate("/");
+        }
+      }
+    };
+
+    handleInitialization();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -48,7 +59,8 @@ const Login = () => {
       if (response.data && response.data.jwt) {
         const token = response.data.jwt;
         localStorage.setItem("token", token);
-        initializeUser();
+        await initializeUser();
+        console.log("dfadfasfasdf");
         toast.success("Login successful!");
         navigate("/dashboard");
       }

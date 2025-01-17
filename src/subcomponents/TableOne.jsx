@@ -31,6 +31,35 @@ function TableOne({ historyData }) {
     return keyMapping && keyMapping[key] ? keyMapping[key] : key;
   };
 
+  const getMimeType = (base64String) => {
+    if (base64String.startsWith("/9j/")) return "image/jpeg";
+    if (base64String.startsWith("iVBORw0KGgo")) return "image/png";
+    if (
+      base64String.startsWith("R0lGODdh") ||
+      base64String.startsWith("R0lGODlh")
+    )
+      return "image/gif";
+    return "image/*";
+  };
+
+  const renderValue = (key, value) => {
+    if ((key === "fuelLevelImage" || key === "carImage") && value) {
+      const mimeType = getMimeType(value);
+      return (
+        <img
+          src={`data:${mimeType};base64,${value}`}
+          alt={key}
+          style={{
+            maxWidth: "150px",
+            maxHeight: "100px",
+            objectFit: "contain",
+          }}
+        />
+      );
+    }
+    return value || "N/A";
+  };
+
   return (
     <div className="mt-3" style={{ overflowX: "auto" }}>
       <table className="table table-bordered">
@@ -41,7 +70,7 @@ function TableOne({ historyData }) {
                 <td>
                   <span className="fw-bold">{getColumnName(key)}</span>
                 </td>
-                <td>{historyData[key] || "N/A"}</td>
+                <td>{renderValue(key, historyData[key])}</td>
               </tr>
             ))}
         </tbody>

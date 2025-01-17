@@ -4,13 +4,22 @@ import { CarDataContext } from "./CarDataContext";
 import axios from "axios";
 import Logout from "./Logout";
 import TableOne from "../subcomponents/TableOne";
+import completed from "../json/completed.json";
+import Pagination from "../subcomponents/Pagination";
 
 function Completed() {
-  const { userRole, apiUrl, showOffcanvas, setShowOffcanvas,carData } =
-    useContext(CarDataContext);
-  const [completedData, setCompletedData] = useState([]);
+  const {
+    userRole,
+    apiUrl,
+    showOffcanvas,
+    setShowOffcanvas,
+    calculateItemsPerPage,
+  } = useContext(CarDataContext);
+  
   const [sortedData, setSortedData] = useState([]);
-  const [sortOrder, setSortOrder] = useState("desc"); 
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(calculateItemsPerPage);
   const token = localStorage.getItem("token");
 
   const [clicked, setClicked] = useState({
@@ -45,10 +54,9 @@ function Completed() {
         return { ...customer, ...service };
       });
 
-      setCompletedData(combinedData);
-      setSortedData(sortByDate(carData, "desc")); 
+      setSortedData(sortByDate(combinedData, "desc"));
 
-      // setSortedData(sortByDate(combinedData, "desc")); 
+      // setSortedData(sortByDate(completed, "desc"));
     } catch (error) {
       console.error("Error fetching completed cars:", error);
     }
@@ -56,6 +64,11 @@ function Completed() {
 
   useEffect(() => {
     fetchCompletedCars();
+    const handleResize = () => {
+      setItemsPerPage(calculateItemsPerPage());
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [userRole]);
 
   const sortByDate = (data, order) => {
@@ -83,6 +96,15 @@ function Completed() {
   const toggleOffcanvas = () => {
     setShowOffcanvas(!showOffcanvas);
   };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const paginatedData = sortedData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="container-fluid">
@@ -120,7 +142,10 @@ function Completed() {
                 <table className="table table-bordered text-center">
                   <thead>
                     <tr>
-                      <th onClick={toggleSortOrder} style={{ cursor: "pointer" }}>
+                      <th
+                        onClick={toggleSortOrder}
+                        style={{ cursor: "pointer" }}
+                      >
                         Date{" "}
                         <i
                           className={` mt-4 bi bi-caret-${
@@ -139,7 +164,7 @@ function Completed() {
                   <tbody>
                     {(() => {
                       let lastDate = null;
-                      return sortedData.map((item, index) => {
+                      return paginatedData.map((item, index) => {
                         const currentDate = formatDate(item.modifiedDate);
                         const showDate = currentDate !== lastDate;
                         lastDate = currentDate;
@@ -152,7 +177,20 @@ function Completed() {
                                 </span>
                               )}
                             </td>
-                            <td>{item.custName || "N/A"}</td>
+                            <td>
+                              <span
+                                onClick={() =>
+                                  setClicked({ click: true, data: item })
+                                }
+                                style={{
+                                  color: "#ffc107",
+                                  textDecoration: "underline",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {item.custName || "N/A"}
+                              </span>
+                            </td>
                             <td>{item.custContactNo || "N/A"}</td>
                             <td>{item.email || "N/A"}</td>
                             <td>
@@ -172,6 +210,30 @@ function Completed() {
                     })()}
                   </tbody>
                 </table>
+                {sortedData.length > itemsPerPage && (
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div
+                      className=""
+                      style={{
+                        position: "absolute",
+                        bottom: "0%",
+                      }}
+                    >
+                      <Pagination
+                        totalItems={sortedData.length}
+                        itemsPerPage={itemsPerPage}
+                        currentPage={currentPage}
+                        onPageChange={handlePageChange}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               !clicked.click && (

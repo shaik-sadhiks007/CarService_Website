@@ -7,10 +7,20 @@ import { toast } from "react-toastify";
 import TableOne from "../subcomponents/TableOne";
 
 function Accepted() {
-  const { userRole, apiUrl, showOffcanvas, setShowOffcanvas } =
-    useContext(CarDataContext);
+  const {
+    userRole,
+    apiUrl,
+    showOffcanvas,
+    setShowOffcanvas,
+    calculateItemsPerPage,
+  } = useContext(CarDataContext);
   const [acceptedData, setAcceptedData] = useState([]);
 
+  console.log(acceptedData, "ad");
+  const [sortedData, setSortedData] = useState([]);
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(calculateItemsPerPage);
   const [clicked, setClicked] = useState({
     click: false,
     data: {},
@@ -47,10 +57,10 @@ function Accepted() {
         const customer = customerData.find(
           (cust) => cust.customerId === service.customerId
         );
-        return { ...service, ...customer };
+        return { ...customer, ...service };
       });
 
-      setAcceptedData(combinedData);
+      setSortedData(sortByDate(combinedData, "desc"));
     } catch (error) {
       console.error("Error fetching accepted cars:", error);
     }
@@ -58,10 +68,37 @@ function Accepted() {
 
   useEffect(() => {
     fetchAcceptedCars();
+    const handleResize = () => {
+      setItemsPerPage(calculateItemsPerPage());
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [userRole]);
 
   const toggleOffcanvas = () => {
     setShowOffcanvas(!showOffcanvas);
+  };
+
+  const sortByDate = (data, order) => {
+    return data.sort((a, b) => {
+      const dateA = new Date(a.modifiedDate);
+      const dateB = new Date(b.modifiedDate);
+      return order === "asc" ? dateA - dateB : dateB - dateA;
+    });
+  };
+
+  const toggleSortOrder = () => {
+    const newOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newOrder);
+    setSortedData(sortByDate([...sortedData], newOrder));
+  };
+
+  const formatDate = (dateString) => {
+    return new Intl.DateTimeFormat("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(dateString));
   };
 
   const handleComplete = async (vehicle) => {
@@ -101,6 +138,15 @@ function Accepted() {
     }
   };
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const paginatedData = sortedData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -132,54 +178,90 @@ function Accepted() {
               <Logout />
             </div>
 
-            {acceptedData.length > 0 && !clicked.click ? (
+            {sortedData.length > 0 && !clicked.click ? (
               <div style={{ overflowX: "auto" }}>
                 <table className="table table-bordered text-center">
                   <thead>
                     <tr>
+                      <th
+                        onClick={toggleSortOrder}
+                        style={{ cursor: "pointer" }}
+                      >
+                        Date{" "}
+                        <i
+                          className={` mt-4 bi bi-caret-${
+                            sortOrder === "asc" ? "up-fill " : "down-fill"
+                          }`}
+                        ></i>
+                      </th>
                       <th>Customer Name</th>
                       <th>Contact No</th>
                       <th>Email</th>
-                      <th>Invoice No</th>
-                      <th>Date & Time</th>
-                      <th>Selected Services</th>
+                      <th>Vehicle No.</th>
+                      <th>Services</th>
                       <th>Remarks</th>
                       {userRole.userRole == "user" && <th>Action</th>}
                     </tr>
                   </thead>
                   <tbody>
-                    {acceptedData.map((item, index) => (
-                      <tr key={index}>
-                        <td>
-                          <span
-                            onClick={() =>
-                              setClicked({ click: true, data: item })
-                            }
-                            style={{
-                              color: "blue",
-                              textDecoration: "underline",
-                              cursor: "pointer",
-                            }}
-                          >
-                            {item.custName}
-                          </span>
-                        </td>
-                        <td>{item.custContactNo}</td>
-                        <td>{item.email}</td>
-                        <td>{item.invoiceNo}</td>
-                        <td>{item.dateTime}</td>
-                        <td>{item.selectedServices?.join(", ") || "N/A"}</td>
-                        <td>{item.remarks}</td>
-                        <td>
-                          <button
-                            className="btn btn-outline-success text-white fw-semibold"
-                            onClick={() => handleComplete(item.vehicleRegNo)}
-                          >
-                            Completed
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {(() => {
+                      let lastDate = null;
+                      return paginatedData.map((item, index) => {
+                        const currentDate = formatDate(item.modifiedDate);
+                        const showDate = currentDate !== lastDate;
+                        lastDate = currentDate;
+                        return (
+                          <tr key={index}>
+                            <td>
+                              {showDate && (
+                                <span className="badge bg-danger">
+                                  {currentDate}
+                                </span>
+                              )}
+                            </td>
+                            <td>
+                              <span
+                                onClick={() =>
+                                  setClicked({ click: true, data: item })
+                                }
+                                style={{
+                                  color: "#ffc107",
+                                  textDecoration: "underline",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {item.custName || "N/A"}
+                              </span>
+                            </td>
+                            <td>{item.custContactNo || "N/A"}</td>
+                            <td>{item.email || "N/A"}</td>
+                            <td>
+                              <span className="badge bg-primary">
+                                {item.vehicleRegNo || "N/A"}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="badge bg-danger">
+                                {item.serviceTypes || "N/A"}
+                              </span>
+                            </td>
+                            <td>{item.remarks || "N/A"}</td>
+                            {userRole.userRole == "user" && (
+                              <td>
+                                <button
+                                  className="btn btn-outline-success text-white fw-semibold"
+                                  onClick={() =>
+                                    handleComplete(item.vehicleRegNo)
+                                  }
+                                >
+                                  Completed
+                                </button>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      });
+                    })()}
                   </tbody>
                 </table>
               </div>
