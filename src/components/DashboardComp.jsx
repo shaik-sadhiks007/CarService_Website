@@ -48,6 +48,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
     createdDate: new Date().toISOString(),
     modifiedBy: null,
     modifiedDate: null,
+    serviceTypes :[]
   };
 
   const [customerInfo, setCustomerInfo] = useState(customerData);

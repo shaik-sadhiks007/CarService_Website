@@ -6,9 +6,11 @@ import Logout from "./Logout";
 import TableOne from "../subcomponents/TableOne";
 
 function Completed() {
-  const { userRole, apiUrl, showOffcanvas, setShowOffcanvas } =
+  const { userRole, apiUrl, showOffcanvas, setShowOffcanvas,carData } =
     useContext(CarDataContext);
   const [completedData, setCompletedData] = useState([]);
+  const [sortedData, setSortedData] = useState([]);
+  const [sortOrder, setSortOrder] = useState("desc"); 
   const token = localStorage.getItem("token");
 
   const [clicked, setClicked] = useState({
@@ -16,42 +18,67 @@ function Completed() {
     data: {},
   });
 
-  useEffect(() => {
-    const fetchCompletedCars = async () => {
-      try {
-        const url =
-          userRole.userRole === "admin"
-            ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
-            : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
+  const fetchCompletedCars = async () => {
+    try {
+      const url =
+        userRole.userRole === "admin"
+          ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
+          : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
 
-        const response = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const customerData = response.data.custInformationList || [];
-        const serviceData = response.data.carServiceInfromationList || [];
+      const customerData = response.data.custInformationList || [];
+      const serviceData = response.data.carServiceInfromationList || [];
 
-        const filteredServiceData = serviceData.filter(
-          (service) => service.status === "D"
+      const filteredServiceData = serviceData.filter(
+        (service) => service.status === "D"
+      );
+
+      const combinedData = filteredServiceData.map((service) => {
+        const customer = customerData.find(
+          (cust) => cust.customerId === service.customerId
         );
+        return { ...customer, ...service };
+      });
 
-        const combinedData = filteredServiceData.map((service) => {
-          const customer = customerData.find(
-            (cust) => cust.customerId === service.customerId
-          );
-          return { ...service, ...customer };
-        });
+      setCompletedData(combinedData);
+      setSortedData(sortByDate(carData, "desc")); 
 
-        setCompletedData(combinedData);
-      } catch (error) {
-        console.error("Error fetching completed cars:", error);
-      }
-    };
+      // setSortedData(sortByDate(combinedData, "desc")); 
+    } catch (error) {
+      console.error("Error fetching completed cars:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchCompletedCars();
   }, [userRole]);
+
+  const sortByDate = (data, order) => {
+    return data.sort((a, b) => {
+      const dateA = new Date(a.modifiedDate);
+      const dateB = new Date(b.modifiedDate);
+      return order === "asc" ? dateA - dateB : dateB - dateA;
+    });
+  };
+
+  const toggleSortOrder = () => {
+    const newOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newOrder);
+    setSortedData(sortByDate([...sortedData], newOrder));
+  };
+
+  const formatDate = (dateString) => {
+    return new Intl.DateTimeFormat("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(dateString));
+  };
 
   const toggleOffcanvas = () => {
     setShowOffcanvas(!showOffcanvas);
@@ -88,45 +115,61 @@ function Completed() {
               <Logout />
             </div>
 
-            {completedData.length > 0 && !clicked.click ? (
+            {sortedData.length > 0 && !clicked.click ? (
               <div style={{ overflowX: "auto" }}>
                 <table className="table table-bordered text-center">
                   <thead>
                     <tr>
+                      <th onClick={toggleSortOrder} style={{ cursor: "pointer" }}>
+                        Date{" "}
+                        <i
+                          className={` mt-4 bi bi-caret-${
+                            sortOrder === "asc" ? "up-fill " : "down-fill"
+                          }`}
+                        ></i>
+                      </th>
                       <th>Customer Name</th>
                       <th>Contact No</th>
                       <th>Email</th>
-                      <th>Invoice No</th>
-                      <th>Date & Time</th>
-                      <th>Selected Services</th>
+                      <th>Vehicle No.</th>
+                      <th>Services</th>
                       <th>Remarks</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {completedData.map((item, index) => (
-                      <tr key={index}>
-                        <td>
-                          <span
-                            onClick={() =>
-                              setClicked({ click: true, data: item })
-                            }
-                            style={{
-                              color: "blue",
-                              textDecoration: "underline",
-                              cursor: "pointer",
-                            }}
-                          >
-                            {item.custName}
-                          </span>
-                        </td>
-                        <td>{item.custContactNo}</td>
-                        <td>{item.email}</td>
-                        <td>{item.invoiceNo}</td>
-                        <td>{item.dateTime}</td>
-                        <td>{item.selectedServices?.join(", ") || "N/A"}</td>
-                        <td>{item.remarks}</td>
-                      </tr>
-                    ))}
+                    {(() => {
+                      let lastDate = null;
+                      return sortedData.map((item, index) => {
+                        const currentDate = formatDate(item.modifiedDate);
+                        const showDate = currentDate !== lastDate;
+                        lastDate = currentDate;
+                        return (
+                          <tr key={index}>
+                            <td>
+                              {showDate && (
+                                <span className="badge bg-danger">
+                                  {currentDate}
+                                </span>
+                              )}
+                            </td>
+                            <td>{item.custName || "N/A"}</td>
+                            <td>{item.custContactNo || "N/A"}</td>
+                            <td>{item.email || "N/A"}</td>
+                            <td>
+                              <span className="badge bg-primary">
+                                {item.vehicleRegNo || "N/A"}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="badge bg-danger">
+                                {item.serviceTypes || "N/A"}
+                              </span>
+                            </td>
+                            <td>{item.remarks || "N/A"}</td>
+                          </tr>
+                        );
+                      });
+                    })()}
                   </tbody>
                 </table>
               </div>

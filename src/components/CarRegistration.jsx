@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./new.css";
 import { CarDataContext } from "./CarDataContext";
 import { toast } from "react-toastify";
@@ -17,10 +17,13 @@ function CarRegistration({
   cId,
   customerData,
   carInfo,
-  setCarPlate
+  setCarPlate,
 }) {
-  console.log(carPlate, "carplate");
   const { apiUrl, userRole, mechanics } = useContext(CarDataContext);
+
+  console.log(carServiceInfo, "ci");
+  const [services, setServices] = useState([]);
+  const [availableServices, setAvailableServices] = useState([]);
 
   const [images, setImages] = useState({
     fuelLevelImage: null,
@@ -49,14 +52,68 @@ function CarRegistration({
     remarks: "Remarks",
     technitionName: "Technition Name",
     managerName: "Manager Name",
+    serviceTypes: "Service Types",
   };
 
+  const handleServiceChange = (e) => {
+    const selectedValue = e.target.value;
+    if (!carServiceInfo.serviceTypes.includes(selectedValue)) {
+      setCarServiceInfo({
+        ...carServiceInfo,
+        serviceTypes: [...carServiceInfo.serviceTypes, selectedValue],
+      });
+      setAvailableServices(
+        availableServices.filter(
+          (service) => service.serviceCategory !== selectedValue
+        )
+      );
+    }
+  };
+
+  const handleRemoveService = (service) => {
+    setCarServiceInfo({
+      ...carServiceInfo,
+      serviceTypes: carServiceInfo.serviceTypes.filter((s) => s !== service),
+    });
+    const removedService = services.find((s) => s.serviceCategory === service);
+    if (removedService) {
+      setAvailableServices([...availableServices, removedService]);
+    }
+  };
+
+  const fetchServices = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Authorization token not found");
+        return;
+      }
+      const response = await axios.get(
+        `${apiUrl}/api/v1/carService/getServiceTypes`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setServices(response.data);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  useEffect(() => {
+    setAvailableServices(services.filter((service) => service.avtive));
+  }, [services]);
 
   const handleSave = async () => {
     try {
-
-      const formattedDateIn = carServiceInfo.dateIn + "+00:00"; 
-
+      const formattedDateIn = carServiceInfo.dateIn + "+00:00";
+      const serviceString = carServiceInfo.serviceTypes.join(", ");
       const data = {
         custInformation: {
           ...customerInfo,
@@ -65,12 +122,11 @@ function CarRegistration({
             ? {
                 modifiedBy: userRole.username,
                 modifiedDate: new Date().toISOString(),
-                customerId: cId, 
+                customerId: cId,
               }
             : {
                 createdBy: userRole.username,
                 createdDate: new Date().toISOString(),
-
               }),
         },
         carServiceInfromation: {
@@ -78,23 +134,22 @@ function CarRegistration({
           fuelLevelImage: images.fuelLevelImage,
           carImage: images.carImage,
           vehicleRegNo: carPlate,
+          serviceTypes: serviceString,
           ...(found
             ? {
                 modifiedBy: userRole.username,
                 modifiedDate: new Date().toISOString(),
-                dateIn : formattedDateIn 
-
+                dateIn: formattedDateIn,
               }
             : {
                 createdBy: userRole.username,
                 createdDate: new Date().toISOString(),
-                dateIn : formattedDateIn 
-
+                dateIn: formattedDateIn,
               }),
         },
       };
 
-      console.log(data, "dataincar");
+      console.log(data,"data")
 
       const token = localStorage.getItem("token");
       if (!token) {
@@ -116,8 +171,7 @@ function CarRegistration({
       setFound(false);
       setCarServiceInfo(carInfo);
       setCustomerInfo(customerData);
-      setCarPlate('')
-      setCarp
+      setCarPlate("");
       toast.success("Car Service Information saved successfully!");
     } catch (error) {
       toast.error("Failed to save Car Service Information.");
@@ -238,6 +292,38 @@ function CarRegistration({
                             </option>
                           ))}
                         </select>
+                      ) : key === "serviceTypes" ? (
+                        <>
+                          <select
+                            className="form-control mb-2 placeholder-white py-2"
+                            value=""
+                            onChange={handleServiceChange}
+                          >
+                            <option value="" disabled>
+                              Select Services
+                            </option>
+                            {availableServices.map((service) => (
+                              <option
+                                key={service.id}
+                                value={service.serviceCategory}
+                              >
+                                {service.serviceCategory}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="mb-2">
+                            {carServiceInfo.serviceTypes.map((service, index) => (
+                              <span
+                                key={index}
+                                className="badge bg-warning me-2 p-2 rounded-pill mb-2"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => handleRemoveService(service)}
+                              >
+                                {service} &times;
+                              </span>
+                            ))}
+                          </div>
+                        </>
                       ) : (
                         <input
                           type="text"
@@ -287,7 +373,7 @@ function CarRegistration({
               </button>
             </div>
 
-            { found && <HistoryTable/>}
+            {found && <HistoryTable />}
           </div>
         </div>
       </div>

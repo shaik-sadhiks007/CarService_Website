@@ -11,8 +11,6 @@ body, html {
     background-position: center;
     background-blend-mode: overlay;
   }
-
-  
   .form-box {
     background: rgba(0, 0, 0, 0.6);
     padding: 30px;
@@ -55,4 +53,21 @@ body, html {
   box-shadow: none !important;
   border-color: #ffc107 !important; 
   color: #ffc107 !important;
+}
+
+.page-link{
+
+  color: white !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: 1px solid #3d4453 !important;
+}
+
+.page-link.active, .active > .page-link {
+  z-index: 3;
+  color: black !important;
+  background-color: #ffc107 !important;
+  border-color: #ffc107 !important;
+  box-shadow: none !important;
+  font-weight: 600;
 }

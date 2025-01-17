@@ -74,7 +74,12 @@ function Accepted() {
 
     const data = {
       custInformation: cuInfo,
-      carServiceInfromation: { ...carInfo, status: "D" },
+      carServiceInfromation: {
+        ...carInfo,
+        status: "D",
+        modifiedBy: userRole.username,
+        modifiedDate: new Date().toISOString(),
+      },
     };
 
     try {
@@ -147,7 +152,9 @@ function Accepted() {
                       <tr key={index}>
                         <td>
                           <span
-                            onClick={() => setClicked({ click: true, data: item })}
+                            onClick={() =>
+                              setClicked({ click: true, data: item })
+                            }
                             style={{
                               color: "blue",
                               textDecoration: "underline",

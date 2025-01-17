@@ -5,6 +5,7 @@ import axios from "axios";
 import Logout from "./Logout";
 import { toast } from "react-toastify";
 import TableOne from "../subcomponents/TableOne";
+import Pagination from "../subcomponents/Pagination";
 
 function Pending() {
   const {
@@ -26,6 +27,16 @@ function Pending() {
   });
   const [fullData, setFullData] = useState(null);
 
+  const calculateItemsPerPage = () => {
+    const screenHeight = window.innerHeight;
+
+    console.log(screenHeight, "height");
+    if (screenHeight > 600) return 10;
+    return 8;
+  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(calculateItemsPerPage);
+
   const token = localStorage.getItem("token");
 
   const fetchPendingCars = async () => {
@@ -46,7 +57,6 @@ function Pending() {
       const customerData = response.data.custInformationList || [];
       const serviceData = response.data.carServiceInfromationList || [];
 
-      // Filter the service data to include only those with status "P"
       const filteredServiceData = serviceData.filter(
         (service) => service.status === "P"
       );
@@ -82,26 +92,25 @@ function Pending() {
   };
 
   useEffect(() => {
-    fetchPendingCars();
+    // fetchPendingCars();
+    const handleResize = () => {
+      setItemsPerPage(calculateItemsPerPage());
+    };
     if (userRole.userRole == "admin") {
       fetchMechanics();
     }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [userRole, setCarData]);
 
   // Open Modal
   const handleAssign = (vehicle) => {
     setSelectedCarIndex(vehicle);
-
-    console.log(vehicle, "assign");
-
     setShowModal(true);
   };
 
-  // Handle mechanic selection and save
   const handleSaveMechanic = async () => {
-    console.log("car", selectedCarIndex);
-    console.log("mech", selectedMechanic);
-
     if (selectedMechanic && selectedCarIndex !== null) {
       const cuInfo = fullData.custInformationList.find(
         (item) => item.vehicleRegNo === selectedCarIndex
@@ -206,6 +215,15 @@ function Pending() {
     }
   };
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const paginatedData = carData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -252,7 +270,7 @@ function Pending() {
                       </tr>
                     </thead>
                     <tbody>
-                      {carData.map((car, index) => (
+                      {paginatedData.map((car, index) => (
                         <tr key={index}>
                           <td>
                             <span
@@ -304,6 +322,31 @@ function Pending() {
                       ))}
                     </tbody>
                   </table>
+
+                  {carData.length > itemsPerPage && (
+                    <div
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <div
+                        className=""
+                        style={{
+                          position: "absolute",
+                          bottom: "0%",
+                        }}
+                      >
+                        <Pagination
+                          totalItems={carData.length}
+                          itemsPerPage={itemsPerPage}
+                          currentPage={currentPage}
+                          onPageChange={handlePageChange}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 !clicked.click && (
