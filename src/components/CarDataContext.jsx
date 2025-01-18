@@ -17,8 +17,6 @@ export const CarDataProvider = ({ children }) => {
     const screenHeight = window.innerHeight;
     const screenWidth = window.innerWidth;
 
-    console.log(`Screen dimensions: ${screenWidth}x${screenHeight}`);
-
     if (screenWidth > 1200 && screenHeight > 900) {
       return 12;
     }
@@ -39,6 +37,8 @@ export const CarDataProvider = ({ children }) => {
   const [mechanics, setMechanics] = useState([]);
 
   const [showOffcanvas, setShowOffcanvas] = useState(false);
+
+  const [services, setServices] = useState([]);
 
   const fetchMechanics = async () => {
     const token = localStorage.getItem("token");
@@ -80,7 +80,6 @@ export const CarDataProvider = ({ children }) => {
         }
       );
 
-      console.log("ini3");
 
       setUserRole(response.data);
     } catch (err) {
@@ -94,9 +93,6 @@ export const CarDataProvider = ({ children }) => {
     initializeUser();
     fetchMechanics();
   }, []);
-
-  console.log(userRole, "user");
-  console.log(mechanics, "mic");
 
   const logout = () => {
     setUserRole({});
@@ -120,6 +116,8 @@ export const CarDataProvider = ({ children }) => {
         initializeUser,
         fetchMechanics,
         calculateItemsPerPage,
+        setServices,
+        services
       }}
     >
       {children}

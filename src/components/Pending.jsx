@@ -393,13 +393,7 @@ function Pending() {
 
               {clicked.click && (
                 <>
-                  <TableOne historyData={clicked.data} />
-                  <button
-                    className="btn btn-outline-warning text-white"
-                    onClick={() => setClicked({ click: false, data: {} })}
-                  >
-                    <span className="fw-semibold">Back</span>
-                  </button>
+                  <TableOne historyData={clicked.data} setClicked={setClicked}/>
                 </>
               )}
             </div>

@@ -21,3 +21,13 @@
 .input-dashboard{
     background-color: #15191F !important;
 }
+  
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); 
+    background-color: transparent;
+    cursor: pointer;
+}
+  
+  
+
+  

@@ -16,7 +16,6 @@ function Accepted() {
   } = useContext(CarDataContext);
   const [acceptedData, setAcceptedData] = useState([]);
 
-  console.log(acceptedData, "ad");
   const [sortedData, setSortedData] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,9 +47,8 @@ function Accepted() {
       const customerData = response.data.custInformationList || [];
       const serviceData = response.data.carServiceInfromationList || [];
 
-      // Filter the service data to include only those with status "A"
       const filteredServiceData = serviceData.filter(
-        (service) => service.status === "A"
+        (service) => service.status.toLowerCase() === "a"
       );
 
       const combinedData = filteredServiceData.map((service) => {
@@ -113,7 +111,7 @@ function Accepted() {
       custInformation: cuInfo,
       carServiceInfromation: {
         ...carInfo,
-        status: "D",
+        status: "C",
         modifiedBy: userRole.username,
         modifiedDate: new Date().toISOString(),
       },
@@ -264,6 +262,31 @@ function Accepted() {
                     })()}
                   </tbody>
                 </table>
+
+                {sortedData.length > itemsPerPage && (
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div
+                      className=""
+                      style={{
+                        position: "absolute",
+                        bottom: "0%",
+                      }}
+                    >
+                      <Pagination
+                        totalItems={sortedData.length}
+                        itemsPerPage={itemsPerPage}
+                        currentPage={currentPage}
+                        onPageChange={handlePageChange}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               !clicked.click && (
@@ -272,13 +295,13 @@ function Accepted() {
             )}
             {clicked.click && (
               <>
-                <TableOne historyData={clicked.data} />
-                <button
-                  className="btn btn-outline-warning text-white"
-                  onClick={() => setClicked({ click: false, data: {} })}
-                >
-                  <span className="fw-semibold">Back</span>
-                </button>
+                <TableOne
+                  historyData={clicked.data}
+                  edit={true}
+                  setClicked={setClicked}
+                  fullData={fullData}
+                  refresh = {fetchAcceptedCars}
+                />
               </>
             )}
           </div>

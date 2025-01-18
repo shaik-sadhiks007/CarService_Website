@@ -44,7 +44,7 @@ function Completed() {
       const serviceData = response.data.carServiceInfromationList || [];
 
       const filteredServiceData = serviceData.filter(
-        (service) => service.status === "D"
+        (service) => service.status === "C"
       );
 
       const combinedData = filteredServiceData.map((service) => {
@@ -243,13 +243,7 @@ function Completed() {
 
             {clicked.click && (
               <>
-                <TableOne historyData={clicked.data} />
-                <button
-                  className="btn btn-outline-warning text-white"
-                  onClick={() => setClicked({ click: false, data: {} })}
-                >
-                  <span className="fw-semibold">Back</span>
-                </button>
+                <TableOne historyData={clicked.data} setClicked={setClicked}/>
               </>
             )}
           </div>

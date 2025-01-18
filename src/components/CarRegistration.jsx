@@ -19,10 +19,9 @@ function CarRegistration({
   carInfo,
   setCarPlate,
 }) {
-  const { apiUrl, userRole, mechanics } = useContext(CarDataContext);
+  const { apiUrl, userRole, mechanics, services, setServices } =
+    useContext(CarDataContext);
 
-  console.log(carServiceInfo, "ci");
-  const [services, setServices] = useState([]);
   const [availableServices, setAvailableServices] = useState([]);
 
   const [images, setImages] = useState({
@@ -96,7 +95,9 @@ function CarRegistration({
           },
         }
       );
-      setServices(response.data);
+
+      const activeServices = response.data.filter((s) => s.avtive === true);
+      setServices(activeServices);
     } catch (error) {
       console.error("Error fetching services:", error);
     }
@@ -149,8 +150,6 @@ function CarRegistration({
         },
       };
 
-      console.log(data,"data")
-
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Authorization token is missing.");
@@ -183,11 +182,14 @@ function CarRegistration({
     const file = e.target.files[0];
 
     if (file) {
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Only JPG, JPEG, and PNG files are allowed.");
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result.split(",")[1];
-        // const base64String = reader.result;
-        // const cleanedBase64 = base64String.replace(/^data:/, "");
         setImages((prevState) => ({
           ...prevState,
           [key]: base64String,
@@ -265,6 +267,7 @@ function CarRegistration({
                           name={key}
                           className="form-control placeholder-white py-2"
                           value={carServiceInfo[key] || ""}
+                          max={new Date().toISOString().slice(0, 16)}
                           onChange={(e) =>
                             setCarServiceInfo({
                               ...carServiceInfo,
@@ -312,16 +315,18 @@ function CarRegistration({
                             ))}
                           </select>
                           <div className="mb-2">
-                            {carServiceInfo.serviceTypes.map((service, index) => (
-                              <span
-                                key={index}
-                                className="badge bg-warning me-2 p-2 rounded-pill mb-2"
-                                style={{ cursor: "pointer" }}
-                                onClick={() => handleRemoveService(service)}
-                              >
-                                {service} &times;
-                              </span>
-                            ))}
+                            {carServiceInfo.serviceTypes.map(
+                              (service, index) => (
+                                <span
+                                  key={index}
+                                  className="badge bg-warning me-2 p-2 rounded-pill mb-2"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleRemoveService(service)}
+                                >
+                                  {service} &times;
+                                </span>
+                              )
+                            )}
                           </div>
                         </>
                       ) : (

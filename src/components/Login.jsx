@@ -33,7 +33,6 @@ const Login = () => {
       } else {
         try {
           await initializeUser();
-          console.log("loginedddddd");
           toast.success("Login successful!");
           navigate("/dashboard");
         } catch (error) {
@@ -60,7 +59,6 @@ const Login = () => {
         const token = response.data.jwt;
         localStorage.setItem("token", token);
         await initializeUser();
-        console.log("dfadfasfasdf");
         toast.success("Login successful!");
         navigate("/dashboard");
       }
