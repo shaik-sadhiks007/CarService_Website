@@ -11,9 +11,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
+
+
   
   return (
-    <Router>
+    <Router basename="/CarServiceUI">
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Login />} />
