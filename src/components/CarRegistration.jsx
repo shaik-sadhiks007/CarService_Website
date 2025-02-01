@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import HistoryTable from "../subcomponents/HistoryTable";
+import { useTranslation } from "react-i18next";
 
 function CarRegistration({
   carPlate,
@@ -18,11 +19,15 @@ function CarRegistration({
   customerData,
   carInfo,
   setCarPlate,
+  historyData
 }) {
   const { apiUrl, userRole, mechanics, services, setServices } =
     useContext(CarDataContext);
 
+    const { t } = useTranslation();
+
   const [availableServices, setAvailableServices] = useState([]);
+
 
   const [images, setImages] = useState({
     fuelLevelImage: null,
@@ -31,27 +36,27 @@ function CarRegistration({
 
   const labels = {
     // Customer Info
-    custName: "Customer Name",
-    custContactNo: "Phone Number",
-    email: "Email",
-    address: "Address",
-    vehicleModel: "Vehicle Model",
-    manufactureYear: "Manufacture Year",
-    vehicleColor: "Velhicle Color",
-    engineNo: "Engine No.",
-    chasisNo: "Chasis No.",
+    custName: t('customerInfo.custName'),
+    custContactNo: t('customerInfo.custContactNo'),
+    email: t('customerInfo.email'),
+    address: t('customerInfo.address'),
+    vehicleModel: t('customerInfo.vehicleModel'),
+    manufactureYear: t('customerInfo.manufactureYear'),
+    vehicleColor: t('customerInfo.vehicleColor'),
+    engineNo: t('customerInfo.engineNo'),
+    chasisNo: t('customerInfo.chasisNo'),
 
     // Car Service Info
-    dateIn: "Date In",
-    entryType: "Entry Type",
-    mileage: "Milege",
-    fuelLevel: "Fuel Level",
-    fuelLevelImage: "Fuel Level Image",
-    carImage: "Car Image",
-    remarks: "Remarks",
-    technitionName: "Technition Name",
-    managerName: "Manager Name",
-    serviceTypes: "Service Types",
+    dateIn: t('carServiceInfo.dateIn'),
+    entryType: t('carServiceInfo.entryType'),
+    mileage: t('carServiceInfo.mileage'),
+    fuelLevel: t('carServiceInfo.fuelLevel'),
+    fuelLevelImage: t('carServiceInfo.fuelLevelImage'),
+    carImage: t('carServiceInfo.carImage'),
+    remarks: t('carServiceInfo.remarks'),
+    technitionName: t('carServiceInfo.technitionName'),
+    managerName: t('carServiceInfo.managerName'),
+    serviceTypes: t('carServiceInfo.serviceTypes'),
   };
 
   const handleServiceChange = (e) => {
@@ -113,6 +118,43 @@ function CarRegistration({
 
   const handleSave = async () => {
     try {
+      const mandatoryCustomerFields = [
+        "custName",
+        "custContactNo",
+        "email",
+        "address",
+        "vehicleModel",
+        "manufactureYear",
+        "vehicleColor",
+        "engineNo",
+      ];
+
+      const mandatoryCarServiceFields = [
+        "dateIn",
+        "entryType",
+        "mileage",
+        "fuelLevel",
+        "remarks",
+        "status",
+        "serviceTypes",
+      ];
+
+      const isCustomerInfoValid = mandatoryCustomerFields.every(
+        (field) => customerInfo[field] && customerInfo[field].trim() !== ""
+      );
+
+      const isCarServiceInfoValid = mandatoryCarServiceFields.every((field) => {
+        if (field === "serviceTypes") {
+          return carServiceInfo[field] && carServiceInfo[field].length > 0;
+        }
+        return carServiceInfo[field] && carServiceInfo[field].trim() !== "";
+      });
+
+      if (!isCustomerInfoValid || !isCarServiceInfoValid) {
+        toast.error("Please fill all mandatory fields.");
+        return;
+      }
+
       const formattedDateIn = carServiceInfo.dateIn + "+00:00";
       const serviceString = carServiceInfo.serviceTypes.join(", ");
       const data = {
@@ -121,14 +163,14 @@ function CarRegistration({
           vehicleRegNo: carPlate,
           ...(found
             ? {
-                modifiedBy: userRole.username,
-                modifiedDate: new Date().toISOString(),
-                customerId: cId,
-              }
+              modifiedBy: userRole.username,
+              modifiedDate: new Date().toISOString(),
+              customerId: cId,
+            }
             : {
-                createdBy: userRole.username,
-                createdDate: new Date().toISOString(),
-              }),
+              createdBy: userRole.username,
+              createdDate: new Date().toISOString(),
+            }),
         },
         carServiceInfromation: {
           ...carServiceInfo,
@@ -138,25 +180,36 @@ function CarRegistration({
           serviceTypes: serviceString,
           ...(found
             ? {
-                modifiedBy: userRole.username,
-                modifiedDate: new Date().toISOString(),
-                dateIn: formattedDateIn,
-              }
+              modifiedBy: userRole.username,
+              modifiedDate: new Date().toISOString(),
+              dateIn: formattedDateIn,
+            }
             : {
-                createdBy: userRole.username,
-                createdDate: new Date().toISOString(),
-                dateIn: formattedDateIn,
-              }),
+              createdBy: userRole.username,
+              createdDate: new Date().toISOString(),
+              dateIn: formattedDateIn,
+            }),
         },
       };
 
+      if (!navigator.onLine) {
+        // Store data in localStorage if offline
+        const pendingRequests =
+          JSON.parse(localStorage.getItem("pendingRequests")) || [];
+        pendingRequests.push(data);
+        localStorage.setItem("pendingRequests", JSON.stringify(pendingRequests));
+        toast.info("You are offline. Data saved locally and will sync when online.");
+        setCarServiceInfo(carInfo)
+        return;
+      }
+
+      // If online, proceed with API call
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Authorization token is missing.");
         return;
       }
 
-      // Send JSON data instead of FormData
       await axios.post(
         `${apiUrl}/api/v1/carService/saveServiceInformation`,
         data,
@@ -167,6 +220,7 @@ function CarRegistration({
           },
         }
       );
+
       setFound(false);
       setCarServiceInfo(carInfo);
       setCustomerInfo(customerData);
@@ -177,6 +231,64 @@ function CarRegistration({
       console.error("Error saving data:", error);
     }
   };
+
+  const syncOfflineData = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    if (navigator.onLine) {
+      let pendingRequests =
+        JSON.parse(localStorage.getItem("pendingRequests")) || [];
+
+      if (pendingRequests.length > 0) {
+        for (let data of pendingRequests) {
+          try {
+            const vehicleRegNo = data.custInformation.vehicleRegNo;
+
+            // Fetch customer details using the vehicle registration number
+            const customerResponse = await axios.get(
+              `http://localhost:8080/CarServiceMaintenance/api/v1/carService/getCustomerDetails?vehicleRegNo=${vehicleRegNo}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            if (customerResponse.status === 200 && customerResponse.data) {
+              // If customer details exist, update the data
+              data.custInformation = { ...customerResponse.data };
+              data.custInformation.modifiedBy = userRole.username;
+              data.custInformation.modifiedDate = new Date().toISOString();
+            }
+
+            // Proceed with saving the data
+            await axios.post(
+              `${apiUrl}/api/v1/carService/saveServiceInformation`,
+              data,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+          } catch (error) {
+            console.error("Error syncing data:", error);
+            continue; // Continue with the next request if an error occurs
+          }
+        }
+
+        // Clear the local storage after syncing successfully
+        localStorage.removeItem("pendingRequests");
+        toast.success("Offline data synced successfully!");
+      }
+    }
+  };
+
+  // Listen for network status change and sync when online
+  window.addEventListener("online", syncOfflineData);
 
   const handleFileChange = (e, key) => {
     const file = e.target.files[0];
@@ -209,7 +321,7 @@ function CarRegistration({
           >
             {/* Customer Information */}
             <div className="mb-4">
-              <h4>Customer Information</h4>
+              <h4>{t('customerInformation')}</h4>
               <div className="row">
                 {Object.keys(customerInfo).map(
                   (key) =>
@@ -244,14 +356,14 @@ function CarRegistration({
           >
             {/* Car Service Information */}
             <div className="mb-4">
-              <h4>Car Service Information</h4>
+              <h4>{t("carServiceInformation")}</h4>
               <div className="row">
                 {Object.keys(carServiceInfo).map((key) =>
                   labels[key] &&
-                  key !== "remarks" &&
-                  !(
-                    key === "technitionName" && userRole.userRole !== "admin"
-                  ) ? (
+                    key !== "remarks" &&
+                    !(
+                      key === "technitionName" && userRole.userRole !== "admin"
+                    ) ? (
                     <div className="col-12 col-md-6 mb-3" key={key}>
                       <label className="form-label">{labels[key]}</label>
                       {key === "fuelLevelImage" || key === "carImage" ? (
@@ -374,11 +486,11 @@ function CarRegistration({
                 className="btn btn-outline-warning text-white"
                 onClick={handleSave}
               >
-                Save
+                {t('save')}
               </button>
             </div>
 
-            {found && <HistoryTable />}
+            {found && <HistoryTable historyData={historyData} />}
           </div>
         </div>
       </div>

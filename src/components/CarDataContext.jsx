@@ -40,6 +40,12 @@ export const CarDataProvider = ({ children }) => {
 
   const [services, setServices] = useState([]);
 
+  const [dashboard, setDashboard] = useState({
+    pending: 0,
+    completed: 0,
+    underProcess: 0
+  })
+
   const fetchMechanics = async () => {
     const token = localStorage.getItem("token");
 
@@ -117,7 +123,9 @@ export const CarDataProvider = ({ children }) => {
         fetchMechanics,
         calculateItemsPerPage,
         setServices,
-        services
+        services,
+        dashboard,
+        setDashboard
       }}
     >
       {children}

@@ -5,6 +5,7 @@ import Logout from "./Logout";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CarRegistration from "./CarRegistration";
+import { useTranslation } from "react-i18next";
 
 function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
   const [carPlate, setCarPlate] = useState("");
@@ -14,6 +15,8 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
   const [loading, setLoading] = useState(false);
 
   const [cId, setCId] = useState(null);
+
+  const [historyData, setHistoryData] = useState([])
 
   const customerData = {
     vehicleRegNo: "",
@@ -38,8 +41,8 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
     entryType: "",
     mileage: "",
     fuelLevel: "",
-    fuelLevelImage: null,
-    carImage: null,
+    // fuelLevelImage: null,
+    // carImage: null,
     remarks: "",
     status: "P",
     technitionName: "",
@@ -48,8 +51,10 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
     createdDate: new Date().toISOString(),
     modifiedBy: null,
     modifiedDate: null,
-    serviceTypes :[]
+    serviceTypes: []
   };
+  const { t } = useTranslation();
+
 
   const [customerInfo, setCustomerInfo] = useState(customerData);
 
@@ -98,10 +103,28 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
           modifiedDate: response.data.modifiedDate,
         });
 
-        setFound(true);
+        toast.success("Customer information found!");
+
+
+        const historyResponse = await axios.get(
+          `https://carservice.rasiminnalai.com/CarServiceMaintenance/api/v1/carService/getCompletedHistory`,
+          {
+            params: { carRegNo: carPlate },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (historyResponse.data) {
+          toast.success("Car History found!");
+          setFound(true);
+          setHistoryData(historyResponse.data);
+        } else {
+          setHistoryData([]);
+        }
         setCId(response.data.customerId);
 
-        toast.success("Customer information found!");
       } else {
         setFound(false);
         setCustomerInfo(customerData);
@@ -117,6 +140,9 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
     }
   };
 
+
+
+  console.log(historyData, "hd")
   return (
     <div className="container-fluid">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -128,7 +154,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
           >
             <i className="bi bi-list text-light fs-2"></i>
           </div>
-          <h1 className="text-white">Car Service Entry</h1>
+          <h1 className="text-white">{t("carServiceEntry")}</h1>
         </div>
         <Logout />
       </div>
@@ -139,14 +165,14 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
       >
         <div className="mb-4">
           <label htmlFor="carPlate" className="form-label">
-            Car Registration Number
+            {t("carRegNo")}
           </label>
           <div className="col-12 col-md-9 col-lg-6 d-flex">
             <input
               id="carPlate"
               type="text"
               className="form-control input-dashboard text-white placeholder-white"
-              placeholder="Enter Car registration number"
+              placeholder={t("carRegNo")}
               value={carPlate}
               onChange={(e) => setCarPlate(e.target.value)}
             />
@@ -155,7 +181,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
               onClick={handleSearch}
               disabled={loading}
             >
-              Search
+              {t("search")}
             </button>
           </div>
         </div>
@@ -170,9 +196,10 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
         setCarServiceInfo={setCarServiceInfo}
         setCustomerInfo={setCustomerInfo}
         cId={cId}
-        carInfo = {customerData}
-        customerData = {customerData}
-        setCarPlate = {setCarPlate}
+        carInfo={customerData}
+        customerData={customerData}
+        setCarPlate={setCarPlate}
+        historyData={historyData}
       />
     </div>
   );

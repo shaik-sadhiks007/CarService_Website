@@ -1,30 +1,9 @@
 import React, { useState } from "react";
 import TableCreation from "./TableCreation";
 
-const HistoryTable = () => {
+const HistoryTable = ({historyData}) => {
 
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-
-  const historyData = [
-    {
-      customerName: "John Doe",
-      contactNo: "+1234567890",
-      services: "Oil Change, Air Filter Replacement",
-      address: "123 Main St, City",
-      remarks: "Good condition",
-      technitionName: "Mike",
-      email: "john@gmail.com",
-    },
-    {
-      customerName: "John Doe",
-      contactNo: "+1234567890",
-      services: "Tire Rotation",
-      address: "123 Main St, City",
-      remarks: "Requires inspection",
-      technitionName: "Josuha",
-      email: "john@gmail.com",
-    },
-  ];
 
   const toggleHistory = () => {
     setIsHistoryVisible(!isHistoryVisible);

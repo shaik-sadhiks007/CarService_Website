@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import "../node_modules/bootstrap/dist/js/bootstrap.js";
 import { CarDataProvider } from "./components/CarDataContext.jsx";
+import './Translation/i18n';
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

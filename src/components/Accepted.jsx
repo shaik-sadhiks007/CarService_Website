@@ -5,6 +5,7 @@ import { CarDataContext } from "./CarDataContext";
 import Logout from "./Logout";
 import { toast } from "react-toastify";
 import TableOne from "../subcomponents/TableOne";
+import { useTranslation } from "react-i18next";
 
 function Accepted() {
   const {
@@ -14,8 +15,6 @@ function Accepted() {
     setShowOffcanvas,
     calculateItemsPerPage,
   } = useContext(CarDataContext);
-  const [acceptedData, setAcceptedData] = useState([]);
-
   const [sortedData, setSortedData] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,6 +23,8 @@ function Accepted() {
     click: false,
     data: {},
   });
+
+  const {t} = useTranslation()
 
   const token = localStorage.getItem("token");
 
@@ -149,9 +150,8 @@ function Accepted() {
     <div className="container-fluid">
       <div className="row">
         <div
-          className={`col-2 col-md-3 col-lg-2 p-3 ${
-            showOffcanvas ? "d-block" : "d-none d-md-block"
-          }`}
+          className={`col-2 col-md-3 col-lg-2 p-3 ${showOffcanvas ? "d-block" : "d-none d-md-block"
+            }`}
           style={{
             height: "auto",
             minHeight: "100vh",
@@ -171,7 +171,7 @@ function Accepted() {
                 >
                   <i className="bi bi-list text-light fs-2"></i>
                 </div>
-                <h1 className="text-white">Accepted</h1>
+                <h1 className="text-white">{t("menu.accepted")}</h1>
               </div>
               <Logout />
             </div>
@@ -187,9 +187,8 @@ function Accepted() {
                       >
                         Date{" "}
                         <i
-                          className={` mt-4 bi bi-caret-${
-                            sortOrder === "asc" ? "up-fill " : "down-fill"
-                          }`}
+                          className={` mt-4 bi bi-caret-${sortOrder === "asc" ? "up-fill " : "down-fill"
+                            }`}
                         ></i>
                       </th>
                       <th>Customer Name</th>
@@ -239,9 +238,15 @@ function Accepted() {
                               </span>
                             </td>
                             <td>
-                              <span className="badge bg-danger">
-                                {item.serviceTypes || "N/A"}
-                              </span>
+                              {item.serviceTypes ? (
+                                <ul className="text-center">
+                                  {item.serviceTypes.split(",").map((type, index) => (
+                                    <li key={index} className="text-start">{type.trim()}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                "N/A"
+                              )}
                             </td>
                             <td>{item.remarks || "N/A"}</td>
                             {userRole.userRole == "user" && (
@@ -300,7 +305,7 @@ function Accepted() {
                   edit={true}
                   setClicked={setClicked}
                   fullData={fullData}
-                  refresh = {fetchAcceptedCars}
+                  refresh={fetchAcceptedCars}
                 />
               </>
             )}

@@ -1,0 +1,68 @@
+{
+  "menu": {
+    "carServiceEntry": "Car Service Entry",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "completed": "Completed"
+  },
+  "greeting": "Hi {{username}}",
+  "customerInfo": {
+    "custName": "Customer Name",
+    "custContactNo": "Phone Number",
+    "email": "Email",
+    "address": "Address",
+    "vehicleModel": "Vehicle Model",
+    "manufactureYear": "Manufacture Year",
+    "vehicleColor": "Vehicle Color",
+    "engineNo": "Engine No.",
+    "chasisNo": "Chasis No."
+  },
+  "carServiceInfo": {
+    "dateIn": "Date In",
+    "entryType": "Entry Type",
+    "mileage": "Mileage",
+    "fuelLevel": "Fuel Level",
+    "fuelLevelImage": "Fuel Level Image",
+    "carImage": "Car Image",
+    "remarks": "Remarks",
+    "technitionName": "Technician Name",
+    "managerName": "Manager Name",
+    "serviceTypes": "Service Types"
+  },
+  "carRegNo": "Car Registration Number",
+  "carServiceInformation": "Car Service Information",
+  "customerInformation": "Customer Information",
+  "save": "Save",
+  "search": "Search",
+  "logout": "Logout",
+  "pending": {
+    "date": "Date",
+    "customerName": "Customer Name",
+    "contactNo": "Contact No",
+    "services": "Services",
+    "status": "Status",
+    "mechanic": "Mechanic",
+    "actions": "Actions"
+  },
+  "admin": {
+    "register": "Register",
+    "addServices": "Add Services",
+    "downloadData": "Download Data",
+    "adminMenu": "Administrator"
+  },
+  "signup": {
+    "signup": "Sign Up",
+    "username": "Username",
+    "password": "Password",
+    "userRole": "User Role",
+    "submit": "Submit"
+  },
+  "menus": {
+    "administrator": "Administrator",
+    "carServiceEntry" : "Car Service Entry",
+    "userRegistration" : "User Registration",
+    "addServices" : "Add Services",
+    "dataDownload" : "Data Download"
+  },
+  "serviceCategory": "Service Category"
+}

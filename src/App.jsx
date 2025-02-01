@@ -9,10 +9,10 @@ import Completed from "./components/Completed";
 import Accepted from "./components/Accepted";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AddServices from "./adminComponents/AddServices";
+import DataDownload from "./adminComponents/DataDownload";
 
 function App() {
-
-
   
   return (
     <Router basename="/CarServiceUI">
@@ -21,6 +21,10 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/register" element={<Signup />} />
+        <Route path="/services" element={<AddServices />} />
+        <Route path="/data" element={<DataDownload />} />
+
         <Route
           path="/pending"
           element={<Pending  />}

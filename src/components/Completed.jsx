@@ -6,6 +6,7 @@ import Logout from "./Logout";
 import TableOne from "../subcomponents/TableOne";
 import completed from "../json/completed.json";
 import Pagination from "../subcomponents/Pagination";
+import { useTranslation } from "react-i18next";
 
 function Completed() {
   const {
@@ -15,12 +16,14 @@ function Completed() {
     setShowOffcanvas,
     calculateItemsPerPage,
   } = useContext(CarDataContext);
-  
+
   const [sortedData, setSortedData] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(calculateItemsPerPage);
   const token = localStorage.getItem("token");
+  
+  const {t} = useTranslation()
 
   const [clicked, setClicked] = useState({
     click: false,
@@ -110,9 +113,8 @@ function Completed() {
     <div className="container-fluid">
       <div className="row">
         <div
-          className={`col-2 col-md-3 col-lg-2 p-3 ${
-            showOffcanvas ? "d-block" : "d-none d-md-block"
-          }`}
+          className={`col-2 col-md-3 col-lg-2 p-3 ${showOffcanvas ? "d-block" : "d-none d-md-block"
+            }`}
           style={{
             height: "auto",
             minHeight: "100vh",
@@ -132,7 +134,7 @@ function Completed() {
                 >
                   <i className="bi bi-list text-light fs-2"></i>
                 </div>
-                <h1 className="text-white">Completed</h1>
+                <h1 className="text-white">{t("menu.completed")}</h1>
               </div>
               <Logout />
             </div>
@@ -148,9 +150,8 @@ function Completed() {
                       >
                         Date{" "}
                         <i
-                          className={` mt-4 bi bi-caret-${
-                            sortOrder === "asc" ? "up-fill " : "down-fill"
-                          }`}
+                          className={` mt-4 bi bi-caret-${sortOrder === "asc" ? "up-fill " : "down-fill"
+                            }`}
                         ></i>
                       </th>
                       <th>Customer Name</th>
@@ -199,9 +200,15 @@ function Completed() {
                               </span>
                             </td>
                             <td>
-                              <span className="badge bg-danger">
-                                {item.serviceTypes || "N/A"}
-                              </span>
+                              {item.serviceTypes ? (
+                                <ul className="text-center">
+                                  {item.serviceTypes.split(",").map((type, index) => (
+                                    <li key={index} className="text-start">{type.trim()}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                "N/A"
+                              )}
                             </td>
                             <td>{item.remarks || "N/A"}</td>
                           </tr>
@@ -243,7 +250,7 @@ function Completed() {
 
             {clicked.click && (
               <>
-                <TableOne historyData={clicked.data} setClicked={setClicked}/>
+                <TableOne historyData={clicked.data} setClicked={setClicked} />
               </>
             )}
           </div>
