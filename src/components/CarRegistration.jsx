@@ -108,7 +108,7 @@ function CarRegistration({
         }
       );
 
-      const activeServices = response.data.filter((s) => s.avtive === true);
+      const activeServices = response.data.filter((s) => s.active === true);
       setServices(activeServices);
     } catch (error) {
       console.error("Error fetching services:", error);
@@ -134,7 +134,7 @@ function CarRegistration({
 
 
   useEffect(() => {
-    setAvailableServices(services.filter((service) => service.avtive));
+    setAvailableServices(services.filter((service) => service.active));
   }, [services]);
 
   const handleSave = async () => {

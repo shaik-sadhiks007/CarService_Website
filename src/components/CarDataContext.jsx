@@ -9,23 +9,6 @@ export const CarDataContext = createContext();
 export const CarDataProvider = ({ children }) => {
   const [carData, setCarData] = useState([]);
 
-  const calculateItemsPerPage = () => {
-    const screenHeight = window.innerHeight;
-    const screenWidth = window.innerWidth;
-
-    if (screenWidth > 1200 && screenHeight > 900) {
-      return 12;
-    }
-    if (screenWidth > 900 && screenHeight > 600) {
-      return 10;
-    }
-    if (screenWidth > 600 && screenHeight > 400) {
-      return 8;
-    }
-
-    return 5;
-  };
-
   const apiUrl = import.meta.env.VITE_API_URL;
 
   const [userRole, setUserRole] = useState({});
@@ -35,12 +18,6 @@ export const CarDataProvider = ({ children }) => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
 
   const [services, setServices] = useState([]);
-
-  const [dashboard, setDashboard] = useState({
-    pending: 0,
-    completed: 0,
-    underProcess: 0
-  })
 
   const fetchMechanics = async () => {
 
@@ -119,11 +96,8 @@ export const CarDataProvider = ({ children }) => {
         setShowOffcanvas,
         initializeUser,
         fetchMechanics,
-        calculateItemsPerPage,
         setServices,
         services,
-        dashboard,
-        setDashboard
       }}
     >
       {children}

@@ -35,7 +35,7 @@ const Signup = () => {
 
     try {
       const response = await axios.post(
-        "https://carservice.rasiminnalai.com/CarServiceMaintenance/api/register/new-user",
+        `${apiUrl}/api/register/new-user`,
         {
           username: trimmedUsername,
           password: trimmedPassword,

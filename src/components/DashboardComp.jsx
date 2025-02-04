@@ -106,7 +106,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
         toast.success("Customer information found!");
 
         const historyResponse = await axios.get(
-          `https://carservice.rasiminnalai.com/CarServiceMaintenance/api/v1/carService/getCompletedHistory`,
+          `${apiUrl}/api/v1/carService/getCompletedHistory`,
           {
             params: { carRegNo: carPlate },
             headers: {

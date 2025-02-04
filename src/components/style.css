@@ -7,7 +7,7 @@ html {
 
 .login-container {
   height: 100vh;
-  background: linear-gradient(to right, #111, #333), url('./src/assets/Banner7.jpg');
+  background: linear-gradient(to right, #111, #333), url('./assets/Banner7.jpg');
   background-size: cover;
   background-position: center;
   background-blend-mode: overlay;

@@ -19,7 +19,6 @@ function Completed() {
     apiUrl,
     showOffcanvas,
     setShowOffcanvas,
-    calculateItemsPerPage,
   } = useContext(CarDataContext);
 
   const [tableData, setTableData] = useState([]);
@@ -439,88 +438,101 @@ function Completed() {
           <Sidebar />
         </div>
         <div className="col-12 col-md-9 col-lg-10 p-3">
-          <div className="container-fluid">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <div className="d-flex">
-                <div
-                  className="d-md-none me-2"
-                  onClick={toggleOffcanvas}
-                  style={{ cursor: "pointer" }}
-                >
-                  <i className="bi bi-list text-light fs-2"></i>
+          {!loading && (
+            <div className="container-fluid">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div className="d-flex">
+                  <div
+                    className="d-md-none me-2"
+                    onClick={toggleOffcanvas}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <i className="bi bi-list text-light fs-2"></i>
+                  </div>
+                  <h1 className="text-white">{t("menu.completed")}</h1>
                 </div>
-                <h1 className="text-white">{t("menu.completed")}</h1>
+                <input
+                  type="text"
+                  placeholder="Search by Vehicle No."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className="form-control w-50 input-dashboard text-white placeholder-white rounded-pill"
+                />
+                <Logout />
               </div>
-              <Logout />
-            </div>
 
-            {!clicked.click ? (
-              <>
+              {!clicked.click ? (
+                <>
 
-                <div
-                  style={{ backgroundColor: "#212632" }}
+                  {/* <div
                   className="text-white w-100 p-4 rounded-2">
                   <label htmlFor="serviceCategory" className="form-label">
                     {t("serviceCategory")}
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Search by Vehicle No."
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    className="form-control input-dashboard text-white placeholder-white"
+
+                  <div className="row">
+                    <div className="col-6">
+                      <input
+                        type="text"
+                        placeholder="Search by Vehicle No."
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        className="form-control mb-3 input-dashboard text-white placeholder-white"
+                      />
+                    </div>
+                  </div>
+
+                </div> */}
+
+
+                  <DataTable
+                    columns={columns}
+                    // data={tableData}
+                    data={tableData.filter((row) =>
+                      row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase())
+                    )}
+                    defaultSortFieldId="date"
+                    defaultSortAsc={false}
+                    pagination
+                    // highlightOnHover
+                    onSort={(column, direction) => {
+                      // Optional: handle custom sorting logic here
+                      console.log(column, direction);
+                    }}
+                    theme="dark"
+                    customStyles={customStyles}
                   />
-                </div>
+
+                  <div className="my-2 d-flex">
+                    <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
+                      {t("exportToExcel")}
+                    </button>
+                    <button onClick={exportToPDF} className="px-4 py-2 btn btn-warning text-white rounded">
+                      {t("exportToPdf")}
+                    </button>
+                  </div>
+                </>
+
+              ) : (
+                !clicked.click && (
+                  <p className="text-white">No data available.</p>
+                )
+              )}
 
 
-                <DataTable
-                  columns={columns}
-                  // data={tableData}
-                  data={tableData.filter((row) =>
-                    row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase())
-                  )}
-                  defaultSortFieldId="date"
-                  defaultSortAsc={false}
-                  pagination
-                  // highlightOnHover
-                  onSort={(column, direction) => {
-                    // Optional: handle custom sorting logic here
-                    console.log(column, direction);
-                  }}
-                  theme="dark"
-                  customStyles={customStyles}
-                />
-
-                <div className="mb-2">
-                  <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
-                    {t("exportToExcel")}
-                  </button>
-                  <button onClick={exportToPDF} className="px-4 py-2 btn btn-warning text-white rounded">
-                    {t("exportToPdf")}
-
-                  </button>
-                </div>
-              </>
-
-            ) : (
-              !clicked.click && (
-                <p className="text-white">No data available.</p>
-              )
-            )}
+              {clicked.click && (
+                <>
+                  <TableOne historyData={clicked.data} setClicked={setClicked} />
+                </>
+              )}
 
 
-            {clicked.click && (
-              <>
-                <TableOne historyData={clicked.data} setClicked={setClicked} />
-              </>
-            )}
-
-            {loading && (
-              <div className="d-flex justify-content-center align-items-center w-100 h-100">
-                <Lottie animationData={carLoader} style={{ width: 400, height: 400 }} />
-              </div>
-            )}
-          </div>
+            </div>)}
+          {loading && (
+            <div className="d-flex justify-content-center align-items-center w-100 h-100">
+              <Lottie animationData={carLoader} style={{ width: 400, height: 400 }} />
+            </div>
+          )}
         </div>
       </div>
     </div>

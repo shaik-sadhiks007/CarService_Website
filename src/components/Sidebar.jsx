@@ -77,7 +77,7 @@ function Sidebar() {
         <div className="offcanvas-body p-3">
           <div className="profile mb-4 d-flex align-items-center">
             <img
-              src="./src/assets/man.png"
+              src="./assets/man.png"
               alt="profile"
               className="rounded-circle me-2"
               width="40px"
@@ -190,7 +190,7 @@ function Sidebar() {
       <div className="d-none d-md-block" style={{ overflow: "hidden" }}>
         <div className="profile mb-4 d-flex align-items-center">
           <img
-            src="./src/assets/man.png"
+            src="./assets/man.png"
             alt="profile"
             className="rounded-circle me-2"
             width="40px"

@@ -12,32 +12,28 @@ import "react-toastify/dist/ReactToastify.css";
 import AddServices from "./adminComponents/AddServices";
 import DataDownload from "./adminComponents/DataDownload";
 import Settings from "./settings/Settings";
+import PrivateRoute from "./settings/PrivateRoute";
 
 function App() {
-  
+
   return (
     <Router basename="/CarServiceUI">
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<DataDownload />} />
-        <Route path="/car-service-entry" element={<Dashboard />} />
-        <Route path="/register" element={<Signup />} />
-        <Route path="/services" element={<AddServices />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route
-          path="/pending"
-          element={<Pending  />}
-        />
-        <Route
-          path="/completed"
-          element={<Completed  />}
-        />
-          <Route
-          path="/accepted"
-          element={<Accepted  />}
-        />
+
+        {/* Protected Routes */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<DataDownload />} />
+          <Route path="/car-service-entry" element={<Dashboard />} />
+          <Route path="/register" element={<Signup />} />
+          <Route path="/services" element={<AddServices />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/pending" element={<Pending />} />
+          <Route path="/completed" element={<Completed />} />
+          <Route path="/accepted" element={<Accepted />} />
+        </Route>
       </Routes>
     </Router>
   );

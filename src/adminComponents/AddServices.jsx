@@ -30,15 +30,15 @@ const AddServices = () => {
 
         try {
             const response = await axios.post(
-                `https://carservice.rasiminnalai.com/CarServiceMaintenance/api/v1/carService/add-servicetypes`,
+                `${apiUrl}/api/v1/carService/add-servicetypes`,
                 {
-                    serviceCategory, // The service category entered by the user
-                    active: true, // Default value
-                    createdBy: userRole.username, // Username from context or local storage
+                    serviceCategory,
+                    active: true,
+                    createdBy: userRole.username,
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`, // Authorization token
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );

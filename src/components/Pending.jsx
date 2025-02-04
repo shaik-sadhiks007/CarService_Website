@@ -701,110 +701,111 @@ function Pending() {
           <Sidebar />
         </div>
         <div className="col-12 col-md-9 col-lg-10 p-3">
-          {!loading && (<div className="container-fluid">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <div className="d-flex">
-                <div
-                  className="d-md-none me-2"
-                  onClick={toggleOffcanvas}
-                  style={{ cursor: "pointer" }}
-                >
-                  <i className="bi bi-list text-light fs-2"></i>
+          {!loading && (
+            <div className="container-fluid">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div className="d-flex">
+                  <div
+                    className="d-md-none me-2"
+                    onClick={toggleOffcanvas}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <i className="bi bi-list text-light fs-2"></i>
+                  </div>
+                  <h1 className="text-white">{t("menu.pending")}</h1>
                 </div>
-                <h1 className="text-white">{t("menu.pending")}</h1>
+                <Logout />
               </div>
-              <Logout />
-            </div>
 
-            {!clicked.click ? (
-              <>
-                <DataTable
-                  columns={columns}
-                  data={tableData}
-                  defaultSortFieldId="date"
-                  defaultSortAsc={false}
-                  pagination
-                  // highlightOnHover
-                  onSort={(column, direction) => {
-                    // Optional: handle custom sorting logic here
-                    console.log(column, direction);
-                  }}
-                  theme="dark"
-                  customStyles={customStyles}
-                />
+              {!clicked.click ? (
+                <>
+                  <DataTable
+                    columns={columns}
+                    data={tableData}
+                    defaultSortFieldId="date"
+                    defaultSortAsc={false}
+                    pagination
+                    // highlightOnHover
+                    onSort={(column, direction) => {
+                      // Optional: handle custom sorting logic here
+                      console.log(column, direction);
+                    }}
+                    theme="dark"
+                    customStyles={customStyles}
+                  />
 
-                <div className="mb-2">
-                  <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
-                  {t("exportToExcel")}
-                  </button>
-                  <button onClick={exportToPDF} className="px-4 py-2 btn btn-warning text-white rounded">
-                    {t("exportToPdf")}
+                  <div className="my-2">
+                    <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
+                      {t("exportToExcel")}
+                    </button>
+                    <button onClick={exportToPDF} className="px-4 py-2 btn btn-warning text-white rounded">
+                      {t("exportToPdf")}
 
-                  </button>
-                </div>
-              </>
+                    </button>
+                  </div>
+                </>
 
-            ) : (
-              !clicked.click && (
-                <p className="text-white">No data available.</p>
-              )
-            )}
+              ) : (
+                !clicked.click && (
+                  <p className="text-white">No data available.</p>
+                )
+              )}
 
-            {clicked.click && (
-              <>
-                <TableOne historyData={clicked.data} setClicked={setClicked} />
-              </>
-            )}
+              {clicked.click && (
+                <>
+                  <TableOne historyData={clicked.data} setClicked={setClicked} />
+                </>
+              )}
 
 
-            {/* Modal */}
-            {showModal && (
-              <div className="modal d-block" tabIndex="-1" role="dialog">
-                <div className="modal-dialog" role="document">
-                  <div className="modal-content">
-                    <div className="modal-header">
-                      <h5 className="modal-title">Assign Mechanic</h5>
-                      <button
-                        type="button"
-                        className="btn-close"
-                        onClick={() => setShowModal(false)}
-                      ></button>
-                    </div>
-                    <div className="modal-body">
-                      <select
-                        className="form-select"
-                        value={selectedMechanic}
-                        onChange={(e) => setSelectedMechanic(e.target.value)}
-                      >
-                        <option value="">Select Mechanic</option>
-                        {mechanics.map((mechanic, index) => (
-                          <option key={index} value={mechanic.username}>
-                            {mechanic.username}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="modal-footer">
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={handleSaveMechanic}
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={() => setShowModal(false)}
-                      >
-                        Close
-                      </button>
+              {/* Modal */}
+              {showModal && (
+                <div className="modal d-block" tabIndex="-1" role="dialog">
+                  <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">Assign Mechanic</h5>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          onClick={() => setShowModal(false)}
+                        ></button>
+                      </div>
+                      <div className="modal-body">
+                        <select
+                          className="form-select"
+                          value={selectedMechanic}
+                          onChange={(e) => setSelectedMechanic(e.target.value)}
+                        >
+                          <option value="">Select Mechanic</option>
+                          {mechanics.map((mechanic, index) => (
+                            <option key={index} value={mechanic.username}>
+                              {mechanic.username}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="modal-footer">
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={handleSaveMechanic}
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={() => setShowModal(false)}
+                        >
+                          Close
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>)}
+              )}
+            </div>)}
 
           {loading && (
             <div className="d-flex justify-content-center align-items-center w-100 h-100">
