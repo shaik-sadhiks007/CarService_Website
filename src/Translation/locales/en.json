@@ -3,7 +3,9 @@
     "carServiceEntry": "Car Service Entry",
     "pending": "Pending",
     "accepted": "Accepted",
-    "completed": "Completed"
+    "completed": "Completed",
+    "settings": "Settings",
+    "dashboard": "Dashboard"
   },
   "greeting": "Hi {{username}}",
   "customerInfo": {
@@ -37,6 +39,7 @@
   "logout": "Logout",
   "pending": {
     "date": "Date",
+    "vehicleRegNo": "Vehicle No.",
     "customerName": "Customer Name",
     "contactNo": "Contact No",
     "services": "Services",
@@ -59,10 +62,44 @@
   },
   "menus": {
     "administrator": "Administrator",
-    "carServiceEntry" : "Car Service Entry",
-    "userRegistration" : "User Registration",
-    "addServices" : "Add Services",
-    "dataDownload" : "Data Download"
+    "carServiceEntry": "Car Service Entry",
+    "userRegistration": "User Registration",
+    "addServices": "Add Services",
+    "dataDownload": "Data Download"
   },
-  "serviceCategory": "Service Category"
+  "serviceCategory": "Service Category",
+  "TableMapping" : {
+    "customerId": "Customer Id",
+    "custName": "Customer Name",
+    "vehicleRegNo": "Vehicle No.",
+    "dateIn": "Date In",
+    "custContactNo": "Phone Number",
+    "email": "Email",
+    "address": "Address",
+    "vehicleModel": "Vehicle Model",
+    "manufactureYear": "Manufacture Year",
+    "vehicleColor": "Vehicle Color",
+    "engineNo": "Engine No.",
+    "chasisNo": "Chassis No.",
+    "entryType": "Entry Type",
+    "mileage": "Mileage",
+    "fuelLevel": "Fuel Level",
+    "fuelLevelImage": "Fuel Level Image",
+    "carImage": "Car Image",
+    "technitionName": "Technician Name",
+    "managerName": "Manager Name",
+    "remarks": "Remarks",
+    "serviceTypes": "Service Types",
+    "createdBy": "Created By",
+    "createdDate": "Created Date",
+    "modifiedBy": "Modified By",
+    "modifiedDate": "Modified Date"
+  },
+  "back": "Back",
+  "edit": "Edit",
+  "exportToPdf" : "Export To Pdf",
+  "exportToExcel" : "Export To Excel"
+
+
+
 }

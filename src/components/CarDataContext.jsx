@@ -2,16 +2,12 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import React, { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import pending from "../json/pending.json";
-import accepted from "../json/accepted.json";
+
 
 export const CarDataContext = createContext();
 
 export const CarDataProvider = ({ children }) => {
   const [carData, setCarData] = useState([]);
-
-  // const [carData, setCarData] = useState(pending);
-  // const [carData, setCarData] = useState(accepted);
 
   const calculateItemsPerPage = () => {
     const screenHeight = window.innerHeight;
@@ -47,6 +43,7 @@ export const CarDataProvider = ({ children }) => {
   })
 
   const fetchMechanics = async () => {
+
     const token = localStorage.getItem("token");
 
     try {
@@ -69,6 +66,7 @@ export const CarDataProvider = ({ children }) => {
     const token = localStorage.getItem("token");
 
     if (!token) {
+      logout();
       return;
     }
 

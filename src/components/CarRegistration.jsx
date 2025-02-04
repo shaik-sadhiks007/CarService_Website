@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import HistoryTable from "../subcomponents/HistoryTable";
 import { useTranslation } from "react-i18next";
+import Logout from "./Logout";
+import { useNavigate } from "react-router-dom";
 
 function CarRegistration({
   carPlate,
@@ -21,10 +23,11 @@ function CarRegistration({
   setCarPlate,
   historyData
 }) {
-  const { apiUrl, userRole, mechanics, services, setServices } =
+  const { apiUrl, userRole, mechanics, services, setServices, logout } =
     useContext(CarDataContext);
 
-    const { t } = useTranslation();
+  const navigate = useNavigate()
+  const { t } = useTranslation();
 
   const [availableServices, setAvailableServices] = useState([]);
 
@@ -89,6 +92,10 @@ function CarRegistration({
     try {
       const token = localStorage.getItem("token");
       if (!token) {
+
+        logout()
+        navigate('/')
+
         console.error("Authorization token not found");
         return;
       }
@@ -108,9 +115,23 @@ function CarRegistration({
     }
   };
 
+
   useEffect(() => {
+
     fetchServices();
+
+    const handleOnline = async () => {
+      await syncOfflineData();
+    };
+
+    window.addEventListener("online", handleOnline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+    };
   }, []);
+
+
 
   useEffect(() => {
     setAvailableServices(services.filter((service) => service.avtive));
@@ -199,7 +220,8 @@ function CarRegistration({
         pendingRequests.push(data);
         localStorage.setItem("pendingRequests", JSON.stringify(pendingRequests));
         toast.info("You are offline. Data saved locally and will sync when online.");
-        setCarServiceInfo(carInfo)
+        setCarServiceInfo(carInfo);
+        setCustomerInfo(customerInfo)
         return;
       }
 
@@ -241,11 +263,11 @@ function CarRegistration({
         JSON.parse(localStorage.getItem("pendingRequests")) || [];
 
       if (pendingRequests.length > 0) {
-        for (let data of pendingRequests) {
+        for (let i = 0; i < pendingRequests.length; i++) {
           try {
+            let data = pendingRequests[i];
             const vehicleRegNo = data.custInformation.vehicleRegNo;
 
-            // Fetch customer details using the vehicle registration number
             const customerResponse = await axios.get(
               `http://localhost:8080/CarServiceMaintenance/api/v1/carService/getCustomerDetails?vehicleRegNo=${vehicleRegNo}`,
               {
@@ -257,13 +279,12 @@ function CarRegistration({
             );
 
             if (customerResponse.status === 200 && customerResponse.data) {
-              // If customer details exist, update the data
               data.custInformation = { ...customerResponse.data };
               data.custInformation.modifiedBy = userRole.username;
               data.custInformation.modifiedDate = new Date().toISOString();
             }
 
-            // Proceed with saving the data
+            // Save the updated data
             await axios.post(
               `${apiUrl}/api/v1/carService/saveServiceInformation`,
               data,
@@ -274,21 +295,27 @@ function CarRegistration({
                 },
               }
             );
+
+            // Remove the synced item from local storage
+            pendingRequests.splice(i, 1);
+            localStorage.setItem("pendingRequests", JSON.stringify(pendingRequests));
+
+            // Adjust loop index to prevent skipping
+            i--;
           } catch (error) {
             console.error("Error syncing data:", error);
-            continue; // Continue with the next request if an error occurs
           }
         }
 
-        // Clear the local storage after syncing successfully
-        localStorage.removeItem("pendingRequests");
-        toast.success("Offline data synced successfully!");
+        // If all data is synced, clear local storage
+        if (pendingRequests.length === 0) {
+          localStorage.removeItem("pendingRequests");
+          toast.success("Offline data synced successfully!");
+        }
       }
     }
   };
 
-  // Listen for network status change and sync when online
-  window.addEventListener("online", syncOfflineData);
 
   const handleFileChange = (e, key) => {
     const file = e.target.files[0];

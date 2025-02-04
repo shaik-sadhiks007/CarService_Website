@@ -9,7 +9,7 @@ function MetricCard({ title, value, change, icon }) {
       </div>
       <div className="d-flex align-items-center">
         <h3 className="mb-0 me-2">{value}</h3>
-        <span className={`badge ${change >= 0 ? "text-success" : "text-danger"}`}>
+        <span className={`badge ${change >= 0 ? "text-success" : "text-danger"}`} style={{overflow : "hidden"}}>
           {change >= 0 ? "+" : ""}
           {change}% From last month
         </span>

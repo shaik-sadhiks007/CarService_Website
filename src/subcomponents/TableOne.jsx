@@ -4,9 +4,12 @@ import { CarDataContext } from "../components/CarDataContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import moment from "moment-timezone";
+import { useTranslation } from "react-i18next";
 
-function TableOne({ historyData, edit, setClicked, fullData,refresh }) {
+function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
   const [isEditing, setIsEditing] = useState(false);
+
+  const { t } = useTranslation()
 
   const [editableData, setEditableData] = useState({
     remarks: historyData?.remarks || "",
@@ -20,33 +23,33 @@ function TableOne({ historyData, edit, setClicked, fullData,refresh }) {
 
   const keyMapping = {
     // Customer Info
-    customerId: "Customer Id",
-    custName: "Customer Name",
-    vehicleRegNo: "Vehicle No.",
-    dateIn: "Date In",
-    custContactNo: "Phone Number",
-    email: "Email",
-    address: "Address",
-    vehicleModel: "Vehicle Model",
-    manufactureYear: "Manufacture Year",
-    vehicleColor: "Vehicle Color",
-    engineNo: "Engine No.",
-    chasisNo: "Chasis No.",
+    customerId: t("TableMapping.customerId"),
+    custName: t("TableMapping.custName"),
+    vehicleRegNo: t("TableMapping.vehicleRegNo"),
+    dateIn: t("TableMapping.dateIn"),
+    custContactNo: t("TableMapping.custContactNo"),
+    email: t("TableMapping.email"),
+    address: t("TableMapping.address"),
+    vehicleModel: t("TableMapping.vehicleModel"),
+    manufactureYear: t("TableMapping.manufactureYear"),
+    vehicleColor: t("TableMapping.vehicleColor"),
+    engineNo: t("TableMapping.engineNo"),
+    chasisNo: t("TableMapping.chasisNo"),
 
     // Car Service Info
-    entryType: "Entry Type",
-    mileage: "Mileage",
-    fuelLevel: "Fuel Level",
-    fuelLevelImage: "Fuel Level Image",
-    carImage: "Car Image",
-    technitionName: "Technician Name",
-    managerName: "Manager Name",
-    remarks: "Remarks",
-    serviceTypes: "Service Types",
-    createdBy: "Created By",
-    createdDate: "Created Date",
-    modifiedBy: "Modified By",
-    modifiedDate: "Modified Date",
+    entryType: t("TableMapping.entryType"),
+    mileage: t("TableMapping.mileage"),
+    fuelLevel: t("TableMapping.fuelLevel"),
+    fuelLevelImage: t("TableMapping.fuelLevelImage"),
+    carImage: t("TableMapping.carImage"),
+    technitionName: t("TableMapping.technitionName"),
+    managerName: t("TableMapping.managerName"),
+    remarks: t("TableMapping.remarks"),
+    serviceTypes: t("TableMapping.serviceTypes"),
+    createdBy: t("TableMapping.createdBy"),
+    createdDate: t("TableMapping.createdDate"),
+    modifiedBy: t("TableMapping.modifiedBy"),
+    modifiedDate: t("TableMapping.modifiedDate"),
   };
 
   const handleServiceChange = (e) => {
@@ -306,7 +309,7 @@ function TableOne({ historyData, edit, setClicked, fullData,refresh }) {
           className="btn btn-outline-warning text-white"
           onClick={() => setClicked({ click: false, data: {} })}
         >
-          <span className="fw-semibold">Back</span>
+          <span className="fw-semibold">{t("back")}</span>
         </button>
         {edit && (
           <>
@@ -315,14 +318,14 @@ function TableOne({ historyData, edit, setClicked, fullData,refresh }) {
                 className="btn btn-outline-success text-white ms-5"
                 onClick={() => saveChanges(historyData.vehicleRegNo)}
               >
-                <span className="fw-semibold">Save</span>
+                <span className="fw-semibold">{t("save")}</span>
               </button>
             ) : (
               <button
                 className="btn btn-outline-warning text-white ms-5"
                 onClick={handleEditButton}
               >
-                <span className="fw-semibold">Edit</span>
+                <span className="fw-semibold">{t("edit")}</span>
               </button>
             )}
           </>

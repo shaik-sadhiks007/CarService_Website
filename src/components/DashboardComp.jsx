@@ -105,14 +105,13 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
 
         toast.success("Customer information found!");
 
-
         const historyResponse = await axios.get(
           `https://carservice.rasiminnalai.com/CarServiceMaintenance/api/v1/carService/getCompletedHistory`,
           {
             params: { carRegNo: carPlate },
             headers: {
               Authorization: `Bearer ${token}`,
-            },
+            }
           }
         );
 
@@ -154,7 +153,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
           >
             <i className="bi bi-list text-light fs-2"></i>
           </div>
-          <h1 className="text-white">{t("carServiceEntry")}</h1>
+          <h1 className="text-white">{t("menu.carServiceEntry")}</h1>
         </div>
         <Logout />
       </div>

@@ -11,6 +11,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddServices from "./adminComponents/AddServices";
 import DataDownload from "./adminComponents/DataDownload";
+import Settings from "./settings/Settings";
 
 function App() {
   
@@ -20,11 +21,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<DataDownload />} />
+        <Route path="/car-service-entry" element={<Dashboard />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/services" element={<AddServices />} />
-        <Route path="/data" element={<DataDownload />} />
-
+        <Route path="/settings" element={<Settings />} />
         <Route
           path="/pending"
           element={<Pending  />}

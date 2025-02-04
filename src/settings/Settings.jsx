@@ -1,31 +1,18 @@
-import React, { useContext, useState } from 'react';
-import axios from 'axios';
-import { toast } from "react-toastify";
+import React, { useContext } from 'react'
 import { CarDataContext } from '../components/CarDataContext';
 import Logout from '../components/Logout';
 import Sidebar from '../components/Sidebar';
-import AdminPage from './AdminPage';
 import { useTranslation } from 'react-i18next';
 
-const DataDownload = () => {
+function Settings() {
 
-    const {t} = useTranslation()
-
-    const { showOffcanvas, setShowOffcanvas, apiUrl, dashboard } = useContext(CarDataContext);
-
-    // Token for Authorization header (use your actual token)
-    const token = localStorage.getItem("token");
-
-    // Form validation and API call
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-    };
+    const { showOffcanvas, setShowOffcanvas } = useContext(CarDataContext);
 
     const toggleOffcanvas = () => {
         setShowOffcanvas(!showOffcanvas);
     };
 
+    const { t } = useTranslation()
     return (
         <div className="container-fluid">
             <div className="row">
@@ -39,7 +26,6 @@ const DataDownload = () => {
                     }}
                 >
                     <Sidebar />
-
                 </div>
 
                 <div className="col-12 col-md-9 col-lg-10 p-3">
@@ -53,26 +39,18 @@ const DataDownload = () => {
                                 >
                                     <i className="bi bi-list text-light fs-2"></i>
                                 </div>
-                                <h1 className="text-white">{t("menu.dashboard")}</h1>
+                                <h1 className="text-white">
+                                    {t("menu.settings")}
+                                </h1>
                             </div>
                             <Logout />
                         </div>
-
-                        <div
-                            className="text-white w-100 p-4 rounded-2"
-                            style={{ backgroundColor: "#212632" }}
-                        >
-
-                            <AdminPage/>
-
-
-                        </div>
-
                     </div>
                 </div>
             </div>
         </div>
-    );
-};
 
-export default DataDownload;
+    )
+}
+
+export default Settings

@@ -16,41 +16,57 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [userRole, setUserRole] = useState('user');
 
-  // Token for Authorization header (use your actual token)
   const token = localStorage.getItem("token");
 
   // Form validation and API call
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Trim input values
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
+    const trimmedUserRole = userRole.trim();
+
     // Basic validation
-    if (!username || !password || !userRole) {
-      toast.error('Please fill in all fields');
+    if (!trimmedUsername || !trimmedPassword || !trimmedUserRole) {
+      toast.error("Please fill in all fields");
       return;
     }
 
     try {
       const response = await axios.post(
-        `https://carservice.rasiminnalai.com/CarServiceMaintenance/api/register/new-user`,
+        "https://carservice.rasiminnalai.com/CarServiceMaintenance/api/register/new-user",
         {
-          username,
-          password,
-          userRole, // Include userRole in the request body
+          username: trimmedUsername,
+          password: trimmedPassword,
+          userRole: trimmedUserRole,
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Add the token here
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      setPassword("");
-      setUsername("");
-
-      toast.success("User registered successfully");
+      if (response.status === 200 || response.status === 201) {
+        setUsername("");
+        setPassword("");
+        toast.success("User registered successfully");
+      } else {
+        toast.error("Unexpected response from server");
+      }
     } catch (err) {
-      toast.error('Registration failed. Please try again.');
-      console.error('Error registering user:', err);
+      if (err.response) {
+        console.error("Server responded with:", err.response.status, err.response.data);
+        toast.error(`Error: ${err.response.data.message || "Registration failed"}`);
+      } else if (err.request) {
+        console.error("No response received:", err.request);
+        toast.error("No response from server. Please try again.");
+      } else {
+        console.error("Axios error:", err.message);
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 
@@ -89,7 +105,7 @@ const Signup = () => {
               <Logout />
             </div>
 
-            <div className="text-white w-50 p-4 rounded-2"
+            <div className="text-white col-12 col-lg-6 p-4 rounded-2"
               style={{ backgroundColor: "#212632" }}
             >
               <form className="" onSubmit={handleSubmit}>

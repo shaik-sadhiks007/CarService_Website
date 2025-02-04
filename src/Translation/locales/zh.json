@@ -3,7 +3,9 @@
     "carServiceEntry": "汽车服务录入",
     "pending": "待处理",
     "accepted": "已接受",
-    "completed": "已完成"
+    "completed": "已完成",
+    "settings": "设置",
+    "dashboard": "控制面板"
   },
   "greeting": "你好 {{username}}",
   "customerInfo": {
@@ -37,6 +39,7 @@
   "logout": "登出",
   "pending": {
     "date": "日期",
+    "vehicleRegNo": "车辆号码",
     "customerName": "客户姓名",
     "contactNo": "联系电话",
     "services": "服务",
@@ -64,5 +67,36 @@
     "addServices": "添加服务",
     "dataDownload": "数据下载"
   },
-  "serviceCategory": "服务类别"
+  "serviceCategory": "服务类别",
+  "TableMapping": {
+    "customerId": "客户 Id",
+    "custName": "客户名称",
+    "vehicleRegNo": "车牌号",
+    "dateIn": "入库日期",
+    "custContactNo": "电话号码",
+    "email": "电子邮件",
+    "address": "地址",
+    "vehicleModel": "车辆型号",
+    "manufactureYear": "制造年份",
+    "vehicleColor": "车辆颜色",
+    "engineNo": "发动机号",
+    "chasisNo": "底盘号",
+    "entryType": "入库类型",
+    "mileage": "里程数",
+    "fuelLevel": "燃油水平",
+    "fuelLevelImage": "燃油水平图片",
+    "carImage": "车辆图片",
+    "technitionName": "技师姓名",
+    "managerName": "经理姓名",
+    "remarks": "备注",
+    "serviceTypes": "服务类型",
+    "createdBy": "创建者",
+    "createdDate": "创建日期",
+    "modifiedBy": "修改者",
+    "modifiedDate": "修改日期"
+  },
+  "back": "返回",
+  "edit": "编辑",
+  "exportToPdf": "导出为 PDF",
+  "exportToExcel": "导出为 Excel"
 }

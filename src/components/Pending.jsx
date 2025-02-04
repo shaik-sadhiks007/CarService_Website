@@ -23,8 +23,6 @@ function Pending() {
     showOffcanvas,
     setShowOffcanvas,
     fetchMechanics,
-    calculateItemsPerPage,
-    setDashboard
   } = useContext(CarDataContext);
 
   const [tableData, setTableData] = useState([]);
@@ -36,6 +34,20 @@ function Pending() {
     data: {},
   });
 
+
+  const excelData = {
+
+    dateIn: "Date",
+    vehicleRegNo: "Velhicle No.",
+    custName: "Customer Name",
+    custContactNo: "Customer No.",
+    serviceTypes: 'Services',
+    technitionName: "Mechanic"
+
+  }
+
+
+
   const { t } = useTranslation()
   const [fullData, setFullData] = useState(null);
 
@@ -45,7 +57,6 @@ function Pending() {
 
   const fetchPendingCars = async () => {
     try {
-
       setLoading(true);
       const url = `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`;
 
@@ -76,11 +87,6 @@ function Pending() {
 
         // setTableData(combinedData);
 
-
-        setDashboard((prevState) => ({
-          ...prevState,
-          pending: combinedData.length
-        }));
         setTableData(sortByDate(combinedData, "desc"));
 
         setLoading(false);
@@ -112,12 +118,6 @@ function Pending() {
           );
           return { ...customer, ...service };
         });
-
-
-        setDashboard((prevState) => ({
-          ...prevState,
-          pending: combinedData.length
-        }));
 
         setTableData(sortByDate(combinedData, "desc"))
 
@@ -167,50 +167,6 @@ function Pending() {
         carServiceInfromation: { ...carInfo, technitionName: selectedMechanic },
       };
 
-      if (navigator.onLine) {
-        // User is online, make API call
-        try {
-          await axios.post(
-            `${apiUrl}/api/v1/carService/saveServiceInformation`,
-            data,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          fetchPendingCars();
-          setSelectedMechanic("");
-          setShowModal(false);
-          toast.success("Assigned successfully!");
-        } catch (error) {
-          toast.error("Failed to Assign. Please try again.");
-          console.error(error);
-        }
-      } else {
-        // User is offline, store in localStorage
-        localStorage.setItem("pendingRequest", JSON.stringify(data));
-
-        setSelectedMechanic("");
-        setShowModal(false);
-        toast.info("You are offline. The request will be sent when you're online.");
-      }
-    }
-  };
-
-  // Flag to prevent multiple API calls
-  let isProcessing = false;
-
-  // Process stored request when online
-  const processPendingRequest = async () => {
-    if (isProcessing) return; // Prevent duplicate execution
-    isProcessing = true;
-
-    const storedRequest = localStorage.getItem("pendingRequest");
-    if (storedRequest) {
-      const data = JSON.parse(storedRequest);
       try {
         await axios.post(
           `${apiUrl}/api/v1/carService/saveServiceInformation`,
@@ -223,21 +179,23 @@ function Pending() {
           }
         );
 
-        // Remove request from storage after success
-        localStorage.removeItem("pendingRequest");
-        toast.success("Pending request processed successfully!");
+        fetchPendingCars();
+        setSelectedMechanic("");
+        setShowModal(false);
+        toast.success("Assigned successfully!");
       } catch (error) {
-        console.error("Error processing pending request", error);
+        toast.error("Failed to Assign. Please try again.");
+        console.error(error);
       }
+    } else {
+      // User is offline, store in localStorage
+      localStorage.setItem("pendingRequest", JSON.stringify(data));
+      setSelectedMechanic("");
+      setShowModal(false);
+      toast.info("You are offline. The request will be sent when you're online.");
     }
 
-    isProcessing = false;
   };
-
-  // Listen for online event
-  window.addEventListener("online", processPendingRequest);
-
-
 
   const toggleOffcanvas = () => {
     setShowOffcanvas(!showOffcanvas);
@@ -250,140 +208,6 @@ function Pending() {
       year: "numeric",
     }).format(new Date(dateString));
   };
-  // const columns = [
-  //   {
-  //     name: t("pending.date"),
-  //     id: "date",
-  //     selector: (row) => new Date(row.dateIn),
-  //     sortable: true,
-  //     cell: (row) => formatDate(row.dateIn),
-  //     style: {
-  //       textAlign: "center",
-  //     },
-  //     width: '120px',
-  //     center: 'true'
-  //   },
-  //   {
-  //     name: t("pending.customerName"),
-  //     selector: (row) => row.custName?.toLowerCase() || "",
-  //     cell: (item) => (
-  //       <span
-  //         onClick={() => setClicked({ click: true, data: item })}
-  //         style={{
-  //           color: "#ffc107",
-  //           textDecoration: "underline",
-  //           cursor: "pointer",
-  //         }}
-  //         className="text-capitalize"
-  //       >
-  //         {item.custName || "N/A"}
-  //       </span>
-  //     ),
-  //     sortable: true,
-  //     style: {
-  //       textAlign: "center",
-  //     },
-  //     width: '190px',
-  //     center: 'true'
-
-  //   },
-  //   {
-  //     name: t("pending.contactNo"),
-  //     selector: (row) => row.custContactNo,
-  //     style: {
-  //       textAlign: "center",
-  //     },
-  //     width: '130px',
-  //     center: 'true'
-
-  //   },
-  //   {
-  //     name: t("pending.services"),
-  //     selector: (row) => row.serviceTypes,
-  //     style: {
-  //       textAlign: "center",
-  //     },
-  //     width: '200px',
-  //     center: 'true',
-
-  //     cell: (item) => (
-  //       item.serviceTypes ? (
-  //         <ul className="text-center">
-  //           {item.serviceTypes.split(",").map((type, index) => (
-  //             <li key={index} className="text-start text-capitalize">{type.trim()}</li>
-  //           ))}
-  //         </ul>
-  //       ) : (
-  //         "N/A"
-  //       )
-  //     ),
-  //   },
-  //   {
-  //     name: t("pending.status"),
-  //     selector: (row) => row.status,
-  //     style: {
-  //       textAlign: "center",
-  //     },
-  //     width: '90px',
-  //     center: 'true'
-
-  //   },
-  //   {
-  //     name: t("pending.mechanic"),
-  //     selector: (row) => row.technitionName || "Unassigned",
-  //     style: {
-  //       textAlign: "center",
-  //     },
-  //     width: '160px',
-  //     sortable: true,
-  //     center: 'true'
-
-  //   },
-  //   {
-  //     name: t("pending.actions"),
-  //     style: {
-  //       textAlign: "center",
-  //     },
-  //     width: '142px',
-  //     center: 'true',
-
-  //     cell: (item) =>
-  //       userRole.userRole === "admin" ? (
-  //         <button
-  //           className="btn btn-primary btn-sm"
-  //           onClick={() => handleAssign(item.vehicleRegNo)}
-  //         >
-  //           Assign
-  //         </button>
-  //       ) : (
-  //         <div className="d-flex justify-content-center">
-  //           {item.technitionName === "" ? (
-  //             <button
-  //               className="btn btn-outline-warning btn-sm me-2"
-  //               onClick={() => handleAccept(item.vehicleRegNo)}
-  //             >
-  //               <span className="fw-semibold">Assign to Me</span>
-  //             </button>
-  //           ) : (
-  //             <>
-  //               <button
-  //                 className="btn btn-outline-success btn-sm me-2"
-  //                 onClick={() => handleAccept(item.vehicleRegNo)}
-  //               >
-  //                 <span className="fw-semibold">Accept</span>
-  //               </button>
-  //               <button
-  //                 className="btn btn-outline-danger btn-sm"
-  //                 onClick={() => handleReject(item.vehicleRegNo)}
-  //               >
-  //                 <span className="fw-semibold">Reject</span>
-  //               </button>
-  //             </>
-  //           )}
-  //         </div>
-  //       ),
-  //   },
-  // ];
 
   const columns = [
     {
@@ -400,9 +224,9 @@ function Pending() {
       center: 'true',
     },
     {
-      name: t("pending.customerName"),
-      selector: (row) => row.custName?.toLowerCase() || "",
-      key: "custName",
+      name: t("pending.vehicleRegNo"),
+      selector: (row) => row.vehicleRegNo,
+      key: "vehicleRegNo",
       cell: (item) => (
         <span
           onClick={() => setClicked({ click: true, data: item })}
@@ -411,6 +235,25 @@ function Pending() {
             textDecoration: "underline",
             cursor: "pointer",
           }}
+          className="text-uppercase"
+        >
+          {item.vehicleRegNo || "N/A"}
+        </span>
+      ),
+      style: {
+        textAlign: "center",
+      },
+      width: '150px',
+      sortable: true,
+      center: 'true',
+    },
+
+    {
+      name: t("pending.customerName"),
+      selector: (row) => row.custName?.toLowerCase() || "",
+      key: "custName",
+      cell: (item) => (
+        <span
           className="text-capitalize"
         >
           {item.custName || "N/A"}
@@ -643,127 +486,204 @@ function Pending() {
 
 
   const exportToExcel = () => {
-    // Limit text length to avoid exceeding the 32,767-character limit
+    // Format data according to excelData mapping
+
+    const keyMapping = {
+      // Customer Info
+      customerId: "Customer Id",
+      custName: "Customer Name",
+      vehicleRegNo: "Vehicle No.",
+      dateIn: "Date In",
+      custContactNo: "Phone Number",
+      email: "Email",
+      address: "Address",
+      vehicleModel: "Vehicle Model",
+      manufactureYear: "Manufacture Year",
+      vehicleColor: "Vehicle Color",
+      engineNo: "Engine No.",
+      chasisNo: "Chasis No.",
+
+      // Car Service Info
+      entryType: "Entry Type",
+      mileage: "Mileage",
+      fuelLevel: "Fuel Level",
+      fuelLevelImage: "Fuel Level Image",
+      carImage: "Car Image",
+      technitionName: "Technician Name",
+      managerName: "Manager Name",
+      remarks: "Remarks",
+      serviceTypes: "Service Types",
+      createdBy: "Created By",
+      createdDate: "Created Date",
+      modifiedBy: "Modified By",
+      modifiedDate: "Modified Date",
+    };
+
     const formattedData = tableData.map((row) =>
       Object.fromEntries(
-        Object.entries(row).map(([key, value]) => [
-          key,
-          typeof value === "string"
-            ? value.substring(0, 32766) // Truncate long strings
-            : value || "", // Replace null/undefined with an empty string
-        ])
+        Object.keys(keyMapping).map((key) => {
+          let value = row[key];
+
+          // Format date if key is 'dateIn'
+          if (key === "dateIn" && value) {
+            value = formatDate(value);
+          }
+
+          // Split 'serviceTypes' into bullet points
+          if (key === "serviceTypes" && value) {
+            value = value.split(",").map(item => `• ${item.trim()}`).join("\n");
+          }
+
+          // Truncate long strings and replace null/undefined with an empty string
+          return [keyMapping[key], typeof value === "string" ? value.substring(0, 32766) : value || ""];
+        })
       )
     );
 
     const worksheet = XLSX.utils.json_to_sheet(formattedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-    XLSX.writeFile(workbook, "data.xlsx");
+    XLSX.writeFile(workbook, "Icon_Technik.xlsx");
   };
 
 
-  // Function to export data to PDF
-  // const exportToPDF = () => {
+  // const exportToPDF = async () => {
   //   const doc = new jsPDF();
-  //   doc.text("Exported Data", 10, 10);
 
-  //   // Extract column headers from 'columns'
-  //   const tableColumn = columns.map(col => col.name);
-
-  //   // Map table rows to match columns' selectors
-  //   const tableRows = tableData.map(row =>
-  //     columns.map(col => {
-  //       const value = row[col.key];
-  //       // Ensure the value is not null or undefined before calling toString()
-  //       return value !== null && value !== undefined ? value.toString() : "";
-  //     })
-  //   );
-
-
-  //   // Check if rows are populated
-  //   if (tableRows.length === 0) {
-  //     doc.text("No data available", 10, 20);
-  //   } else {
-  //     // Use autoTable to add the data
-  //     doc.autoTable({
-  //       head: [tableColumn], // Headers
-  //       body: tableRows,     // Data rows
-  //       startY: 20           // Starting position of the table
+  //   // Helper function to convert an image to Base64
+  //   const getBase64ImageFromURL = (url) => {
+  //     return new Promise((resolve, reject) => {
+  //       const img = new Image();
+  //       img.crossOrigin = "Anonymous";
+  //       img.onload = () => {
+  //         const canvas = document.createElement("canvas");
+  //         canvas.width = img.width;
+  //         canvas.height = img.height;
+  //         const ctx = canvas.getContext("2d");
+  //         ctx.drawImage(img, 0, 0);
+  //         resolve(canvas.toDataURL("image/png"));
+  //       };
+  //       img.onerror = (error) => reject(error);
+  //       img.src = url;
   //     });
-  //   }
+  //   };
 
-  //   doc.save("data.pdf");
+  //   try {
+  //     // Load header and footer images
+  //     const headerImage = await getBase64ImageFromURL(headerIcon);
+  //     const footerImage = await getBase64ImageFromURL(headerIcon);
+
+  //     // Add header image
+  //     doc.addImage(headerImage, "PNG", 0, 0, 210, 50); // Adjust dimensions as needed
+
+  //     // Adjust starting Y position to account for the header
+  //     const tableStartY = 60;
+
+  //     // Extract column headers from 'columns'
+  //     const tableColumn = columns.map(col => col.name);
+
+  //     // Map table rows to match columns' selectors
+  //     const tableRows = tableData.map(row =>
+  //       columns.map(col => {
+  //         const value = row[col.key];
+  //         // Ensure the value is not null or undefined before calling toString()
+  //         return value !== null && value !== undefined ? value.toString() : "";
+  //       })
+  //     );
+
+  //     // Add table or fallback content
+  //     if (tableRows.length === 0) {
+  //       doc.text("No data available", 10, tableStartY);
+  //     } else {
+  //       doc.autoTable({
+  //         head: [tableColumn], // Headers
+  //         body: tableRows,     // Data rows
+  //         startY: tableStartY, // Starting position of the table
+  //       });
+  //     }
+
+  //     // Add footer image
+  //     const pageHeight = doc.internal.pageSize.height;
+  //     doc.addImage(footerImage, "PNG", 0, pageHeight - 50, 210, 50); // Adjust dimensions as needed
+
+  //     // Save PDF
+  //     doc.save("data_with_images_and_table.pdf");
+  //   } catch (error) {
+  //     console.error("Error loading images: ", error);
+  //   }
   // };
 
-  
+
   const exportToPDF = async () => {
+
     const doc = new jsPDF();
-  
-    // Helper function to convert an image to Base64
-    const getBase64ImageFromURL = (url) => {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0);
-          resolve(canvas.toDataURL("image/png"));
-        };
-        img.onerror = (error) => reject(error);
-        img.src = url;
+
+    // Header: Centered H1 Title
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    const headerText = "ICON TECHNIK PTE. LTD.";
+    const pageWidth = doc.internal.pageSize.width;
+    const textWidth = doc.getTextWidth(headerText);
+    doc.text(headerText, (pageWidth - textWidth) / 2, 20);
+
+    // Add HR Line after header
+    doc.setLineWidth(0.5);
+    doc.line(10, 25, pageWidth - 10, 25);
+
+    // Adjust starting Y position for table
+    const tableStartY = 35;
+
+    // Extract column headers from 'columns'
+    const tableColumn = Object.values(excelData);
+
+    // Map table rows to match columns' selectors
+    const tableRows = tableData.map(row =>
+      Object.keys(excelData).map(key => {
+        let value = row[key];
+
+        // Format date if key is 'dateIn'
+        if (key === "dateIn" && value) {
+          return formatDate(value);
+        }
+
+        // Split 'serviceTypes' into bullet points
+        if (key === "serviceTypes" && value) {
+          return value.split(",").map(item => `• ${item.trim()}`).join("\n");
+        }
+
+        // Default conversion to string
+        return value !== null && value !== undefined ? value.toString() : "";
+      })
+    );
+
+    // Add table or fallback content
+    if (tableRows.length === 0) {
+      doc.text("No data available", 10, tableStartY);
+    } else {
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: tableStartY,
       });
-    };
-  
-    try {
-      // Load header and footer images
-      const headerImage = await getBase64ImageFromURL(headerIcon);
-      const footerImage = await getBase64ImageFromURL(headerIcon);
-  
-      // Add header image
-      doc.addImage(headerImage, "PNG", 0, 0, 210, 50); // Adjust dimensions as needed
-  
-      // Adjust starting Y position to account for the header
-      const tableStartY = 60;
-  
-      // Extract column headers from 'columns'
-      const tableColumn = columns.map(col => col.name);
-  
-      // Map table rows to match columns' selectors
-      const tableRows = tableData.map(row =>
-        columns.map(col => {
-          const value = row[col.key];
-          // Ensure the value is not null or undefined before calling toString()
-          return value !== null && value !== undefined ? value.toString() : "";
-        })
-      );
-  
-      // Add table or fallback content
-      if (tableRows.length === 0) {
-        doc.text("No data available", 10, tableStartY);
-      } else {
-        doc.autoTable({
-          head: [tableColumn], // Headers
-          body: tableRows,     // Data rows
-          startY: tableStartY, // Starting position of the table
-        });
-      }
-  
-      // Add footer image
-      const pageHeight = doc.internal.pageSize.height;
-      doc.addImage(footerImage, "PNG", 0, pageHeight - 50, 210, 50); // Adjust dimensions as needed
-  
-      // Save PDF
-      doc.save("data_with_images_and_table.pdf");
-    } catch (error) {
-      console.error("Error loading images: ", error);
     }
+
+    const footerMargin = 5;
+    const pageHeight = doc.internal.pageSize.height;
+    const pageWidthF = doc.internal.pageSize.width;
+
+    // Footer HR Line
+    const footerStartY = pageHeight - 10 - footerMargin;
+    doc.line(10, footerStartY, pageWidthF - 10, footerStartY);
+
+    // Footer Text (Centered)
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const footerText = "Registered Address: 1 BUKIT BATOK CRESCENT, #05-60/61, WCEGA PLAZA, SINGAPORE (658064)";
+    const textWidthF = doc.getTextWidth(footerText);
+    doc.text(footerText, (pageWidthF - textWidthF) / 2, footerStartY + 7);
+
+    doc.save("Icon_Technik_Pending_List.pdf");
   };
-  
-
-
 
 
   return (
@@ -798,7 +718,6 @@ function Pending() {
 
             {!clicked.click ? (
               <>
-
                 <DataTable
                   columns={columns}
                   data={tableData}
@@ -816,17 +735,18 @@ function Pending() {
 
                 <div className="mb-2">
                   <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
-                    Export to Excel
+                  {t("exportToExcel")}
                   </button>
                   <button onClick={exportToPDF} className="px-4 py-2 btn btn-warning text-white rounded">
-                    Export to PDF
+                    {t("exportToPdf")}
+
                   </button>
                 </div>
               </>
 
             ) : (
               !clicked.click && (
-                <p className="text-white">No completed data available.</p>
+                <p className="text-white">No data available.</p>
               )
             )}
 
