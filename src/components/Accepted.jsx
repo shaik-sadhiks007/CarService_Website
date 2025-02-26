@@ -528,19 +528,21 @@ function Accepted() {
                   </div>
                   <div className="d-flex gap-4 my-2">
                     <button className={`btn ${category === 'all' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('all')}>
-                      All
+                      {t("category.all")}
                     </button>
                     <button className={`btn ${category === 'customer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('customer')}>
-                      Customer
+                      {t("category.customer")}
                     </button>
                     <button className={`btn ${category === 'dealer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('dealer')}>
-                      Dealer
+                      {t("category.dealer")}
+
                     </button>
                     <button className={`btn ${category === 'rental' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('rental')}>
-                      Rental
+                      {t("category.rental")}
                     </button>
                     <button className={`btn ${category === 'towing' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('towing')}>
-                      Towing
+                      {t("category.towing")}
+
                     </button>
                   </div>
 

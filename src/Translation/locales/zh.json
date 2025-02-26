@@ -117,5 +117,12 @@
     "complaints": "投诉",
     "Information": "信息",
     "towing": "拖车人员"
+  },
+  "category": {
+    "all": "全部",
+    "customer": "客户",
+    "dealer": "经销商",
+    "rental": "租赁公司",
+    "towing": "拖车"
   }
 }

@@ -117,5 +117,12 @@
     "complaints": "Complaints",
     "Information" : "Information",
     "towing" : "Towing Person"
+  },
+  "category" : {
+    "all" : "All",
+    "customer" : "Customer",
+    "dealer" : "Dealer",
+    "rental" : "Rental Company",
+    "towing" : "Towing"
   }
 }
