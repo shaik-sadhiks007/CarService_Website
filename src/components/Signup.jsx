@@ -6,6 +6,7 @@ import { CarDataContext } from './CarDataContext';
 import { toast } from "react-toastify";
 import Logout from './Logout';
 import { useTranslation } from 'react-i18next';
+import RightSidebar from '../sidebar/RightSidebar';
 
 const Signup = () => {
   const { showOffcanvas, setShowOffcanvas, apiUrl } = useContext(CarDataContext);
@@ -14,7 +15,7 @@ const Signup = () => {
   // State to manage form fields
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [userRole, setUserRole] = useState('user');
+  const [userRole, setUserRole] = useState('mechanic');
 
   const token = localStorage.getItem("token");
 
@@ -91,7 +92,7 @@ const Signup = () => {
 
         <div className="col-12 col-md-9 col-lg-10 p-3">
           <div className="container-fluid">
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            {/* <div className="d-flex justify-content-between align-items-center mb-3">
               <div className="d-flex">
                 <div
                   className="d-md-none me-2"
@@ -103,7 +104,11 @@ const Signup = () => {
                 <h1 className="text-white">{t("menus.userRegistration")}</h1>
               </div>
               <Logout />
-            </div>
+            </div> */}
+
+            <RightSidebar/>
+
+            
 
             <div className="text-white col-12 col-lg-6 p-4 rounded-2"
               style={{ backgroundColor: "#212632" }}
@@ -146,8 +151,10 @@ const Signup = () => {
                     value={userRole}
                     onChange={(e) => setUserRole(e.target.value)}
                   >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
+                    <option value="guest">Guest</option>
+                    <option value="super_admin">Super Admin</option>
+                    <option value="account_admin">Accounting Admin</option>
+                    <option value="mechanic">Mechanic</option>
                   </select>
                 </div>
 

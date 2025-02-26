@@ -26,7 +26,7 @@
     "fuelLevel": "Fuel Level",
     "fuelLevelImage": "Fuel Level Image",
     "carImage": "Car Image",
-    "remarks": "Remarks",
+    "remarks": "Mechanic Remarks",
     "technitionName": "Technician Name",
     "managerName": "Manager Name",
     "serviceTypes": "Service Types"
@@ -68,7 +68,7 @@
     "dataDownload": "Data Download"
   },
   "serviceCategory": "Service Category",
-  "TableMapping" : {
+  "TableMapping": {
     "customerId": "Customer Id",
     "custName": "Customer Name",
     "vehicleRegNo": "Vehicle No.",
@@ -97,9 +97,21 @@
   },
   "back": "Back",
   "edit": "Edit",
-  "exportToPdf" : "Export To Pdf",
-  "exportToExcel" : "Export To Excel"
-
-
-
+  "exportToPdf": "Export To Pdf",
+  "exportToExcel": "Export To Excel",
+  "account_admin": {
+    "paymentPending": "Payment Pending",
+    "readyToDeliver": "Ready To Deliver",
+    "paymentPendingCars": "Payment Pending Cars",
+    "ReadyToDeliverCars": "Ready to Deliver cars",
+    "paymentStatus": "Payment Status"
+  },
+  "guest": {
+    "guest": "Guest",
+    "customer" : "Customer",
+    "dealer" : "Dealer",
+    "rental" : "Rental",
+    "name": "Name",
+    "complaints": "Complaints"
+  }
 }

@@ -16,8 +16,31 @@ export const CarDataProvider = ({ children }) => {
   const [mechanics, setMechanics] = useState([]);
 
   const [showOffcanvas, setShowOffcanvas] = useState(false);
+  
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
 
-  const [services, setServices] = useState([]);
+
+  const [services, setServices] = useState([
+    {
+      "id": 1,
+      "serviceCategory": "Repair",
+      "active": true,
+      "createdBy": "SYSTEM",
+      "createdDate": "2025-01-04T22:11:26",
+      "modifiedBy": null,
+      "modifiedDate": null
+    },
+
+    {
+      "id": 2,
+      "serviceCategory": "General Service",
+      "active": true,
+      "createdBy": "SYSTEM",
+      "createdDate": "2025-01-04T22:11:26",
+      "modifiedBy": null,
+      "modifiedDate": null
+    },
+  ]);
 
   const fetchMechanics = async () => {
 
@@ -32,11 +55,12 @@ export const CarDataProvider = ({ children }) => {
         },
       });
 
-      const mech = response.data.filter((user) => user.userRole === "user");
+      const mech = response.data.filter((user) => user.userRole === "mechanic");
       setMechanics(mech);
     } catch (error) {
       console.error("Error fetching mechanics:", error);
     }
+
   };
 
   const initializeUser = async () => {
@@ -70,10 +94,41 @@ export const CarDataProvider = ({ children }) => {
     }
   };
 
+
+  const initializeUser2 = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      logout();
+      return null;
+    }
+
+    try {
+      const decodedToken = jwtDecode(token);
+      if (decodedToken.exp * 1000 < Date.now()) {
+        logout();
+        return null;
+      }
+
+      const response = await axios.get(`${apiUrl}/api/v1/carService/getUserInfo`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { username: decodedToken.sub },
+      });
+
+      return response.data; // Return userRole instead of setting it immediately
+    } catch (err) {
+      console.error("Error fetching user info:", err);
+      toast.error("Error fetching user info");
+      return null
+    }
+  };
+
   useEffect(() => {
     initializeUser();
+    initializeUser2();
     fetchMechanics();
   }, []);
+
 
   const logout = () => {
     setUserRole({});
@@ -98,6 +153,9 @@ export const CarDataProvider = ({ children }) => {
         fetchMechanics,
         setServices,
         services,
+        initializeUser2,
+        selectedLanguage,
+        setSelectedLanguage
       }}
     >
       {children}

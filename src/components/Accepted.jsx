@@ -12,6 +12,7 @@ import Lottie from "lottie-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import RightSidebar from "../sidebar/RightSidebar";
 
 function Accepted() {
   const {
@@ -50,8 +51,8 @@ function Accepted() {
     try {
       setLoading(true);
       const url =
-        userRole.userRole === "admin"
-          ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
+        userRole.userRole === "super_admin"
+          ? `${apiUrl}/api/v1/carService/getAllAccpeted`
           : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
 
       const response = await axios.get(url, {
@@ -210,7 +211,7 @@ function Accepted() {
       center: 'true',
     },
 
-    userRole.userRole === "user" && {
+    userRole.userRole === "mechanic" && {
       name: t("pending.actions"),
       style: {
         textAlign: "center",
@@ -329,26 +330,26 @@ function Accepted() {
       custContactNo: "Phone Number",
       email: "Email",
       address: "Address",
-      vehicleModel: "Vehicle Model",
-      manufactureYear: "Manufacture Year",
-      vehicleColor: "Vehicle Color",
-      engineNo: "Engine No.",
-      chasisNo: "Chasis No.",
+      // vehicleModel: "Vehicle Model",
+      // manufactureYear: "Manufacture Year",
+      // vehicleColor: "Vehicle Color",
+      // engineNo: "Engine No.",
+      // chasisNo: "Chasis No.",
 
       // Car Service Info
       entryType: "Entry Type",
       mileage: "Mileage",
-      fuelLevel: "Fuel Level",
-      fuelLevelImage: "Fuel Level Image",
-      carImage: "Car Image",
-      technitionName: "Technician Name",
-      managerName: "Manager Name",
-      remarks: "Remarks",
+      // fuelLevel: "Fuel Level",
+      // fuelLevelImage: "Fuel Level Image",
+      // carImage: "Car Image",
+      // technitionName: "Technician Name",
+      // managerName: "Manager Name",
+      remarks: "Mechanic Remarks",
       serviceTypes: "Service Types",
-      createdBy: "Created By",
-      createdDate: "Created Date",
-      modifiedBy: "Modified By",
-      modifiedDate: "Modified Date",
+      // createdBy: "Created By",
+      // createdDate: "Created Date",
+      // modifiedBy: "Modified By",
+      // modifiedDate: "Modified Date",
     };
 
     const formattedData = tableData.map((row) =>
@@ -467,7 +468,7 @@ function Accepted() {
         <div className="col-12 col-md-9 col-lg-10 p-3">
           {!loading && (
             <div className="container-fluid">
-              <div className="d-flex justify-content-between align-items-center mb-3">
+              {/* <div className="d-flex justify-content-between align-items-center mb-3">
                 <div className="d-flex">
                   <div
                     className="d-md-none me-2"
@@ -479,7 +480,12 @@ function Accepted() {
                   <h1 className="text-white">{t("menu.accepted")}</h1>
                 </div>
                 <Logout />
-              </div>
+              </div> */}
+
+              <RightSidebar />
+
+              <h1 className="text-white">{t("menu.accepted")}</h1>
+
 
               {!clicked.click ? (
                 <>

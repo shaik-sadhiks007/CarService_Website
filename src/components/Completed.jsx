@@ -12,6 +12,7 @@ import Lottie from "lottie-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import RightSidebar from "../sidebar/RightSidebar";
 
 function Completed() {
   const {
@@ -50,8 +51,8 @@ function Completed() {
       setLoading(true);
 
       const url =
-        userRole.userRole === "admin"
-          ? `${apiUrl}/api/v1/carService/getAllPendingCarServiceforAdmin`
+        userRole.userRole === "super_admin"
+          ? `${apiUrl}/api/v1/carService/getAllCompleted`
           : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
 
       const response = await axios.get(url, {
@@ -289,6 +290,38 @@ function Completed() {
   const exportToExcel = () => {
     // Format data according to excelData mapping
 
+    // const keyMapping = {
+    //   // Customer Info
+    //   customerId: "Customer Id",
+    //   custName: "Customer Name",
+    //   vehicleRegNo: "Vehicle No.",
+    //   dateIn: "Date In",
+    //   custContactNo: "Phone Number",
+    //   email: "Email",
+    //   address: "Address",
+    //   vehicleModel: "Vehicle Model",
+    //   manufactureYear: "Manufacture Year",
+    //   vehicleColor: "Vehicle Color",
+    //   engineNo: "Engine No.",
+    //   chasisNo: "Chasis No.",
+
+    //   // Car Service Info
+    //   entryType: "Entry Type",
+    //   mileage: "Mileage",
+    //   fuelLevel: "Fuel Level",
+    //   fuelLevelImage: "Fuel Level Image",
+    //   carImage: "Car Image",
+    //   technitionName: "Technician Name",
+    //   managerName: "Manager Name",
+    //   remarks: "Remarks",
+    //   serviceTypes: "Service Types",
+    //   createdBy: "Created By",
+    //   createdDate: "Created Date",
+    //   modifiedBy: "Modified By",
+    //   modifiedDate: "Modified Date",
+    // };
+
+
     const keyMapping = {
       // Customer Info
       customerId: "Customer Id",
@@ -298,28 +331,27 @@ function Completed() {
       custContactNo: "Phone Number",
       email: "Email",
       address: "Address",
-      vehicleModel: "Vehicle Model",
-      manufactureYear: "Manufacture Year",
-      vehicleColor: "Vehicle Color",
-      engineNo: "Engine No.",
-      chasisNo: "Chasis No.",
+      // vehicleModel: "Vehicle Model",
+      // manufactureYear: "Manufacture Year",
+      // vehicleColor: "Vehicle Color",
+      // engineNo: "Engine No.",
+      // chasisNo: "Chasis No.",
 
       // Car Service Info
       entryType: "Entry Type",
       mileage: "Mileage",
-      fuelLevel: "Fuel Level",
-      fuelLevelImage: "Fuel Level Image",
-      carImage: "Car Image",
-      technitionName: "Technician Name",
-      managerName: "Manager Name",
-      remarks: "Remarks",
+      // fuelLevel: "Fuel Level",
+      // fuelLevelImage: "Fuel Level Image",
+      // carImage: "Car Image",
+      // technitionName: "Technician Name",
+      // managerName: "Manager Name",
+      remarks: "Mechanic Remarks",
       serviceTypes: "Service Types",
-      createdBy: "Created By",
-      createdDate: "Created Date",
-      modifiedBy: "Modified By",
-      modifiedDate: "Modified Date",
+      // createdBy: "Created By",
+      // createdDate: "Created Date",
+      // modifiedBy: "Modified By",
+      // modifiedDate: "Modified Date",
     };
-
     const formattedData = tableData.map((row) =>
       Object.fromEntries(
         Object.keys(keyMapping).map((key) => {
@@ -440,7 +472,7 @@ function Completed() {
         <div className="col-12 col-md-9 col-lg-10 p-3">
           {!loading && (
             <div className="container-fluid">
-              <div className="d-flex justify-content-between align-items-center mb-3">
+              {/* <div className="d-flex justify-content-between align-items-center mb-3">
                 <div className="d-flex">
                   <div
                     className="d-md-none me-2"
@@ -459,7 +491,11 @@ function Completed() {
                   className="form-control w-50 input-dashboard text-white placeholder-white rounded-pill"
                 />
                 <Logout />
-              </div>
+              </div> */}
+
+              <RightSidebar />
+
+              <h1 className="text-white">{t("menu.completed")}</h1>
 
               {!clicked.click ? (
                 <>

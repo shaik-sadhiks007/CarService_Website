@@ -14,6 +14,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
   const [editableData, setEditableData] = useState({
     remarks: historyData?.remarks || "",
     serviceTypes: historyData?.serviceTypes || "",
+    paymentStatus: historyData?.paymentStatus || ""
   });
 
   const { services, setServices, apiUrl, userRole } =
@@ -30,26 +31,27 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     custContactNo: t("TableMapping.custContactNo"),
     email: t("TableMapping.email"),
     address: t("TableMapping.address"),
-    vehicleModel: t("TableMapping.vehicleModel"),
-    manufactureYear: t("TableMapping.manufactureYear"),
-    vehicleColor: t("TableMapping.vehicleColor"),
-    engineNo: t("TableMapping.engineNo"),
-    chasisNo: t("TableMapping.chasisNo"),
+    // vehicleModel: t("TableMapping.vehicleModel"),
+    // manufactureYear: t("TableMapping.manufactureYear"),
+    // vehicleColor: t("TableMapping.vehicleColor"),
+    // engineNo: t("TableMapping.engineNo"),
+    // chasisNo: t("TableMapping.chasisNo"),
 
     // Car Service Info
     entryType: t("TableMapping.entryType"),
-    mileage: t("TableMapping.mileage"),
-    fuelLevel: t("TableMapping.fuelLevel"),
-    fuelLevelImage: t("TableMapping.fuelLevelImage"),
-    carImage: t("TableMapping.carImage"),
-    technitionName: t("TableMapping.technitionName"),
-    managerName: t("TableMapping.managerName"),
+    // mileage: t("TableMapping.mileage"),
+    // fuelLevel: t("TableMapping.fuelLevel"),
+    // fuelLevelImage: t("TableMapping.fuelLevelImage"),
+    // carImage: t("TableMapping.carImage"),
+    // technitionName: t("TableMapping.technitionName"),
+    // managerName: t("TableMapping.managerName"),
     remarks: t("TableMapping.remarks"),
     serviceTypes: t("TableMapping.serviceTypes"),
-    createdBy: t("TableMapping.createdBy"),
-    createdDate: t("TableMapping.createdDate"),
-    modifiedBy: t("TableMapping.modifiedBy"),
-    modifiedDate: t("TableMapping.modifiedDate"),
+    paymentStatus: t("account_admin.paymentStatus"),
+    // createdBy: t("TableMapping.createdBy"),
+    // createdDate: t("TableMapping.createdDate"),
+    // modifiedBy: t("TableMapping.modifiedBy"),
+    // modifiedDate: t("TableMapping.modifiedDate"),
   };
 
   const handleServiceChange = (e) => {
@@ -161,7 +163,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
   };
 
   const renderValue = (key, value) => {
-    if (isEditing && key === "remarks") {
+    if (isEditing && userRole?.userRole == "mechanic" && key === "remarks") {
       return (
         <input
           type="text"
@@ -173,7 +175,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
       );
     }
 
-    if (isEditing && key === "serviceTypes") {
+    if (isEditing && userRole?.userRole == "mechanic" && key === "serviceTypes") {
       return (
         <>
           <select
@@ -206,6 +208,25 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
       );
     }
 
+    if (isEditing && userRole?.userRole == "account_admin" && key === "paymentStatus") {
+
+      return (
+        <select
+          className="form-select"
+          name="paymentStatus"
+          value={editableData.paymentStatus}
+          onChange={handleInputChange}
+        >
+          <option value="P">Pending Payment</option>
+          <option value="C">Completed</option>
+          <option value="D">Ready for Delivery</option>
+          <option value="L">Pay Later</option>
+        </select>
+      )
+
+    }
+
+
     if (key === "createdDate" || key === "modifiedDate" || key === "dateIn") {
       return formatDate(value);
     }
@@ -228,7 +249,12 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
 
   const handleEditButton = () => {
     setIsEditing(true);
-    toast.success("you can edit Remarks and Services now.");
+
+    if (userRole == 'mechanic') {
+      toast.success("you can edit Remarks and Services now.");
+    } else {
+      toast.success("you can edit Payment Status now.");
+    }
   };
 
   const saveChanges = async (vehicle) => {
@@ -241,6 +267,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
         ...historyData,
         remarks: editableData.remarks,
         serviceTypes: serviceString,
+        paymentStatus: editableData.paymentStatus,
         modifiedBy: userRole.username,
         modifiedDate: moment().tz("Asia/Singapore").toISOString(),
       },
@@ -259,6 +286,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
         ...carInfo,
         remarks: editableData.remarks,
         serviceTypes: serviceString,
+        paymentStatus: editableData.paymentStatus,
         modifiedBy: userRole.username,
         modifiedDate: moment().tz("Asia/Singapore").toISOString(),
       },

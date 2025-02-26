@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { CarDataContext } from "../components/CarDataContext";
 
 const LanguageSwitcher = ({ switchLanguage }) => {
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+
+  const {selectedLanguage, setSelectedLanguage} = useContext(CarDataContext);
 
   const handleSelect = (language) => {
     setSelectedLanguage(language);

@@ -13,6 +13,10 @@ import AddServices from "./adminComponents/AddServices";
 import DataDownload from "./adminComponents/DataDownload";
 import Settings from "./settings/Settings";
 import PrivateRoute from "./settings/PrivateRoute";
+import GuestLogin from "./components/GuestLogin";
+import FormFilling from "./guestComp/FormFilling";
+import PaymentPending from "./guestComp/PaymentPending";
+import ReadyToDeliver from "./guestComp/ReadyToDeliver";
 
 function App() {
 
@@ -33,6 +37,11 @@ function App() {
           <Route path="/pending" element={<Pending />} />
           <Route path="/completed" element={<Completed />} />
           <Route path="/accepted" element={<Accepted />} />
+          <Route path="/guest" element={<GuestLogin />} />
+          <Route path="/form-filling" element={<FormFilling />} />
+          <Route path="/ready-to-deliver" element={<ReadyToDeliver />} />
+          <Route path="/payment-pending" element={<PaymentPending />} />
+
         </Route>
       </Routes>
     </Router>

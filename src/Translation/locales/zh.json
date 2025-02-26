@@ -98,5 +98,20 @@
   "back": "返回",
   "edit": "编辑",
   "exportToPdf": "导出为 PDF",
-  "exportToExcel": "导出为 Excel"
+  "exportToExcel": "导出为 Excel",
+  "account_admin": {
+    "paymentPending": "待付款",
+    "readyToDeliver": "准备交付",
+    "paymentPendingCars": "待付款车辆",
+    "ReadyToDeliverCars": "准备交付的车辆",
+    "paymentStatus": "付款状态"
+  },
+  "guest": {
+    "guest": "访客",
+    "customer": "客户",
+    "dealer": "经销商",
+    "rental": "租赁",
+    "name": "姓名",
+    "complaints": "投诉"
+  }
 }

@@ -14,6 +14,7 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import headerIcon from '../assets/header.png'
+import RightSidebar from "../sidebar/RightSidebar";
 
 function Pending() {
   const {
@@ -68,7 +69,7 @@ function Pending() {
 
       setFullData(response.data);
 
-      if (userRole.userRole?.toLowerCase() === "admin") {
+      if (userRole.userRole?.toLowerCase() === "super_admin") {
         console.log("hi admin")
         const customerData = response.data.custInformationList || [];
         const serviceData = response.data.carServiceInfromationList || [];
@@ -141,7 +142,7 @@ function Pending() {
 
     fetchPendingCars();
 
-    if (userRole.userRole == "admin") {
+    if (userRole.userRole == "super_admin") {
       fetchMechanics();
     }
 
@@ -328,7 +329,7 @@ function Pending() {
       center: 'true',
 
       cell: (item) =>
-        userRole.userRole === "admin" ? (
+        userRole.userRole === "super_admin" ? (
           <button
             className="btn btn-primary btn-sm"
             onClick={() => handleAssign(item.vehicleRegNo)}
@@ -488,6 +489,37 @@ function Pending() {
   const exportToExcel = () => {
     // Format data according to excelData mapping
 
+    // const keyMapping = {
+    //   // Customer Info
+    //   customerId: "Customer Id",
+    //   custName: "Customer Name",
+    //   vehicleRegNo: "Vehicle No.",
+    //   dateIn: "Date In",
+    //   custContactNo: "Phone Number",
+    //   email: "Email",
+    //   address: "Address",
+    //   vehicleModel: "Vehicle Model",
+    //   manufactureYear: "Manufacture Year",
+    //   vehicleColor: "Vehicle Color",
+    //   engineNo: "Engine No.",
+    //   chasisNo: "Chasis No.",
+
+    //   // Car Service Info
+    //   entryType: "Entry Type",
+    //   mileage: "Mileage",
+    //   fuelLevel: "Fuel Level",
+    //   fuelLevelImage: "Fuel Level Image",
+    //   carImage: "Car Image",
+    //   technitionName: "Technician Name",
+    //   managerName: "Manager Name",
+    //   remarks: "Remarks",
+    //   serviceTypes: "Service Types",
+    //   createdBy: "Created By",
+    //   createdDate: "Created Date",
+    //   modifiedBy: "Modified By",
+    //   modifiedDate: "Modified Date",
+    // };
+
     const keyMapping = {
       // Customer Info
       customerId: "Customer Id",
@@ -497,26 +529,26 @@ function Pending() {
       custContactNo: "Phone Number",
       email: "Email",
       address: "Address",
-      vehicleModel: "Vehicle Model",
-      manufactureYear: "Manufacture Year",
-      vehicleColor: "Vehicle Color",
-      engineNo: "Engine No.",
-      chasisNo: "Chasis No.",
+      // vehicleModel: "Vehicle Model",
+      // manufactureYear: "Manufacture Year",
+      // vehicleColor: "Vehicle Color",
+      // engineNo: "Engine No.",
+      // chasisNo: "Chasis No.",
 
       // Car Service Info
       entryType: "Entry Type",
       mileage: "Mileage",
-      fuelLevel: "Fuel Level",
-      fuelLevelImage: "Fuel Level Image",
-      carImage: "Car Image",
-      technitionName: "Technician Name",
-      managerName: "Manager Name",
-      remarks: "Remarks",
+      // fuelLevel: "Fuel Level",
+      // fuelLevelImage: "Fuel Level Image",
+      // carImage: "Car Image",
+      // technitionName: "Technician Name",
+      // managerName: "Manager Name",
+      remarks: "Mechanic Remarks",
       serviceTypes: "Service Types",
-      createdBy: "Created By",
-      createdDate: "Created Date",
-      modifiedBy: "Modified By",
-      modifiedDate: "Modified Date",
+      // createdBy: "Created By",
+      // createdDate: "Created Date",
+      // modifiedBy: "Modified By",
+      // modifiedDate: "Modified Date",
     };
 
     const formattedData = tableData.map((row) =>
@@ -703,19 +735,11 @@ function Pending() {
         <div className="col-12 col-md-9 col-lg-10 p-3">
           {!loading && (
             <div className="container-fluid">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="d-flex">
-                  <div
-                    className="d-md-none me-2"
-                    onClick={toggleOffcanvas}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <i className="bi bi-list text-light fs-2"></i>
-                  </div>
-                  <h1 className="text-white">{t("menu.pending")}</h1>
-                </div>
-                <Logout />
-              </div>
+
+              <RightSidebar />
+
+              <h1 className="text-white">{t("menu.pending")}</h1>
+
 
               {!clicked.click ? (
                 <>

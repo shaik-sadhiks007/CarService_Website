@@ -6,6 +6,7 @@ import Logout from '../components/Logout';
 import Sidebar from '../components/Sidebar';
 import AdminPage from './AdminPage';
 import { useTranslation } from 'react-i18next';
+import NewDashboard from './NewDashboard';
 
 const DataDownload = () => {
 
@@ -64,6 +65,8 @@ const DataDownload = () => {
                         >
 
                             <AdminPage/>
+
+                            <NewDashboard/>
 
 
                         </div>

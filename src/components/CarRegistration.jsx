@@ -21,10 +21,13 @@ function CarRegistration({
   customerData,
   carInfo,
   setCarPlate,
-  historyData
+  historyData,
+  role = false
 }) {
   const { apiUrl, userRole, mechanics, services, setServices, logout } =
     useContext(CarDataContext);
+
+  console.log(customerInfo, 'custInfo')
 
   const navigate = useNavigate()
   const { t } = useTranslation();
@@ -39,15 +42,23 @@ function CarRegistration({
 
   const labels = {
     // Customer Info
-    custName: t('customerInfo.custName'),
+    // custName: t('customerInfo.custName'),
+
+    custName: `${t(`guest.${role}`) || role} ${t('guest.name')}`,
+
     custContactNo: t('customerInfo.custContactNo'),
     email: t('customerInfo.email'),
-    address: t('customerInfo.address'),
+    // address: t('customerInfo.address'),
     vehicleModel: t('customerInfo.vehicleModel'),
-    manufactureYear: t('customerInfo.manufactureYear'),
-    vehicleColor: t('customerInfo.vehicleColor'),
-    engineNo: t('customerInfo.engineNo'),
-    chasisNo: t('customerInfo.chasisNo'),
+
+    customerComplaints: `${t(`guest.${role}`) || role} ${t('guest.complaints')}`,
+
+
+
+    // manufactureYear: t('customerInfo.manufactureYear'),
+    // vehicleColor: t('customerInfo.vehicleColor'),
+    // engineNo: t('customerInfo.engineNo'),
+    // chasisNo: t('customerInfo.chasisNo'),
 
     // Car Service Info
     dateIn: t('carServiceInfo.dateIn'),
@@ -88,37 +99,39 @@ function CarRegistration({
     }
   };
 
-  const fetchServices = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
+  // const fetchServices = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
 
-        logout()
-        navigate('/')
+  //       logout()
+  //       navigate('/')
 
-        console.error("Authorization token not found");
-        return;
-      }
-      const response = await axios.get(
-        `${apiUrl}/api/v1/carService/getServiceTypes`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  //       console.error("Authorization token not found");
+  //       return;
+  //     }
+  //     const response = await axios.get(
+  //       `${apiUrl}/api/v1/carService/getServiceTypes`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
 
-      const activeServices = response.data.filter((s) => s.active === true);
-      setServices(activeServices);
-    } catch (error) {
-      console.error("Error fetching services:", error);
-    }
-  };
+  //     const activeServices = response.data.filter((s) => s.active === true);
+  //     setServices(activeServices);
+  //   } catch (error) {
+  //     console.error("Error fetching services:", error);
+  //   }
+  // };
+
+  console.log(carServiceInfo.dateIn, "datein")
 
 
   useEffect(() => {
 
-    fetchServices();
+    // fetchServices();
 
     const handleOnline = async () => {
       await syncOfflineData();
@@ -143,32 +156,27 @@ function CarRegistration({
         "custName",
         "custContactNo",
         "email",
-        "address",
         "vehicleModel",
-        "manufactureYear",
-        "vehicleColor",
-        "engineNo",
+        "custType",
       ];
 
       const mandatoryCarServiceFields = [
         "dateIn",
         "entryType",
         "mileage",
-        "fuelLevel",
-        "remarks",
         "status",
         "serviceTypes",
       ];
 
       const isCustomerInfoValid = mandatoryCustomerFields.every(
-        (field) => customerInfo[field] && customerInfo[field].trim() !== ""
+        (field) => customerInfo[field] && String(customerInfo[field]).trim() !== ""
       );
 
       const isCarServiceInfoValid = mandatoryCarServiceFields.every((field) => {
         if (field === "serviceTypes") {
           return carServiceInfo[field] && carServiceInfo[field].length > 0;
         }
-        return carServiceInfo[field] && carServiceInfo[field].trim() !== "";
+        return carServiceInfo[field] && String(carServiceInfo[field]).trim() !== "";
       });
 
       if (!isCustomerInfoValid || !isCarServiceInfoValid) {
@@ -176,12 +184,13 @@ function CarRegistration({
         return;
       }
 
-      const formattedDateIn = carServiceInfo.dateIn + "+00:00";
-      const serviceString = carServiceInfo.serviceTypes.join(", ");
+      const formattedDateIn = new Date(carServiceInfo.dateIn).toISOString().replace("Z", "");
+
       const data = {
         custInformation: {
           ...customerInfo,
           vehicleRegNo: carPlate,
+          custType: role === 'rental' ? 'r' : role === 'dealer' ? 'd' : 'c',
           ...(found
             ? {
               modifiedBy: userRole.username,
@@ -198,7 +207,8 @@ function CarRegistration({
           fuelLevelImage: images.fuelLevelImage,
           carImage: images.carImage,
           vehicleRegNo: carPlate,
-          serviceTypes: serviceString,
+          serviceTypes: carServiceInfo.serviceTypes.join(','),
+          paymentStatus: "pending",
           ...(found
             ? {
               modifiedBy: userRole.username,
@@ -213,8 +223,8 @@ function CarRegistration({
         },
       };
 
+
       if (!navigator.onLine) {
-        // Store data in localStorage if offline
         const pendingRequests =
           JSON.parse(localStorage.getItem("pendingRequests")) || [];
         pendingRequests.push(data);
@@ -225,7 +235,6 @@ function CarRegistration({
         return;
       }
 
-      // If online, proceed with API call
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Authorization token is missing.");
@@ -254,6 +263,7 @@ function CarRegistration({
     }
   };
 
+
   const syncOfflineData = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -269,7 +279,7 @@ function CarRegistration({
             const vehicleRegNo = data.custInformation.vehicleRegNo;
 
             const customerResponse = await axios.get(
-              `http://localhost:8080/CarServiceMaintenance/api/v1/carService/getCustomerDetails?vehicleRegNo=${vehicleRegNo}`,
+              `${apiUrl}/api/v1/carService/getCustomerDetails?vehicleRegNo=${vehicleRegNo}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -354,23 +364,31 @@ function CarRegistration({
                   (key) =>
                     labels[key] && (
                       <div className="col-12 col-md-6 mb-3" key={key}>
-                        <label className="form-label">{labels[key]}</label>
-                        <input
-                          type="text"
-                          name={key}
-                          className="form-control placeholder-white py-2"
-                          placeholder={labels[key]}
-                          value={customerInfo[key] || ""}
-                          onChange={(e) =>
-                            setCustomerInfo({
-                              ...customerInfo,
-                              [key]: e.target.value,
-                            })
-                          }
-                          disabled={
-                            userRole.userRole === "user" ? found : false
-                          }
-                        />
+
+                        {key !== "customerComplaints" && (
+
+                          <>
+                            <label className="form-label text-capitalize">{labels[key]}</label>
+                            <input
+                              type="text"
+                              name={key}
+                              className="form-control placeholder-white py-2"
+                              placeholder={labels[key]}
+                              value={customerInfo[key] || ""}
+                              onChange={(e) =>
+                                setCustomerInfo({
+                                  ...customerInfo,
+                                  [key]: e.target.value,
+                                })
+                              }
+                              disabled={
+                                userRole.userRole === "mechanic" ? found : false
+                              }
+                            />
+                          </>
+
+                        )}
+
                       </div>
                     )
                 )}
@@ -387,9 +405,9 @@ function CarRegistration({
               <div className="row">
                 {Object.keys(carServiceInfo).map((key) =>
                   labels[key] &&
-                    key !== "remarks" &&
+                    (key !== "remarks" && key !== "customerComplaints") &&
                     !(
-                      key === "technitionName" && userRole.userRole !== "admin"
+                      key === "technitionName" && userRole.userRole !== "super_admin"
                     ) ? (
                     <div className="col-12 col-md-6 mb-3" key={key}>
                       <label className="form-label">{labels[key]}</label>
@@ -415,7 +433,7 @@ function CarRegistration({
                           }
                         />
                       ) : key === "technitionName" &&
-                        userRole.userRole === "admin" ? (
+                        userRole.userRole === "super_admin" ? (
                         <select
                           name={key}
                           className="form-control placeholder-white py-2"
@@ -487,11 +505,30 @@ function CarRegistration({
                 )}
 
                 {/* Display remarks field at the end */}
-                {labels["remarks"] && (
+
+                {role && labels["customerComplaints"] && (
                   <div className="col-12 mb-3">
-                    <label className="form-label">{labels["remarks"]}</label>
+                    <label className="form-label text-capitalize">{labels["customerComplaints"]}</label>
                     <textarea
-                      className="form-control placeholder-white py-2"
+                      className="form-control placeholder-white py-2 text-capitalize"
+                      rows="4"
+                      placeholder={labels["customerComplaints"]}
+                      value={customerInfo["customerComplaints"] || ""}
+                      onChange={(e) =>
+                        setCustomerInfo({
+                          ...customerInfo,
+                          customerComplaints: e.target.value,
+                        })
+                      }
+                    ></textarea>
+                  </div>
+                )}
+
+                {!role && labels["remarks"] && (
+                  <div className="col-12 mb-3">
+                    <label className="form-label text-capitalize">{labels["remarks"]}</label>
+                    <textarea
+                      className="form-control placeholder-white py-2 text-capitalize"
                       rows="4"
                       placeholder={labels["remarks"]}
                       value={carServiceInfo["remarks"] || ""}

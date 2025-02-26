@@ -11,6 +11,8 @@ function Sidebar() {
     useContext(CarDataContext);
   const { t, i18n } = useTranslation();
 
+
+
   const menuItems = [
     {
       path: "/car-service-entry",
@@ -24,14 +26,35 @@ function Sidebar() {
       iconclassName: "bi bi-check-circle-fill",
       label: t("menu.completed"),
     },
+    {
+      path: "/ready-to-deliver",
+      iconclassName: "bi bi-check-circle-fill",
+      label: t("account_admin.readyToDeliver"),
+    },
   ];
 
   const adminItems = [
     { path: "/register", iconclassName: "bi bi-person-plus-fill", label: t("admin.register") },
-    { path: "/services", iconclassName: "bi bi-tools", label: t("admin.addServices") },
+    // { path: "/services", iconclassName: "bi bi-tools", label: t("admin.addServices") },
   ];
 
+  const accountantItems = [
+    { path: "/payment-pending", iconclassName: "bi bi-person-plus-fill", label: t("account_admin.paymentPending") },
+    {
+      path: "/ready-to-deliver",
+      iconclassName: "bi bi-check-circle-fill",
+      label: t("account_admin.readyToDeliver"),
+    },
+  ];
+
+  const guestItems = [
+    { path: "/guest", iconclassName: "bi bi-person-plus-fill", label: t("guest.guest") },
+  ];
+
+
+
   const toggleOffcanvas = () => {
+
     setShowOffcanvas(!showOffcanvas);
   };
 
@@ -64,8 +87,8 @@ function Sidebar() {
         onClick={toggleOffcanvas}
       >
         <div className="offcanvas-header">
-          {/* <h5 className="offcanvas-title text-white">{t('menu.menu')}</h5> */}
-          <div className="">
+
+          <div onClick={(e) => e.stopPropagation()}>
             <LanguageSwitcher switchLanguage={switchLanguage} />
           </div>
           <button
@@ -89,7 +112,7 @@ function Sidebar() {
           </div>
 
           <ul className="nav nav-pills flex-column mb-auto">
-            {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'admin' && (
+            {/* {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'super_admin' && (
               <li
                 className={`nav-item my-2 rounded-2 ${location.pathname === '/dashboard' ? "active" : ""}`}
                 style={{
@@ -111,8 +134,9 @@ function Sidebar() {
                 </Link>
 
               </li>
-            )}
-            {menuItems.map((item) => {
+            )} */}
+
+            {userRole && userRole.userRole && (userRole.userRole.toLowerCase() === 'mechanic' || userRole.userRole.toLowerCase() === 'super_admin') && menuItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
                 <li
@@ -136,7 +160,7 @@ function Sidebar() {
               );
             })}
 
-            {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'admin' && (
+            {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'super_admin' && (
               <div>
                 <hr className="text-white" />
 
@@ -171,23 +195,78 @@ function Sidebar() {
 
               </div>
             )}
+
+            {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'account_admin' && (
+              <div>
+
+                <ul className="nav flex-column">
+                  {accountantItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <li
+                        key={item.path}
+                        className={`nav-item my-2 rounded-2 ${isActive ? "active" : ""}`}
+                        style={{
+                          backgroundColor: isActive ? "#FFC107" : "#2E3543",
+                          color: isActive ? "#000" : "#fff",
+                        }}
+                      >
+                        <Link
+                          to={item.path}
+                          className="nav-link d-flex align-items-center"
+                          style={{ color: "inherit" }}
+                        >
+                          <i className={`${item.iconclassName} me-2`}></i>
+                          <span className="fw-semibold">{item.label}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+              </div>
+            )}
+
+            {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'guest' && (
+              <div>
+
+                <ul className="nav flex-column">
+                  {guestItems.map((item) => {
+                    const isActive = true;
+                    return (
+                      <li
+                        key={item.path}
+                        className={`nav-item my-2 rounded-2 ${isActive ? "active" : ""}`}
+                        style={{
+                          backgroundColor: isActive ? "#FFC107" : "#2E3543",
+                          color: isActive ? "#000" : "#fff",
+                        }}
+                      >
+                        <Link
+                          to={item.path}
+                          className="nav-link d-flex align-items-center"
+                          style={{ color: "inherit" }}
+                        >
+                          <i className={`${item.iconclassName} me-2`}></i>
+                          <span className="fw-semibold">{item.label}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+              </div>
+            )}
           </ul>
         </div>
-      </div>
-
-      {/* Language Switcher */}
-      {/* <div className="language-switcher mb-3">
-        <button onClick={() => switchLanguage('en')} className="btn btn-secondary me-2">EN</button>
-        <button onClick={() => switchLanguage('zh')} className="btn btn-secondary">中文</button>
-      </div> */}
-
-      <div className="mb-3">
-        <LanguageSwitcher switchLanguage={switchLanguage} />
       </div>
 
 
       {/* Regular Sidebar for Desktop */}
       <div className="d-none d-md-block" style={{ overflow: "hidden" }}>
+        <div className="mb-3">
+          <LanguageSwitcher switchLanguage={switchLanguage} />
+        </div>
         <div className="profile mb-4 d-flex align-items-center">
           <img
             src="./assets/man.png"
@@ -202,7 +281,7 @@ function Sidebar() {
         </div>
 
         <ul className="nav nav-pills flex-column mb-auto" style={{ overflowY: "hidden" }}>
-          {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'admin' && (
+          {/* {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'super_admin' && (
             <li
               className={`nav-item my-2 rounded-2 ${location.pathname === '/dashboard' ? "active" : ""}`}
               style={{
@@ -224,9 +303,9 @@ function Sidebar() {
               </Link>
 
             </li>
-          )}
+          )} */}
 
-          {menuItems.map((item) => {
+          {userRole && userRole.userRole && (userRole.userRole.toLowerCase() === 'mechanic' || userRole.userRole.toLowerCase() === 'super_admin') && menuItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <li
@@ -250,7 +329,7 @@ function Sidebar() {
           })}
 
           {/* Admin Menu */}
-          {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'admin' && (
+          {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'super_admin' && (
 
             <div>
               <hr className="text-white" />
@@ -260,6 +339,70 @@ function Sidebar() {
               <ul className="nav flex-column">
                 {adminItems.map((item) => {
                   const isActive = location.pathname === item.path;
+                  return (
+                    <li
+                      key={item.path}
+                      className={`nav-item my-2 rounded-2 ${isActive ? "active" : ""}`}
+                      style={{
+                        backgroundColor: isActive ? "#FFC107" : "#2E3543",
+                        color: isActive ? "#000" : "#fff",
+                      }}
+                    >
+                      <Link
+                        to={item.path}
+                        className="nav-link d-flex align-items-center"
+                        style={{ color: "inherit" }}
+                      >
+                        <i className={`${item.iconclassName} me-2`}></i>
+                        <span className="fw-semibold">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+
+            </div>
+
+          )}
+
+          {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'account_admin' && (
+
+            <div>
+              <ul className="nav flex-column">
+                {accountantItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <li
+                      key={item.path}
+                      className={`nav-item my-2 rounded-2 ${isActive ? "active" : ""}`}
+                      style={{
+                        backgroundColor: isActive ? "#FFC107" : "#2E3543",
+                        color: isActive ? "#000" : "#fff",
+                      }}
+                    >
+                      <Link
+                        to={item.path}
+                        className="nav-link d-flex align-items-center"
+                        style={{ color: "inherit" }}
+                      >
+                        <i className={`${item.iconclassName} me-2`}></i>
+                        <span className="fw-semibold">{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+
+            </div>
+
+          )}
+
+          {userRole && userRole.userRole && userRole.userRole.toLowerCase() === 'guest' && (
+
+            <div>
+              <ul className="nav flex-column">
+                {guestItems.map((item) => {
+                  const isActive = true;
                   return (
                     <li
                       key={item.path}

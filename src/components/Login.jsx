@@ -11,7 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const { userRole, logout, apiUrl, initializeUser } =
+  const { userRole, logout, apiUrl, initializeUser, initializeUser2 } =
     useContext(CarDataContext);
 
   const isTokenExpired = (token) => {
@@ -32,9 +32,36 @@ const Login = () => {
         navigate("/");
       } else {
         try {
+
           await initializeUser();
+
+          const userData = await initializeUser2();
+
+          if (!userData) {
+            logout();
+            navigate("/");
+            return;
+          }
+
+
           toast.success("Login successful!");
-          navigate("/dashboard");
+          console.log(userData.userRole, "login user useEffect")
+          if (userData.userRole === "super_admin") {
+            // navigate("/dashboard");
+            navigate("/car-service-entry")
+
+
+          } else if (userData.userRole == "mechanic") {
+
+            navigate("/car-service-entry")
+
+          } else if (userData.userRole == "account_admin") {
+
+            navigate("/payment-pending")
+
+          } else {
+            navigate('/guest')
+          }
         } catch (error) {
           console.error("Error initializing user:", error);
           toast.error("Failed to initialize user. Please try again.");
@@ -59,8 +86,35 @@ const Login = () => {
         const token = response.data.jwt;
         localStorage.setItem("token", token);
         await initializeUser();
+        const userData = await initializeUser2();
+
+        if (!userData) {
+          logout();
+          navigate("/");
+          return;
+        }
+
         toast.success("Login successful!");
-        navigate("/dashboard");
+        if (userData.userRole === "super_admin") {
+
+          // navigate("/dashboard");
+          navigate("/car-service-entry")
+
+
+        } else if (userData.userRole == "mechanic") {
+
+          navigate("/car-service-entry")
+
+        } else if (userData.userRole == "account_admin") {
+
+          navigate("/payment-pending")
+
+        }
+        else {
+          navigate('/guest')
+        }
+        console.log(userData.userRole, "login user submit")
+
       }
     } catch (err) {
       toast.error("Invalid credentials or server error");

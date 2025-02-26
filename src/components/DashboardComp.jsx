@@ -6,8 +6,9 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CarRegistration from "./CarRegistration";
 import { useTranslation } from "react-i18next";
+import RightSidebar from "../sidebar/RightSidebar";
 
-function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
+function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role = "customer" }) {
   const [carPlate, setCarPlate] = useState("");
 
   const [found, setFound] = useState(false);
@@ -23,12 +24,13 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
     custName: "",
     custContactNo: "",
     email: "",
-    address: "",
+    // address: "",
     vehicleModel: "",
-    manufactureYear: "",
-    vehicleColor: "",
-    engineNo: "",
-    chasisNo: "",
+    // manufactureYear: "",
+    // vehicleColor: "",
+    // engineNo: "",
+    // chasisNo: "",
+    custType: "c",
     createdBy: null,
     createdDate: null,
     modifiedBy: null,
@@ -46,12 +48,14 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
     remarks: "",
     status: "P",
     technitionName: "",
-    managerName: null,
+    // managerName: null,
+    customerComplaints: "",
     createdBy: "",
     createdDate: new Date().toISOString(),
     modifiedBy: null,
     modifiedDate: null,
-    serviceTypes: []
+    serviceTypes: [],
+    paymentStatus: "pending",
   };
   const { t } = useTranslation();
 
@@ -84,23 +88,42 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
         }
       );
 
-      if (response.data !== "No Customer Information Found") {
+      if (response.data.custInformationList.length > 0) {
+
+        console.log(response.data.custInformationList[0], "data found")
         setCustomerInfo({
           ...customerInfo,
-          vehicleRegNo: response.data.vehicleRegNo,
-          custName: response.data.custName,
-          custContactNo: response.data.custContactNo,
-          email: response.data.email,
-          address: response.data.address,
-          vehicleModel: response.data.vehicleModel,
-          manufactureYear: response.data.manufactureYear,
-          vehicleColor: response.data.vehicleColor,
-          engineNo: response.data.engineNo,
-          chasisNo: response.data.chasisNo,
-          createdBy: response.data.createdBy,
-          createdDate: response.data.createdDate,
-          modifiedBy: response.data.modifiedBy,
-          modifiedDate: response.data.modifiedDate,
+          vehicleRegNo: response.data.custInformationList[0].vehicleRegNo,
+          custName: response.data.custInformationList[0].custName,
+          custContactNo: response.data.custInformationList[0].custContactNo,
+          email: response.data.custInformationList[0].email,
+          // address: response.data.custInformationList[0].address,
+          vehicleModel: response.data.custInformationList[0].vehicleModel,
+          // manufactureYear: response.data.custInformationList[0].manufactureYear,
+          // vehicleColor: response.data.custInformationList[0].vehicleColor,
+          // engineNo: response.data.custInformationList[0].engineNo,
+          // chasisNo: response.data.custInformationList[0].chasisNo,
+          createdBy: response.data.custInformationList[0].createdBy,
+          createdDate: response.data.custInformationList[0].createdDate,
+          modifiedBy: response.data.custInformationList[0].modifiedBy,
+          modifiedDate: response.data.custInformationList[0].modifiedDate,
+        });
+
+        setCarServiceInfo({
+          ...carServiceInfo,
+          vehicleRegNo: response.data.carServiceInfromationList[0].vehicleRegNo,
+          dateIn: response.data.carServiceInfromationList[0].dateIn,
+          entryType: response.data.carServiceInfromationList[0].entryType,
+          mileage: response.data.carServiceInfromationList[0].mileage,
+          serviceTypes: response.data.carServiceInfromationList[0].serviceTypes
+            ? response.data.carServiceInfromationList[0].serviceTypes.split(',')
+            : [],
+          paymentStatus: response.data.carServiceInfromationList[0].paymentStatus,
+          customerComplaints: response.data.carServiceInfromationList[0].customerComplaints,
+          createdBy: response.data.carServiceInfromationList[0].createdBy,
+          createdDate: response.data.carServiceInfromationList[0].createdDate,
+          modifiedBy: response.data.carServiceInfromationList[0].modifiedBy,
+          modifiedDate: response.data.carServiceInfromationList[0].modifiedDate,
         });
 
         toast.success("Customer information found!");
@@ -115,20 +138,19 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
           }
         );
 
-        if (historyResponse.data) {
+        if (historyResponse.data.length > 0) {
           toast.success("Car History found!");
           setFound(true);
           setHistoryData(historyResponse.data);
         } else {
           setHistoryData([]);
         }
-        setCId(response.data.customerId);
+        setCId(response.data.custInformationList[0].customerId);
 
       } else {
         setFound(false);
         setCustomerInfo(customerData);
         setCId(null);
-        toast.error("No data found for the provided registration number.");
       }
     } catch (err) {
       setFound(false);
@@ -141,21 +163,14 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
 
 
 
-  console.log(historyData, "hd")
+
   return (
     <div className="container-fluid">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <div className="d-flex">
-          <div
-            className="d-md-none me-2"
-            onClick={toggleOffcanvas}
-            style={{ cursor: "pointer" }}
-          >
-            <i className="bi bi-list text-light fs-2"></i>
-          </div>
-          <h1 className="text-white">{t("menu.carServiceEntry")}</h1>
-        </div>
-        <Logout />
+
+      <RightSidebar />
+
+      <div>
+        <h1 className="text-white mb-4">{t("menu.carServiceEntry")}</h1>
       </div>
 
       <div
@@ -199,6 +214,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole }) {
         customerData={customerData}
         setCarPlate={setCarPlate}
         historyData={historyData}
+        role={role}
       />
     </div>
   );
