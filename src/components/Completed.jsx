@@ -23,6 +23,8 @@ function Completed() {
   } = useContext(CarDataContext);
 
   const [tableData, setTableData] = useState([]);
+  const [searchText, setSearchText] = useState("");
+
   const token = localStorage.getItem("token");
   const { t } = useTranslation()
 
@@ -30,6 +32,9 @@ function Completed() {
     click: false,
     data: {},
   });
+
+  const [category, setCategory] = useState("all")
+
 
   const excelData = {
 
@@ -287,6 +292,8 @@ function Completed() {
     },
   };
 
+
+
   const exportToExcel = () => {
     // Format data according to excelData mapping
 
@@ -451,9 +458,19 @@ function Completed() {
     doc.save("Icon_Technik_Completed_List.pdf");
   };
 
-  const [searchText, setSearchText] = useState("");
 
+  const filteredData = tableData.filter((row) => {
+    if (category === 'all') return true;
+    if (category === 'customer') return row.custType === 'c';
+    if (category === 'dealer') return row.custType === 'd';
+    if (category === 'rental') return row.custType === 'r';
+    if (category === 'towing') return row.custType === 't';
+    return true;
+  }).filter((row) => row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase()));
 
+  const handleCategoryChange = (selectedCategory) => {
+    setCategory(selectedCategory);
+  };
 
   return (
     <div className="container-fluid">
@@ -480,40 +497,54 @@ function Completed() {
               {!clicked.click ? (
                 <>
 
-<div
-                        className="text-white w-100 rounded-2">
+                  <div
+                    className="text-white w-100 rounded-2">
 
-                        <div className="row ">
-                            <div className="col-12 col-md-6">
-                                <input
-                                    type="text"
-                                    placeholder="Search by Vehicle No."
-                                    value={searchText}
-                                    onChange={(e) => setSearchText(e.target.value)}
-                                    className="form-control mb-3 input-dashboard text-white placeholder-white"
-                                />
-                            </div>
-                        </div>
-
+                    <div className="row ">
+                      <div className="col-12 col-md-6 mt-2">
+                        <input
+                          type="text"
+                          placeholder="Search by Vehicle No."
+                          value={searchText}
+                          onChange={(e) => setSearchText(e.target.value)}
+                          className="form-control mb-3 input-dashboard text-white placeholder-white"
+                        />
+                      </div>
                     </div>
+
+                  </div>
+
+                  <div className="d-flex gap-4 my-2">
+                    <button className={`btn ${category === 'all' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('all')}>
+                      All
+                    </button>
+                    <button className={`btn ${category === 'customer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('customer')}>
+                      Customer
+                    </button>
+                    <button className={`btn ${category === 'dealer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('dealer')}>
+                      Dealer
+                    </button>
+                    <button className={`btn ${category === 'rental' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('rental')}>
+                      Rental
+                    </button>
+                    <button className={`btn ${category === 'towing' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('towing')}>
+                      Towing
+                    </button>
+                  </div>
 
                   <DataTable
                     columns={columns}
-                    // data={tableData}
-                    data={tableData.filter((row) =>
-                      row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase())
-                    )}
+                    data={filteredData}
                     defaultSortFieldId="date"
                     defaultSortAsc={false}
                     pagination
-                    // highlightOnHover
                     onSort={(column, direction) => {
-                      // Optional: handle custom sorting logic here
                       console.log(column, direction);
                     }}
                     theme="dark"
                     customStyles={customStyles}
                   />
+
 
                   <div className="my-2 d-flex">
                     <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
@@ -534,7 +565,13 @@ function Completed() {
 
               {clicked.click && (
                 <>
-                  <TableOne historyData={clicked.data} setClicked={setClicked} />
+                  <TableOne
+                    historyData={clicked.data}
+                    setClicked={setClicked}
+                    edit={userRole.userRole === "super_admin"}
+                    fullData={fullData}
+                    refresh={fetchCompletedCars}
+                  />
                 </>
               )}
 

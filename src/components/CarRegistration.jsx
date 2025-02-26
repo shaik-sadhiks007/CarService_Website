@@ -40,6 +40,7 @@ function CarRegistration({
     carImage: null,
   });
 
+
   const labels = {
     // Customer Info
     // custName: t('customerInfo.custName'),
@@ -74,7 +75,6 @@ function CarRegistration({
   const handleServiceChange = (e) => {
     const selectedValue = e.target.value;
 
-    console.log(selectedValue, "value")
     // if (!carServiceInfo.serviceTypes.includes(selectedValue)) {
     //   setCarServiceInfo({
     //     ...carServiceInfo,
@@ -93,9 +93,6 @@ function CarRegistration({
     });
 
   };
-
-
-  console.log(carServiceInfo, "info of car");
 
   const handleRemoveService = (service) => {
     setCarServiceInfo({
@@ -196,7 +193,7 @@ function CarRegistration({
         custInformation: {
           ...customerInfo,
           vehicleRegNo: carPlate,
-          custType: role === 'rental' ? 'r' : role === 'dealer' ? 'd' : 'c',
+          custType: role === 'rental' ? 'r' : role === 'dealer' ? 'd' : role === 'towing' ? 't' : 'c',
           ...(found
             ? {
               modifiedBy: userRole.username,
@@ -367,7 +364,7 @@ function CarRegistration({
               
               <h4>
 
-                {`${t(`guest.${role === 'mechanic' ? 'customer' : role}`) || role} ${t('guest.Information')}`}
+                {`${t(`guest.${role === 'mechanic' ? 'customer' : role}`) || `guest.${role}`} ${t('guest.Information')}`}
 
               </h4>
 

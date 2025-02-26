@@ -115,6 +115,7 @@
     "rental" : "Rental Company",
     "name": "Name",
     "complaints": "Complaints",
-    "Information" : "Information"
+    "Information" : "Information",
+    "towing" : "Towing Person"
   }
 }

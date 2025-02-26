@@ -23,9 +23,10 @@ function GuestLogin() {
 
 
     const guestItems = [
-        { name: t("guest.customer"), icon: "bi-person" },
-        { name: t("guest.dealer"), icon: "bi-shop" },
-        { name: t("guest.rental"), icon: "bi-car-front" }
+        { name: "customer", icon: "bi-person" },
+        { name: "dealer", icon: "bi-shop" },
+        { name: "rental", icon: "bi-car-front" },
+        { name: "towing", icon: "bi-truck" }
     ];
 
     return (
@@ -55,7 +56,7 @@ function GuestLogin() {
                                     onClick={() => handleCardClick(role.name.toLowerCase())}
                                 >
                                     <i className={`bi ${role.icon} text-white`} style={{ fontSize: "2rem", marginBottom: "10px" }}></i>
-                                    <h3 className="text-white">{role.name}</h3>
+                                    <h3 className="text-white text-capitalize">{role.name}</h3>
                                 </div>
                             </div>
                         ))}

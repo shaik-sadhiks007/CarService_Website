@@ -12,9 +12,20 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
   const { t } = useTranslation()
 
   const [editableData, setEditableData] = useState({
+    vehicleRegNo: historyData?.vehicleRegNo || "",
+    custName: historyData?.custName || "",
+    custContactNo: historyData?.custContactNo || "",
+    email: historyData?.email || "",
+    vehicleModel: historyData?.vehicleModel || "",
+    fuelLevel: historyData?.fuelLevel || "",
+    status: historyData?.status || "",
+    technitionName: historyData?.technitionName || "",
+    customerComplaints: historyData?.customerComplaints || "",
+    dateIn: historyData?.dateIn || "",
     remarks: historyData?.remarks || "",
     serviceTypes: historyData?.serviceTypes || "",
-    paymentStatus: historyData?.paymentStatus || ""
+    paymentStatus: historyData?.paymentStatus || "",
+
   });
 
   const { services, setServices, apiUrl, userRole } =
@@ -45,9 +56,11 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     // carImage: t("TableMapping.carImage"),
     // technitionName: t("TableMapping.technitionName"),
     // managerName: t("TableMapping.managerName"),
-    remarks: t("TableMapping.remarks"),
     serviceTypes: t("TableMapping.serviceTypes"),
     paymentStatus: t("account_admin.paymentStatus"),
+    customerComplaints: t("TableMapping.customerComplaints"),
+    remarks: t("TableMapping.remarks"),
+
     // createdBy: t("TableMapping.createdBy"),
     // createdDate: t("TableMapping.createdDate"),
     // modifiedBy: t("TableMapping.modifiedBy"),
@@ -57,17 +70,24 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
   const handleServiceChange = (e) => {
     const selectedValue = e.target.value;
 
-    if (!editableData.serviceTypes.includes(selectedValue)) {
-      setEditableData({
-        ...editableData,
-        serviceTypes: [...editableData.serviceTypes, selectedValue],
-      });
-      setAvailableServices(
-        availableServices.filter(
-          (service) => service.serviceCategory !== selectedValue
-        )
-      );
-    }
+    // if (!editableData.serviceTypes.includes(selectedValue)) {
+    //   setEditableData({
+    //     ...editableData,
+    //     serviceTypes: [...editableData.serviceTypes, selectedValue],
+    //   });
+    //   setAvailableServices(
+    //     availableServices.filter(
+    //       (service) => service.serviceCategory !== selectedValue
+    //     )
+    //   );
+    // }
+
+
+    setEditableData({
+      ...editableData,
+      serviceTypes: selectedValue,
+    });
+
   };
 
   const handleRemoveService = (service) => {
@@ -163,7 +183,47 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
   };
 
   const renderValue = (key, value) => {
-    if (isEditing && userRole?.userRole == "mechanic" && key === "remarks") {
+
+
+    if (
+      isEditing &&
+      userRole.userRole === "super_admin" &&
+      ["vehicleRegNo", "custName", "customerComplaints", "custContactNo", "vehicleModel", "fuelLevel", "email"].includes(key)
+    ) {
+      return (
+        <input
+          type="text"
+          name={key}
+          value={editableData[key] || ""}
+          onChange={handleInputChange}
+          className="form-control placeholder-white"
+        />
+      );
+    }
+
+    if (isEditing && (userRole?.userRole == "super_admin") && key === "dateIn") {
+      return (
+        <>
+          <input
+            type="datetime-local"
+            name="dateIn"
+            className="form-control placeholder-white py-2"
+            value={editableData["dateIn"] || ""}
+            max={new Date().toISOString().slice(0, 16)}
+            onChange={handleInputChange}
+          />
+        </>
+      )
+    }
+
+    // if (isEditing && (userRole?.userRole == "super_admin") && key === "technitionName") {
+    //   return (
+    //     <>
+         
+    //     </>
+    //   )
+    // }
+    if (isEditing && (userRole?.userRole == "mechanic" || userRole?.userRole == "super_admin") && key === "remarks") {
       return (
         <input
           type="text"
@@ -175,24 +235,24 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
       );
     }
 
-    if (isEditing && userRole?.userRole == "mechanic" && key === "serviceTypes") {
+    if (isEditing && (userRole?.userRole == "mechanic" || userRole?.userRole == "super_admin") && key === "serviceTypes") {
       return (
         <>
           <select
             className="form-control mb-2 placeholder-white py-2"
-            value=""
+            value={editableData.serviceTypes}
             onChange={handleServiceChange}
           >
             <option value="" disabled>
               Select Services
             </option>
-            {availableServices.map((service) => (
+            {services.map((service) => (
               <option key={service.id} value={service.serviceCategory}>
                 {service.serviceCategory}
               </option>
             ))}
           </select>
-          <div className="mb-2">
+          {/* <div className="mb-2">
             {editableData.serviceTypes.map((service, index) => (
               <span
                 key={index}
@@ -203,12 +263,12 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
                 {service} &times;
               </span>
             ))}
-          </div>
+          </div> */}
         </>
       );
     }
 
-    if (isEditing && userRole?.userRole == "account_admin" && key === "paymentStatus") {
+    if (isEditing && (userRole?.userRole == "account_admin" || userRole?.userRole == "super_admin") && key === "paymentStatus") {
 
       return (
         <select
@@ -248,7 +308,6 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
 
   const handleEditButton = () => {
     setIsEditing(true);
-
     if (userRole == 'mechanic') {
       toast.success("you can edit Remarks and Services now.");
     } else {
@@ -280,9 +339,20 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     );
 
     const data = {
-      custInformation: cuInfo,
+      custInformation: {
+        ...cuInfo,
+        vehicleRegNo: editableData.vehicleRegNo,
+        custName: editableData.custName,
+        custContactNo: editableData.custContactNo,
+        email: editableData.email,
+        vehicleModel: editableData.vehicleModel,
+        modifiedBy: userRole.username,
+        modifiedDate: moment().tz("Asia/Singapore").toISOString(),
+
+      },
       carServiceInfromation: {
         ...carInfo,
+        vehicleRegNo: editableData.vehicleRegNo,
         remarks: editableData.remarks,
         serviceTypes: serviceString,
         paymentStatus: editableData.paymentStatus,

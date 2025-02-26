@@ -205,7 +205,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
         setCarServiceInfo={setCarServiceInfo}
         setCustomerInfo={setCustomerInfo}
         cId={cId}
-        carInfo={customerData}
+        carInfo={carInfo}
         customerData={customerData}
         setCarPlate={setCarPlate}
         historyData={historyData}

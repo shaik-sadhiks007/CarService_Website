@@ -21,6 +21,8 @@ function Accepted() {
     showOffcanvas,
     setShowOffcanvas,
   } = useContext(CarDataContext);
+  const [category, setCategory] = useState("all")
+
 
   const [tableData, setTableData] = useState([]);
   const [clicked, setClicked] = useState({
@@ -113,6 +115,21 @@ function Accepted() {
       year: "numeric",
     }).format(new Date(dateString));
   };
+
+
+  const filteredData = tableData.filter((row) => {
+    if (category === 'all') return true;
+    if (category === 'customer') return row.custType === 'c';
+    if (category === 'dealer') return row.custType === 'd';
+    if (category === 'rental') return row.custType === 'r';
+    if (category === 'towing') return row.custType === 't';
+    return true;
+  }).filter((row) => row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase()));
+
+  const handleCategoryChange = (selectedCategory) => {
+    setCategory(selectedCategory);
+  };
+
 
   const columns = [
     {
@@ -497,7 +514,7 @@ function Accepted() {
                     className="text-white w-100 rounded-2">
 
                     <div className="row ">
-                      <div className="col-12 col-md-6">
+                      <div className="col-12 col-md-6 mt-2">
                         <input
                           type="text"
                           placeholder="Search by Vehicle No."
@@ -509,22 +526,37 @@ function Accepted() {
                     </div>
 
                   </div>
+                  <div className="d-flex gap-4 my-2">
+                    <button className={`btn ${category === 'all' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('all')}>
+                      All
+                    </button>
+                    <button className={`btn ${category === 'customer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('customer')}>
+                      Customer
+                    </button>
+                    <button className={`btn ${category === 'dealer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('dealer')}>
+                      Dealer
+                    </button>
+                    <button className={`btn ${category === 'rental' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('rental')}>
+                      Rental
+                    </button>
+                    <button className={`btn ${category === 'towing' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('towing')}>
+                      Towing
+                    </button>
+                  </div>
+
                   <DataTable
                     columns={columns}
-                    data={tableData.filter((row) =>
-                      row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase())
-                    )}
+                    data={filteredData}
                     defaultSortFieldId="date"
                     defaultSortAsc={false}
                     pagination
-                    // highlightOnHover
                     onSort={(column, direction) => {
-                      // Optional: handle custom sorting logic here
                       console.log(column, direction);
                     }}
                     theme="dark"
                     customStyles={customStyles}
                   />
+
 
                   <div className="my-2">
                     <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
@@ -547,7 +579,7 @@ function Accepted() {
                 <>
                   <TableOne
                     historyData={clicked.data}
-                    edit={true}
+                    edit={userRole.userRole === "super_admin" || userRole.userRole == 'mechanic'}
                     setClicked={setClicked}
                     fullData={fullData}
                     refresh={fetchAcceptedCars}
