@@ -12,7 +12,7 @@ import Lottie from "lottie-react";
 import carLoader from "../assets/car-loader.json";
 
 
-function ReadyToDeliver() {
+function PendingCars() {
     const {
         userRole,
         apiUrl,
@@ -41,32 +41,71 @@ function ReadyToDeliver() {
     const fetchPendingCars = async () => {
         try {
             setLoading(true);
-            const url = `${apiUrl}/api/v1/carService/getAllReadyForDelivery`
 
-            const response = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const urls =
+                userRole.userRole === "account_admin"
+                    ? [
+                        `${apiUrl}/api/v1/carService/getAllPending`,
+                        `${apiUrl}/api/v1/carService/getAllAccpeted`
+                    ]
+                    : null;
 
-            setFullData(response.data);
+            if (urls !== null) {
+                try {
+                    const responses = await Promise.all(
+                        urls.map(url =>
+                            axios.get(url, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                },
+                            })
+                        )
+                    );
 
-            const customerData = response.data.custInformationList || [];
-            const serviceData = response.data.carServiceInfromationList || [];
+                    const custInformationList = responses.flatMap(response => response.data.custInformationList);
+                    const carServiceInfromationList = responses.flatMap(response => response.data.carServiceInfromationList);
 
-            // const filteredServiceData = serviceData.filter(
-            //     (service) => service.status.toLowerCase() === "a"
-            // );
+                    const data = {
+                        custInformationList: [...custInformationList],
+                        carServiceInfromationList: [...carServiceInfromationList]
+                    }
 
-            const combinedData = serviceData.map((service) => {
-                const customer = customerData.find(
-                    (cust) => cust.customerId === service.customerId
-                );
-                return { ...customer, ...service };
-            });
+                    setFullData(data)
 
-            setTableData(sortByDate(combinedData, "desc"));
-            setLoading(false);
+                    console.log("Merged Customer Information List:", custInformationList);
+                    console.log("Merged Car Service Information List:", carServiceInfromationList);
+                    console.log(data, "full data")
+
+
+                    const filteredServiceData = carServiceInfromationList.filter(
+                        (service) => service.paymentStatus?.toLowerCase() == "p"
+                    );
+
+                    console.log(filteredServiceData, "filter")
+
+                    const combinedData = filteredServiceData.map((service) => {
+                        const customer = custInformationList.find(
+                            (cust) => cust.customerId === service.customerId
+                        );
+                        return { ...customer, ...service };
+                    });
+
+                    console.log(combinedData, "combDa")
+
+
+
+                    setTableData(sortByDate(combinedData, "desc"));
+                    setLoading(false);
+                } catch (error) {
+                    console.error("Error fetching car service data:", error);
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setLoading(false);
+            }
+
+
 
 
         } catch (error) {
@@ -96,6 +135,8 @@ function ReadyToDeliver() {
             year: "numeric",
         }).format(new Date(dateString));
     };
+
+
 
     const columns = [
         {
@@ -324,7 +365,8 @@ function ReadyToDeliver() {
 
                     <RightSidebar />
 
-                    <h1 className="text-white">{t("account_admin.ReadyToDeliverCars")}</h1>
+                    <h1 className="text-white">{t("account_admin.pendingCars")}</h1>
+
 
                     {!clicked.click ? (
                         <>
@@ -344,6 +386,7 @@ function ReadyToDeliver() {
                                 </div>
 
                             </div>
+                            
                             <DataTable
                                 columns={columns}
                                 data={tableData.filter((row) =>
@@ -403,4 +446,4 @@ function ReadyToDeliver() {
     );
 }
 
-export default ReadyToDeliver;
+export default PendingCars;

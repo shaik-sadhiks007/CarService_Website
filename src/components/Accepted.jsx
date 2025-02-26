@@ -28,6 +28,9 @@ function Accepted() {
     data: {},
   });
 
+  const [searchText, setSearchText] = useState("");
+
+
   const excelData = {
 
     dateIn: "Date",
@@ -489,9 +492,28 @@ function Accepted() {
 
               {!clicked.click ? (
                 <>
+
+                  <div
+                    className="text-white w-100 rounded-2">
+
+                    <div className="row ">
+                      <div className="col-12 col-md-6">
+                        <input
+                          type="text"
+                          placeholder="Search by Vehicle No."
+                          value={searchText}
+                          onChange={(e) => setSearchText(e.target.value)}
+                          className="form-control mb-3 input-dashboard text-white placeholder-white"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
                   <DataTable
                     columns={columns}
-                    data={tableData}
+                    data={tableData.filter((row) =>
+                      row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase())
+                    )}
                     defaultSortFieldId="date"
                     defaultSortAsc={false}
                     pagination

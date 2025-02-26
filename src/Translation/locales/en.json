@@ -88,7 +88,8 @@
     "carImage": "Car Image",
     "technitionName": "Technician Name",
     "managerName": "Manager Name",
-    "remarks": "Remarks",
+    "remarks": "Mechanic Complaints",
+    "customerComplaints" : "Customer Complaints",
     "serviceTypes": "Service Types",
     "createdBy": "Created By",
     "createdDate": "Created Date",
@@ -104,14 +105,16 @@
     "readyToDeliver": "Ready To Deliver",
     "paymentPendingCars": "Payment Pending Cars",
     "ReadyToDeliverCars": "Ready to Deliver cars",
-    "paymentStatus": "Payment Status"
+    "paymentStatus": "Payment Status",
+    "pendingCars" : "Pending Cars"
   },
   "guest": {
     "guest": "Guest",
     "customer" : "Customer",
     "dealer" : "Dealer",
-    "rental" : "Rental",
+    "rental" : "Rental Company",
     "name": "Name",
-    "complaints": "Complaints"
+    "complaints": "Complaints",
+    "Information" : "Information"
   }
 }

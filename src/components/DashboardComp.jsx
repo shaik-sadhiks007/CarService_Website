@@ -8,7 +8,7 @@ import CarRegistration from "./CarRegistration";
 import { useTranslation } from "react-i18next";
 import RightSidebar from "../sidebar/RightSidebar";
 
-function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role = "customer" }) {
+function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role = "mechanic" }) {
   const [carPlate, setCarPlate] = useState("");
 
   const [found, setFound] = useState(false);
@@ -40,8 +40,8 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
   const carInfo = {
     vehicleRegNo: "",
     dateIn: new Date().toISOString().slice(0, 16),
-    entryType: "",
-    mileage: "",
+    // entryType: "",
+    // mileage: "",
     fuelLevel: "",
     // fuelLevelImage: null,
     // carImage: null,
@@ -54,8 +54,8 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
     createdDate: new Date().toISOString(),
     modifiedBy: null,
     modifiedDate: null,
-    serviceTypes: [],
-    paymentStatus: "pending",
+    serviceTypes: "",
+    paymentStatus: "P",
   };
   const { t } = useTranslation();
 
@@ -66,9 +66,6 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
 
   const token = localStorage.getItem("token");
 
-  const toggleOffcanvas = () => {
-    setShowOffcanvas(!showOffcanvas);
-  };
 
   const handleSearch = async () => {
     if (!carPlate.trim()) {
@@ -90,7 +87,6 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
 
       if (response.data.custInformationList.length > 0) {
 
-        console.log(response.data.custInformationList[0], "data found")
         setCustomerInfo({
           ...customerInfo,
           vehicleRegNo: response.data.custInformationList[0].vehicleRegNo,
@@ -109,22 +105,22 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
           modifiedDate: response.data.custInformationList[0].modifiedDate,
         });
 
-        setCarServiceInfo({
-          ...carServiceInfo,
-          vehicleRegNo: response.data.carServiceInfromationList[0].vehicleRegNo,
-          dateIn: response.data.carServiceInfromationList[0].dateIn,
-          entryType: response.data.carServiceInfromationList[0].entryType,
-          mileage: response.data.carServiceInfromationList[0].mileage,
-          serviceTypes: response.data.carServiceInfromationList[0].serviceTypes
-            ? response.data.carServiceInfromationList[0].serviceTypes.split(',')
-            : [],
-          paymentStatus: response.data.carServiceInfromationList[0].paymentStatus,
-          customerComplaints: response.data.carServiceInfromationList[0].customerComplaints,
-          createdBy: response.data.carServiceInfromationList[0].createdBy,
-          createdDate: response.data.carServiceInfromationList[0].createdDate,
-          modifiedBy: response.data.carServiceInfromationList[0].modifiedBy,
-          modifiedDate: response.data.carServiceInfromationList[0].modifiedDate,
-        });
+        // setCarServiceInfo({
+        //   ...carServiceInfo,
+        //   vehicleRegNo: response.data.carServiceInfromationList[0].vehicleRegNo,
+        //   dateIn: response.data.carServiceInfromationList[0].dateIn,
+        //   entryType: response.data.carServiceInfromationList[0].entryType,
+        //   mileage: response.data.carServiceInfromationList[0].mileage,
+        //   serviceTypes: response.data.carServiceInfromationList[0].serviceTypes
+        //     ? response.data.carServiceInfromationList[0].serviceTypes.split(',')
+        //     : [],
+        //   paymentStatus: response.data.carServiceInfromationList[0].paymentStatus,
+        //   customerComplaints: response.data.carServiceInfromationList[0].customerComplaints,
+        //   createdBy: response.data.carServiceInfromationList[0].createdBy,
+        //   createdDate: response.data.carServiceInfromationList[0].createdDate,
+        //   modifiedBy: response.data.carServiceInfromationList[0].modifiedBy,
+        //   modifiedDate: response.data.carServiceInfromationList[0].modifiedDate,
+        // });
 
         toast.success("Customer information found!");
 
@@ -140,11 +136,12 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
 
         if (historyResponse.data.length > 0) {
           toast.success("Car History found!");
-          setFound(true);
           setHistoryData(historyResponse.data);
         } else {
           setHistoryData([]);
         }
+
+        setFound(true);
         setCId(response.data.custInformationList[0].customerId);
 
       } else {
@@ -160,8 +157,6 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
       setLoading(false);
     }
   };
-
-
 
 
   return (

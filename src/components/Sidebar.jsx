@@ -40,6 +40,7 @@ function Sidebar() {
 
   const accountantItems = [
     { path: "/payment-pending", iconclassName: "bi bi-person-plus-fill", label: t("account_admin.paymentPending") },
+    { path: "/pending-cars", iconclassName: "bi bi-hourglass-split", label: t("account_admin.pendingCars")}, 
     {
       path: "/ready-to-deliver",
       iconclassName: "bi bi-check-circle-fill",

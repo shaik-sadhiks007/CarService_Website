@@ -30,15 +30,15 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     dateIn: t("TableMapping.dateIn"),
     custContactNo: t("TableMapping.custContactNo"),
     email: t("TableMapping.email"),
-    address: t("TableMapping.address"),
-    // vehicleModel: t("TableMapping.vehicleModel"),
+    // address: t("TableMapping.address"),
+    vehicleModel: t("TableMapping.vehicleModel"),
     // manufactureYear: t("TableMapping.manufactureYear"),
     // vehicleColor: t("TableMapping.vehicleColor"),
     // engineNo: t("TableMapping.engineNo"),
     // chasisNo: t("TableMapping.chasisNo"),
 
     // Car Service Info
-    entryType: t("TableMapping.entryType"),
+    // entryType: t("TableMapping.entryType"),
     // mileage: t("TableMapping.mileage"),
     // fuelLevel: t("TableMapping.fuelLevel"),
     // fuelLevelImage: t("TableMapping.fuelLevelImage"),
@@ -219,7 +219,6 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
         >
           <option value="P">Pending Payment</option>
           <option value="C">Completed</option>
-          <option value="D">Ready for Delivery</option>
           <option value="L">Pay Later</option>
         </select>
       )

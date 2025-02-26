@@ -88,7 +88,8 @@
     "carImage": "车辆图片",
     "technitionName": "技师姓名",
     "managerName": "经理姓名",
-    "remarks": "备注",
+    "remarks": "技师投诉",
+    "customerComplaints": "客户投诉",
     "serviceTypes": "服务类型",
     "createdBy": "创建者",
     "createdDate": "创建日期",
@@ -104,14 +105,16 @@
     "readyToDeliver": "准备交付",
     "paymentPendingCars": "待付款车辆",
     "ReadyToDeliverCars": "准备交付的车辆",
-    "paymentStatus": "付款状态"
+    "paymentStatus": "付款状态",
+    "pendingCars": "待处理车辆"
   },
   "guest": {
     "guest": "访客",
     "customer": "客户",
     "dealer": "经销商",
-    "rental": "租赁",
+    "rental": "租赁公司",
     "name": "姓名",
-    "complaints": "投诉"
+    "complaints": "投诉",
+    "Information": "信息"
   }
 }

@@ -44,16 +44,14 @@ function CarRegistration({
     // Customer Info
     // custName: t('customerInfo.custName'),
 
-    custName: `${t(`guest.${role}`) || role} ${t('guest.name')}`,
+    custName: `${t(`guest.${role === 'mechanic' ? 'customer' : role}`) || role} ${t('guest.name')}`,
 
     custContactNo: t('customerInfo.custContactNo'),
     email: t('customerInfo.email'),
     // address: t('customerInfo.address'),
     vehicleModel: t('customerInfo.vehicleModel'),
 
-    customerComplaints: `${t(`guest.${role}`) || role} ${t('guest.complaints')}`,
-
-
+    customerComplaints: `${t(`guest.${role === 'mechanic' ? 'customer' : role}`) || role} ${t('guest.complaints')}`,
 
     // manufactureYear: t('customerInfo.manufactureYear'),
     // vehicleColor: t('customerInfo.vehicleColor'),
@@ -62,8 +60,8 @@ function CarRegistration({
 
     // Car Service Info
     dateIn: t('carServiceInfo.dateIn'),
-    entryType: t('carServiceInfo.entryType'),
-    mileage: t('carServiceInfo.mileage'),
+    // entryType: t('carServiceInfo.entryType'),
+    // mileage: t('carServiceInfo.mileage'),
     fuelLevel: t('carServiceInfo.fuelLevel'),
     fuelLevelImage: t('carServiceInfo.fuelLevelImage'),
     carImage: t('carServiceInfo.carImage'),
@@ -75,18 +73,29 @@ function CarRegistration({
 
   const handleServiceChange = (e) => {
     const selectedValue = e.target.value;
-    if (!carServiceInfo.serviceTypes.includes(selectedValue)) {
-      setCarServiceInfo({
-        ...carServiceInfo,
-        serviceTypes: [...carServiceInfo.serviceTypes, selectedValue],
-      });
-      setAvailableServices(
-        availableServices.filter(
-          (service) => service.serviceCategory !== selectedValue
-        )
-      );
-    }
+
+    console.log(selectedValue, "value")
+    // if (!carServiceInfo.serviceTypes.includes(selectedValue)) {
+    //   setCarServiceInfo({
+    //     ...carServiceInfo,
+    //     serviceTypes: [...carServiceInfo.serviceTypes, selectedValue],
+    //   });
+    //   setAvailableServices(
+    //     availableServices.filter(
+    //       (service) => service.serviceCategory !== selectedValue
+    //     )
+    //   );
+    // }
+
+    setCarServiceInfo({
+      ...carServiceInfo,
+      serviceTypes: selectedValue,
+    });
+
   };
+
+
+  console.log(carServiceInfo, "info of car");
 
   const handleRemoveService = (service) => {
     setCarServiceInfo({
@@ -126,7 +135,6 @@ function CarRegistration({
   //   }
   // };
 
-  console.log(carServiceInfo.dateIn, "datein")
 
 
   useEffect(() => {
@@ -162,8 +170,6 @@ function CarRegistration({
 
       const mandatoryCarServiceFields = [
         "dateIn",
-        "entryType",
-        "mileage",
         "status",
         "serviceTypes",
       ];
@@ -173,9 +179,9 @@ function CarRegistration({
       );
 
       const isCarServiceInfoValid = mandatoryCarServiceFields.every((field) => {
-        if (field === "serviceTypes") {
-          return carServiceInfo[field] && carServiceInfo[field].length > 0;
-        }
+        // if (field === "serviceTypes") {
+        //   return carServiceInfo[field] && carServiceInfo[field].length > 0;
+        // }
         return carServiceInfo[field] && String(carServiceInfo[field]).trim() !== "";
       });
 
@@ -204,11 +210,11 @@ function CarRegistration({
         },
         carServiceInfromation: {
           ...carServiceInfo,
-          fuelLevelImage: images.fuelLevelImage,
-          carImage: images.carImage,
+          // fuelLevelImage: images.fuelLevelImage,
+          // carImage: images.carImage,
           vehicleRegNo: carPlate,
-          serviceTypes: carServiceInfo.serviceTypes.join(','),
-          paymentStatus: "pending",
+          // serviceTypes: carServiceInfo.serviceTypes,
+          paymentStatus: "P",
           ...(found
             ? {
               modifiedBy: userRole.username,
@@ -358,7 +364,13 @@ function CarRegistration({
           >
             {/* Customer Information */}
             <div className="mb-4">
-              <h4>{t('customerInformation')}</h4>
+              
+              <h4>
+
+                {`${t(`guest.${role === 'mechanic' ? 'customer' : role}`) || role} ${t('guest.Information')}`}
+
+              </h4>
+
               <div className="row">
                 {Object.keys(customerInfo).map(
                   (key) =>
@@ -366,7 +378,6 @@ function CarRegistration({
                       <div className="col-12 col-md-6 mb-3" key={key}>
 
                         {key !== "customerComplaints" && (
-
                           <>
                             <label className="form-label text-capitalize">{labels[key]}</label>
                             <input
@@ -392,170 +403,177 @@ function CarRegistration({
                       </div>
                     )
                 )}
-              </div>
-            </div>
-          </div>
-          <div
-            className="text-white w-100 p-4 rounded-2 mt-4"
-            style={{ backgroundColor: "#212632" }}
-          >
-            {/* Car Service Information */}
-            <div className="mb-4">
-              <h4>{t("carServiceInformation")}</h4>
-              <div className="row">
-                {Object.keys(carServiceInfo).map((key) =>
-                  labels[key] &&
-                    (key !== "remarks" && key !== "customerComplaints") &&
-                    !(
-                      key === "technitionName" && userRole.userRole !== "super_admin"
-                    ) ? (
-                    <div className="col-12 col-md-6 mb-3" key={key}>
-                      <label className="form-label">{labels[key]}</label>
-                      {key === "fuelLevelImage" || key === "carImage" ? (
-                        <input
-                          type="file"
-                          name={key}
-                          className="form-control placeholder-white py-2"
-                          onChange={(e) => handleFileChange(e, key)}
-                        />
-                      ) : key === "dateIn" ? (
-                        <input
-                          type="datetime-local"
-                          name={key}
-                          className="form-control placeholder-white py-2"
-                          value={carServiceInfo[key] || ""}
-                          max={new Date().toISOString().slice(0, 16)}
-                          onChange={(e) =>
-                            setCarServiceInfo({
-                              ...carServiceInfo,
-                              [key]: e.target.value,
-                            })
-                          }
-                        />
-                      ) : key === "technitionName" &&
-                        userRole.userRole === "super_admin" ? (
-                        <select
-                          name={key}
-                          className="form-control placeholder-white py-2"
-                          value={carServiceInfo[key] || ""}
-                          onChange={(e) =>
-                            setCarServiceInfo({
-                              ...carServiceInfo,
-                              [key]: e.target.value,
-                            })
-                          }
-                        >
-                          <option value="">Select Mechanic</option>
-                          {mechanics.map((mechanic, index) => (
-                            <option key={index} value={mechanic.username}>
-                              {mechanic.username}
-                            </option>
-                          ))}
-                        </select>
-                      ) : key === "serviceTypes" ? (
-                        <>
-                          <select
-                            className="form-control mb-2 placeholder-white py-2"
-                            value=""
-                            onChange={handleServiceChange}
-                          >
-                            <option value="" disabled>
-                              Select Services
-                            </option>
-                            {availableServices.map((service) => (
-                              <option
-                                key={service.id}
-                                value={service.serviceCategory}
+
+                {/* Car Service Information */}
+                <div className="mb-4">
+                  {/* <h4>{t("carServiceInformation")}</h4> */}
+                  <div className="row">
+                    {Object.keys(carServiceInfo).map((key) =>
+                      labels[key] &&
+                        (key !== "remarks" && key !== "customerComplaints") &&
+                        !(
+                          key === "technitionName" && userRole.userRole !== "super_admin"
+                        ) ? (
+                        <div className="col-12 col-md-6 mb-3" key={key}>
+                          <label className="form-label">{labels[key]}</label>
+                          {key === "fuelLevelImage" || key === "carImage" ? (
+                            <input
+                              type="file"
+                              name={key}
+                              className="form-control placeholder-white py-2"
+                              onChange={(e) => handleFileChange(e, key)}
+                            />
+                          ) : key === "dateIn" ? (
+                            <input
+                              type="datetime-local"
+                              name={key}
+                              className="form-control placeholder-white py-2"
+                              value={carServiceInfo[key] || ""}
+                              max={new Date().toISOString().slice(0, 16)}
+                              onChange={(e) =>
+                                setCarServiceInfo({
+                                  ...carServiceInfo,
+                                  [key]: e.target.value,
+                                })
+                              }
+                            />
+                          ) : key === "technitionName" &&
+                            userRole.userRole === "super_admin" ? (
+                            <select
+                              name={key}
+                              className="form-control placeholder-white py-2"
+                              value={carServiceInfo[key] || ""}
+                              onChange={(e) =>
+                                setCarServiceInfo({
+                                  ...carServiceInfo,
+                                  [key]: e.target.value,
+                                })
+                              }
+                            >
+                              <option value="">Select Mechanic</option>
+                              {mechanics.map((mechanic, index) => (
+                                <option key={index} value={mechanic.username}>
+                                  {mechanic.username}
+                                </option>
+                              ))}
+                            </select>
+                          ) : key === "serviceTypes" ? (
+                            <>
+                              <select
+                                className="form-control mb-2 placeholder-white py-2"
+                                value={carServiceInfo.serviceTypes}
+                                onChange={handleServiceChange}
                               >
-                                {service.serviceCategory}
-                              </option>
-                            ))}
-                          </select>
-                          <div className="mb-2">
-                            {carServiceInfo.serviceTypes.map(
-                              (service, index) => (
-                                <span
-                                  key={index}
-                                  className="badge bg-warning me-2 p-2 rounded-pill mb-2"
-                                  style={{ cursor: "pointer" }}
-                                  onClick={() => handleRemoveService(service)}
-                                >
-                                  {service} &times;
-                                </span>
-                              )
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        <input
-                          type="text"
-                          className="form-control placeholder-white py-2"
-                          placeholder={labels[key]}
-                          value={carServiceInfo[key] || ""}
+                                <option value='' disabled>
+                                  Select Services
+                                </option>
+                                {/* {availableServices.map((service) => (
+                                  <option
+                                    key={service.id}
+                                    value={service.serviceCategory}
+                                  >
+                                    {service.serviceCategory}
+                                  </option>
+                                ))} */}
+
+                                {services.map((service) => (
+                                  <option
+                                    key={service.id}
+                                    value={service.serviceCategory}
+                                  >
+                                    {service.serviceCategory}
+                                  </option>
+                                ))}
+                              </select>
+                              {/* <div className="mb-2">
+                                {carServiceInfo.serviceTypes.map(
+                                  (service, index) => (
+                                    <span
+                                      key={index}
+                                      className="badge bg-warning me-2 p-2 rounded-pill mb-2"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() => handleRemoveService(service)}
+                                    >
+                                      {service} &times;
+                                    </span>
+                                  )
+                                )}
+                              </div> */}
+                            </>
+                          ) : (
+                            <input
+                              type="text"
+                              className="form-control placeholder-white py-2"
+                              placeholder={labels[key]}
+                              value={carServiceInfo[key] || ""}
+                              onChange={(e) =>
+                                setCarServiceInfo({
+                                  ...carServiceInfo,
+                                  [key]: e.target.value,
+                                })
+                              }
+                            />
+                          )}
+                        </div>
+                      ) : null
+                    )}
+
+                    {/* Display remarks field at the end */}
+
+                    {labels["customerComplaints"] && (
+                      <div className="col-12 mb-3">
+                        <label className="form-label text-capitalize">{labels["customerComplaints"]}</label>
+                        <textarea
+                          className="form-control placeholder-white py-2 text-capitalize"
+                          rows="4"
+                          placeholder={labels["customerComplaints"]}
+                          value={carServiceInfo["customerComplaints"] || ""}
                           onChange={(e) =>
                             setCarServiceInfo({
                               ...carServiceInfo,
-                              [key]: e.target.value,
+                              customerComplaints: e.target.value,
                             })
                           }
-                        />
-                      )}
-                    </div>
-                  ) : null
-                )}
+                        ></textarea>
+                      </div>
+                    )}
 
-                {/* Display remarks field at the end */}
-
-                {role && labels["customerComplaints"] && (
-                  <div className="col-12 mb-3">
-                    <label className="form-label text-capitalize">{labels["customerComplaints"]}</label>
-                    <textarea
-                      className="form-control placeholder-white py-2 text-capitalize"
-                      rows="4"
-                      placeholder={labels["customerComplaints"]}
-                      value={customerInfo["customerComplaints"] || ""}
-                      onChange={(e) =>
-                        setCustomerInfo({
-                          ...customerInfo,
-                          customerComplaints: e.target.value,
-                        })
-                      }
-                    ></textarea>
+                    {role == "mechanic" && labels["remarks"] && (
+                      <div className="col-12 mb-3">
+                        <label className="form-label text-capitalize">{labels["remarks"]}</label>
+                        <textarea
+                          className="form-control placeholder-white py-2 text-capitalize"
+                          rows="4"
+                          placeholder={labels["remarks"]}
+                          value={carServiceInfo["remarks"] || ""}
+                          onChange={(e) =>
+                            setCarServiceInfo({
+                              ...carServiceInfo,
+                              remarks: e.target.value,
+                            })
+                          }
+                        ></textarea>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
 
-                {!role && labels["remarks"] && (
-                  <div className="col-12 mb-3">
-                    <label className="form-label text-capitalize">{labels["remarks"]}</label>
-                    <textarea
-                      className="form-control placeholder-white py-2 text-capitalize"
-                      rows="4"
-                      placeholder={labels["remarks"]}
-                      value={carServiceInfo["remarks"] || ""}
-                      onChange={(e) =>
-                        setCarServiceInfo({
-                          ...carServiceInfo,
-                          remarks: e.target.value,
-                        })
-                      }
-                    ></textarea>
-                  </div>
-                )}
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    className="btn btn-outline-warning text-white"
+                    onClick={handleSave}
+                  >
+                    {t('save')}
+                  </button>
+                </div>
+
+                {found && <HistoryTable historyData={historyData} />}
               </div>
             </div>
-
-            <div className="mt-4">
-              <button
-                type="button"
-                className="btn btn-outline-warning text-white"
-                onClick={handleSave}
-              >
-                {t('save')}
-              </button>
-            </div>
-
-            {found && <HistoryTable historyData={historyData} />}
           </div>
+
+
         </div>
       </div>
     </div>

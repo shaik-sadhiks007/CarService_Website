@@ -33,7 +33,7 @@ export const CarDataProvider = ({ children }) => {
 
     {
       "id": 2,
-      "serviceCategory": "General Service",
+      "serviceCategory": "General_Service",
       "active": true,
       "createdBy": "SYSTEM",
       "createdDate": "2025-01-04T22:11:26",

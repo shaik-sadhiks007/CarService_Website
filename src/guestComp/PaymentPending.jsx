@@ -26,6 +26,7 @@ function PaymentPending() {
         data: {},
     });
 
+    const [searchText, setSearchText] = useState("");
 
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -43,8 +44,6 @@ function PaymentPending() {
             const urls =
                 userRole.userRole === "account_admin"
                     ? [
-                        `${apiUrl}/api/v1/carService/getAllPending`,
-                        `${apiUrl}/api/v1/carService/getAllAccpeted`,
                         `${apiUrl}/api/v1/carService/getAllCompleted`
                     ]
                     : null;
@@ -80,7 +79,7 @@ function PaymentPending() {
                         (service) => service.paymentStatus?.toLowerCase() == "p"
                     );
 
-                    console.log(filteredServiceData,"filter")
+                    console.log(filteredServiceData, "filter")
 
                     const combinedData = filteredServiceData.map((service) => {
                         const customer = custInformationList.find(
@@ -89,7 +88,7 @@ function PaymentPending() {
                         return { ...customer, ...service };
                     });
 
-                    console.log(combinedData,"combDa")
+                    console.log(combinedData, "combDa")
 
 
 
@@ -366,9 +365,28 @@ function PaymentPending() {
 
                     {!clicked.click ? (
                         <>
+                            <div
+                                className="text-white w-100 rounded-2">
+
+                                <div className="row ">
+                                    <div className="col-12 col-md-6">
+                                        <input
+                                            type="text"
+                                            placeholder="Search by Vehicle No."
+                                            value={searchText}
+                                            onChange={(e) => setSearchText(e.target.value)}
+                                            className="form-control mb-3 input-dashboard text-white placeholder-white"
+                                        />
+                                    </div>
+                                </div>
+
+                            </div>
+
                             <DataTable
                                 columns={columns}
-                                data={tableData}
+                                data={tableData.filter((row) =>
+                                    row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase())
+                                )}
                                 defaultSortFieldId="date"
                                 defaultSortAsc={false}
                                 pagination

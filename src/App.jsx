@@ -17,6 +17,7 @@ import GuestLogin from "./components/GuestLogin";
 import FormFilling from "./guestComp/FormFilling";
 import PaymentPending from "./guestComp/PaymentPending";
 import ReadyToDeliver from "./guestComp/ReadyToDeliver";
+import PendingCars from "./guestComp/PendingCars";
 
 function App() {
 
@@ -41,7 +42,7 @@ function App() {
           <Route path="/form-filling" element={<FormFilling />} />
           <Route path="/ready-to-deliver" element={<ReadyToDeliver />} />
           <Route path="/payment-pending" element={<PaymentPending />} />
-
+          <Route path="/pending-cars" element={<PendingCars />} />
         </Route>
       </Routes>
     </Router>

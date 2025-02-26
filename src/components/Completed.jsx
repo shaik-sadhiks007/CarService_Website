@@ -472,26 +472,6 @@ function Completed() {
         <div className="col-12 col-md-9 col-lg-10 p-3">
           {!loading && (
             <div className="container-fluid">
-              {/* <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="d-flex">
-                  <div
-                    className="d-md-none me-2"
-                    onClick={toggleOffcanvas}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <i className="bi bi-list text-light fs-2"></i>
-                  </div>
-                  <h1 className="text-white">{t("menu.completed")}</h1>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search by Vehicle No."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  className="form-control w-50 input-dashboard text-white placeholder-white rounded-pill"
-                />
-                <Logout />
-              </div> */}
 
               <RightSidebar />
 
@@ -500,26 +480,22 @@ function Completed() {
               {!clicked.click ? (
                 <>
 
-                  {/* <div
-                  className="text-white w-100 p-4 rounded-2">
-                  <label htmlFor="serviceCategory" className="form-label">
-                    {t("serviceCategory")}
-                  </label>
+<div
+                        className="text-white w-100 rounded-2">
 
-                  <div className="row">
-                    <div className="col-6">
-                      <input
-                        type="text"
-                        placeholder="Search by Vehicle No."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        className="form-control mb-3 input-dashboard text-white placeholder-white"
-                      />
+                        <div className="row ">
+                            <div className="col-12 col-md-6">
+                                <input
+                                    type="text"
+                                    placeholder="Search by Vehicle No."
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    className="form-control mb-3 input-dashboard text-white placeholder-white"
+                                />
+                            </div>
+                        </div>
+
                     </div>
-                  </div>
-
-                </div> */}
-
 
                   <DataTable
                     columns={columns}
