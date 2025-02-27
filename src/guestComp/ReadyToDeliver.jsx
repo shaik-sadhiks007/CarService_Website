@@ -99,14 +99,25 @@ function ReadyToDeliver() {
         }).format(new Date(dateString));
     };
 
-    const filteredData = tableData.filter((row) => {
-        if (category === 'all') return true;
-        if (category === 'customer') return row.custType === 'c';
-        if (category === 'dealer') return row.custType === 'd';
-        if (category === 'rental') return row.custType === 'r';
-        if (category === 'towing') return row.custType === 't';
-        return true;
-    }).filter((row) => row.vehicleRegNo.toLowerCase().includes(searchText.toLowerCase()));
+    const filteredData = tableData
+        .filter((row) => {
+            switch (category.toLowerCase()) {
+                case 'all':
+                    return true;
+                case 'customer':
+                    return row.custType?.toLowerCase() === 'c';
+                case 'dealer':
+                    return row.custType?.toLowerCase() === 'd';
+                case 'rental':
+                    return row.custType?.toLowerCase() === 'r';
+                case 'towing':
+                    return row.custType?.toLowerCase() === 't';
+                default:
+                    return true;
+            }
+        })
+        .filter((row) => row.vehicleRegNo?.toLowerCase().includes(searchText.toLowerCase()));
+
 
     const handleCategoryChange = (selectedCategory) => {
         setCategory(selectedCategory);
