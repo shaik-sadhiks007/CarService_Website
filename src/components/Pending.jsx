@@ -822,9 +822,6 @@ function Pending() {
                     customStyles={customStyles}
                   />
 
-
-
-
                   <div className="my-2">
                     <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
                       {t("exportToExcel")}

@@ -12,7 +12,6 @@ function Sidebar() {
   const { t, i18n } = useTranslation();
 
 
-
   const menuItems = [
     {
       path: "/car-service-entry",
