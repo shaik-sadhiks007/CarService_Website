@@ -11,7 +11,7 @@ function GuestLogin() {
 
     const navigate = useNavigate();
 
-    const {t} = useTranslation()
+    const { t } = useTranslation()
 
     const toggleOffcanvas = () => {
         setShowOffcanvas(!showOffcanvas);
@@ -23,10 +23,10 @@ function GuestLogin() {
 
 
     const guestItems = [
-        { name: "customer", icon: "bi-person" },
-        { name: "dealer", icon: "bi-shop" },
-        { name: "rental", icon: "bi-car-front" },
-        { name: "towing", icon: "bi-truck" }
+        { name: t("guest.customer"), icon: "bi-person" },
+        { name: t("guest.towing"), icon: "bi-truck" },
+        { name: t("guest.dealer"), icon: "bi-shop" },
+        { name: t("guest.rental"), icon: "bi-car-front" },
     ];
 
     return (
@@ -49,7 +49,7 @@ function GuestLogin() {
                     {/* Cards for selecting role */}
                     <div className="row text-center">
                         {guestItems.map((role, index) => (
-                            <div key={index} className="col-md-4">
+                            <div key={index} className="col-md-6">
                                 <div
                                     className="card p-3 mb-4 d-flex align-items-center justify-content-center"
                                     style={{ cursor: "pointer", backgroundColor: "#343a40", color: "white" }}

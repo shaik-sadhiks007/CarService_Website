@@ -112,11 +112,11 @@
     "guest": "Guest",
     "customer" : "Customer",
     "dealer" : "Dealer",
-    "rental" : "Rental Company",
+    "rental" : "Rental",
     "name": "Name",
     "complaints": "Complaints",
     "Information" : "Information",
-    "towing" : "Towing Person"
+    "towing" : "Towing"
   },
   "category" : {
     "all" : "All",

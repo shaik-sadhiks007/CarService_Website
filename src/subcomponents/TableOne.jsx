@@ -285,6 +285,15 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
 
     }
 
+    // Display full payment status descriptions when not editing
+    if (key === "paymentStatus" && !isEditing) {
+      const statusMap = {
+        "P": "Pending Payment",
+        "C": "Completed",
+        "L": "Pay Later"
+      };
+      return statusMap[value] || value || "N/A";
+    }
 
     if (key === "createdDate" || key === "modifiedDate" || key === "dateIn") {
       return formatDate(value);

@@ -525,24 +525,32 @@ function Completed() {
 
                   </div>
 
-                  <div className="d-flex gap-4 my-2">
-                    <button className={`btn ${category === 'all' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('all')}>
-                      {t("category.all")}
-                    </button>
-                    <button className={`btn ${category === 'customer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('customer')}>
-                      {t("category.customer")}
-                    </button>
-                    <button className={`btn ${category === 'dealer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('dealer')}>
-                      {t("category.dealer")}
-
-                    </button>
-                    <button className={`btn ${category === 'rental' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('rental')}>
-                      {t("category.rental")}
-                    </button>
-                    <button className={`btn ${category === 'towing' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('towing')}>
-                      {t("category.towing")}
-
-                    </button>
+                  <div className="row g-2 my-2">
+                    <div className="col-6 col-sm-4 col-md-auto">
+                      <button className={`btn w-100 ${category === 'all' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('all')}>
+                        {t("category.all")}
+                      </button>
+                    </div>
+                    <div className="col-6 col-sm-4 col-md-auto">
+                      <button className={`btn w-100 ${category === 'customer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('customer')}>
+                        {t("category.customer")}
+                      </button>
+                    </div>
+                    <div className="col-6 col-sm-4 col-md-auto">
+                      <button className={`btn w-100 ${category === 'dealer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('dealer')}>
+                        {t("category.dealer")}
+                      </button>
+                    </div>
+                    <div className="col-6 col-sm-4 col-md-auto">
+                      <button className={`btn w-100 ${category === 'rental' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('rental')}>
+                        {t("category.rental")}
+                      </button>
+                    </div>
+                    <div className="col-6 col-sm-4 col-md-auto">
+                      <button className={`btn w-100 ${category === 'towing' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('towing')}>
+                        {t("category.towing")}
+                      </button>
+                    </div>
                   </div>
 
                   <DataTable
@@ -559,13 +567,17 @@ function Completed() {
                   />
 
 
-                  <div className="my-2 d-flex">
-                    <button onClick={exportToExcel} className="px-4 py-2 btn btn-warning text-white mr-2 rounded me-4">
-                      {t("exportToExcel")}
-                    </button>
-                    <button onClick={exportToPDF} className="px-4 py-2 btn btn-warning text-white rounded">
-                      {t("exportToPdf")}
-                    </button>
+                  <div className="row g-2 my-2">
+                    <div className="col-12 col-sm-6 col-md-auto">
+                      <button onClick={exportToExcel} className="btn btn-warning text-white w-100">
+                        {t("exportToExcel")}
+                      </button>
+                    </div>
+                    <div className="col-12 col-sm-6 col-md-auto">
+                      <button onClick={exportToPDF} className="btn btn-warning text-white w-100">
+                        {t("exportToPdf")}
+                      </button>
+                    </div>
                   </div>
                 </>
 

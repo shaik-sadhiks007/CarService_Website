@@ -18,6 +18,7 @@ function Sidebar() {
       iconclassName: "bi bi-car-front",
       label: t("menu.carServiceEntry"),
     },
+    { path: "/guest", iconclassName: "bi bi-person-plus-fill", label: t("guest.guest") },
     { path: "/pending", iconclassName: "bi bi-hourglass-split", label: t("menu.pending") },
     { path: "/accepted", iconclassName: "bi bi-gear-fill", label: t("menu.accepted") },
     {
@@ -30,6 +31,7 @@ function Sidebar() {
       iconclassName: "bi bi-check-circle-fill",
       label: t("account_admin.readyToDeliver"),
     },
+
   ];
 
   const adminItems = [
@@ -39,7 +41,7 @@ function Sidebar() {
 
   const accountantItems = [
     { path: "/payment-pending", iconclassName: "bi bi-person-plus-fill", label: t("account_admin.paymentPending") },
-    { path: "/pending-cars", iconclassName: "bi bi-hourglass-split", label: t("account_admin.pendingCars")}, 
+    { path: "/pending-cars", iconclassName: "bi bi-hourglass-split", label: t("account_admin.pendingCars") },
     {
       path: "/ready-to-deliver",
       iconclassName: "bi bi-check-circle-fill",

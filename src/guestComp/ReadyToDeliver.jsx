@@ -370,24 +370,32 @@ function ReadyToDeliver() {
                                 </div>
 
                             </div>
-                            <div className="d-flex gap-4 my-2">
-                                <button className={`btn ${category === 'all' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('all')}>
-                                    {t("category.all")}
-                                </button>
-                                <button className={`btn ${category === 'customer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('customer')}>
-                                    {t("category.customer")}
-                                </button>
-                                <button className={`btn ${category === 'dealer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('dealer')}>
-                                    {t("category.dealer")}
-
-                                </button>
-                                <button className={`btn ${category === 'rental' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('rental')}>
-                                    {t("category.rental")}
-                                </button>
-                                <button className={`btn ${category === 'towing' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('towing')}>
-                                    {t("category.towing")}
-
-                                </button>
+                            <div className="row g-2 my-2">
+                                <div className="col-6 col-sm-4 col-md-auto">
+                                    <button className={`btn w-100 ${category === 'all' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('all')}>
+                                        {t("category.all")}
+                                    </button>
+                                </div>
+                                <div className="col-6 col-sm-4 col-md-auto">
+                                    <button className={`btn w-100 ${category === 'customer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('customer')}>
+                                        {t("category.customer")}
+                                    </button>
+                                </div>
+                                <div className="col-6 col-sm-4 col-md-auto">
+                                    <button className={`btn w-100 ${category === 'dealer' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('dealer')}>
+                                        {t("category.dealer")}
+                                    </button>
+                                </div>
+                                <div className="col-6 col-sm-4 col-md-auto">
+                                    <button className={`btn w-100 ${category === 'rental' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('rental')}>
+                                        {t("category.rental")}
+                                    </button>
+                                </div>
+                                <div className="col-6 col-sm-4 col-md-auto">
+                                    <button className={`btn w-100 ${category === 'towing' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('towing')}>
+                                        {t("category.towing")}
+                                    </button>
+                                </div>
                             </div>
                             <DataTable
                                 columns={columns}
