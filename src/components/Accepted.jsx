@@ -312,7 +312,7 @@ function Accepted() {
     },
     headRow: {
       style: {
-        backgroundColor: "transparent",
+        backgroundColor: "#15191F",
         color: "#fff",
         fontSize: "18px",
         whiteSpace: "nowrap",

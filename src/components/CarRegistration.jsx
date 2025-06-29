@@ -8,6 +8,7 @@ import HistoryTable from "../subcomponents/HistoryTable";
 import { useTranslation } from "react-i18next";
 import Logout from "./Logout";
 import { useNavigate } from "react-router-dom";
+import moment from "moment-timezone";
 
 function CarRegistration({
   carPlate,
@@ -187,7 +188,7 @@ function CarRegistration({
         return;
       }
 
-      const formattedDateIn = new Date(carServiceInfo.dateIn).toISOString().replace("Z", "");
+      const formattedDateIn = moment.tz(carServiceInfo.dateIn, moment.tz.guess()).tz("Asia/Singapore").format("YYYY-MM-DDTHH:mm:ss");
 
       const data = {
         custInformation: {
@@ -351,6 +352,12 @@ function CarRegistration({
     }
   };
 
+  // Helper to get current SGT time as local time string for input
+  const getSGTDateTimeLocal = () => {
+    const sgt = moment().tz("Asia/Singapore");
+    return sgt.format("YYYY-MM-DDTHH:mm");
+  };
+
   return (
     <div className="row px-0">
       <div className="col-12">
@@ -425,8 +432,8 @@ function CarRegistration({
                               type="datetime-local"
                               name={key}
                               className="form-control placeholder-white py-2"
-                              value={carServiceInfo[key] || ""}
-                              max={new Date().toISOString().slice(0, 16)}
+                              value={getSGTDateTimeLocal() || carServiceInfo[key]}
+                              max={getSGTDateTimeLocal()}
                               onChange={(e) =>
                                 setCarServiceInfo({
                                   ...carServiceInfo,

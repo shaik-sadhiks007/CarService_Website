@@ -186,7 +186,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
               onChange={(e) => setCarPlate(e.target.value)}
             />
             <button
-              className="btn btn-outline-warning text-white py-2 ms-3"
+              className="bg-warning border-0 border-warning rounded text-white px-3 py-2 ms-3"
               onClick={handleSearch}
               disabled={loading}
             >

@@ -4,6 +4,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 import "./App.css";
+import "./pwa.css";
 import Pending from "./components/Pending";
 import Completed from "./components/Completed";
 import Accepted from "./components/Accepted";
@@ -18,12 +19,14 @@ import FormFilling from "./guestComp/FormFilling";
 import PaymentPending from "./guestComp/PaymentPending";
 import ReadyToDeliver from "./guestComp/ReadyToDeliver";
 import PendingCars from "./guestComp/PendingCars";
+import OfflineIndicator from "./components/OfflineIndicator";
 
 function App() {
 
   return (
-    <Router basename="/CarServiceUI">
+    <Router>
       <ToastContainer />
+      <OfflineIndicator />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -31,7 +34,8 @@ function App() {
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<DataDownload />} />
-          <Route path="/car-service-entry" element={<Dashboard />} />
+          {/* <Route path="/car-service-entry" element={<Dashboard />} /> */}
+          <Route path="/car-service-entry" element={<GuestLogin />} />
           <Route path="/register" element={<Signup />} />
           <Route path="/services" element={<AddServices />} />
           <Route path="/settings" element={<Settings />} />

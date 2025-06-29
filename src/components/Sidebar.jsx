@@ -14,11 +14,11 @@ function Sidebar() {
 
   const menuItems = [
     {
-      path: "/car-service-entry",
+      path: "/guest",
       iconclassName: "bi bi-car-front",
       label: t("menu.carServiceEntry"),
     },
-    { path: "/guest", iconclassName: "bi bi-person-plus-fill", label: t("guest.guest") },
+    // { path: "/guest", iconclassName: "bi bi-person-plus-fill", label: t("guest.guest") },
     { path: "/pending", iconclassName: "bi bi-hourglass-split", label: t("menu.pending") },
     { path: "/accepted", iconclassName: "bi bi-gear-fill", label: t("menu.accepted") },
     {
