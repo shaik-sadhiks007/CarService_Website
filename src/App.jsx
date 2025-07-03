@@ -24,7 +24,7 @@ import OfflineIndicator from "./components/OfflineIndicator";
 function App() {
 
   return (
-    <Router>
+    <Router basename="/CarServiceUi/">
       <ToastContainer />
       <OfflineIndicator />
       <Routes>
