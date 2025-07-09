@@ -13,6 +13,8 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import RightSidebar from "../sidebar/RightSidebar";
+import VirtualKeyboard from "./VirtualKeyboard";
+import { useRef } from "react";
 
 function Completed() {
   const {
@@ -34,6 +36,11 @@ function Completed() {
   });
 
   const [category, setCategory] = useState("all")
+
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardInput, setKeyboardInput] = useState("");
+  const [activeInput, setActiveInput] = useState(null);
+  const activeInputRef = useRef(null);
 
 
   const excelData = {
@@ -113,6 +120,22 @@ function Completed() {
 
   const toggleOffcanvas = () => {
     setShowOffcanvas(!showOffcanvas);
+  };
+
+  const handleInputFocus = (field, value, ref) => {
+    setActiveInput(field);
+    setShowKeyboard(true);
+    setKeyboardInput(value || "");
+    if (ref) activeInputRef.current = ref;
+  };
+  const handleKeyboardChange = (val) => {
+    setKeyboardInput(val);
+    if (activeInput === "searchText") setSearchText(val);
+  };
+  const handleKeyboardClose = () => {
+    setShowKeyboard(false);
+    setActiveInput(null);
+    if (activeInputRef.current) activeInputRef.current.blur();
   };
 
   const columns = [
@@ -519,6 +542,7 @@ function Completed() {
                           value={searchText}
                           onChange={(e) => setSearchText(e.target.value)}
                           className="form-control mb-3 input-dashboard text-white placeholder-white"
+                          onFocus={e => handleInputFocus("searchText", searchText, e.target)}
                         />
                       </div>
                     </div>
@@ -609,6 +633,13 @@ function Completed() {
           )}
         </div>
       </div>
+      {showKeyboard && (
+        <VirtualKeyboard
+          input={keyboardInput}
+          onChange={handleKeyboardChange}
+          onClose={handleKeyboardClose}
+        />
+      )}
     </div>
   );
 }

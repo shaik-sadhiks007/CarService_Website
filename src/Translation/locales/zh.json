@@ -51,7 +51,8 @@
     "register": "注册",
     "addServices": "添加服务",
     "downloadData": "下载数据",
-    "adminMenu": "管理员"
+    "adminMenu": "管理员",
+    "manageuser" : "用户管理"
   },
   "signup": {
     "signup": "注册",

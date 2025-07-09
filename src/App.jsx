@@ -20,11 +20,12 @@ import PaymentPending from "./guestComp/PaymentPending";
 import ReadyToDeliver from "./guestComp/ReadyToDeliver";
 import PendingCars from "./guestComp/PendingCars";
 import OfflineIndicator from "./components/OfflineIndicator";
+import ManageUser from "./adminComponents/ManageUser";
 
 function App() {
 
   return (
-    <Router basename="/CarServiceUi/">
+    <Router basename="/">
       <ToastContainer />
       <OfflineIndicator />
       <Routes>
@@ -37,8 +38,8 @@ function App() {
           {/* <Route path="/car-service-entry" element={<Dashboard />} /> */}
           <Route path="/car-service-entry" element={<GuestLogin />} />
           <Route path="/register" element={<Signup />} />
-          <Route path="/services" element={<AddServices />} />
-          <Route path="/settings" element={<Settings />} />
+          {/* <Route path="/services" element={<AddServices />} /> */}
+          {/* <Route path="/settings" element={<Settings />} /> */}
           <Route path="/pending" element={<Pending />} />
           <Route path="/completed" element={<Completed />} />
           <Route path="/accepted" element={<Accepted />} />
@@ -47,6 +48,8 @@ function App() {
           <Route path="/ready-to-deliver" element={<ReadyToDeliver />} />
           <Route path="/payment-pending" element={<PaymentPending />} />
           <Route path="/pending-cars" element={<PendingCars />} />
+          <Route path="/manage-user" element={<ManageUser />} />
+
         </Route>
       </Routes>
     </Router>

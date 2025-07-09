@@ -288,11 +288,15 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     // Display full payment status descriptions when not editing
     if (key === "paymentStatus" && !isEditing) {
       const statusMap = {
-        "P": "Pending Payment",
-        "C": "Completed",
-        "L": "Pay Later"
+        "P": { label: "Pending Payment", className: "bg-primary" },
+        "C": { label: "Completed", className: "bg-success" },
+        "L": { label: "Pay Later", className: "bg-warning text-dark" }
       };
-      return statusMap[value] || value || "N/A";
+      const status = statusMap[value];
+      if (status) {
+        return <span className={`badge ${status.className}`}>{status.label}</span>;
+      }
+      return value || "N/A";
     }
 
     if (key === "createdDate" || key === "modifiedDate" || key === "dateIn") {

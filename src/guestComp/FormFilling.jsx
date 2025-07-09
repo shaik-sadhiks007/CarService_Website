@@ -9,6 +9,8 @@ import DashboardComp from "../components/DashboardComp";
 
 function FormFilling() {
     const { apiUrl, showOffcanvas, setShowOffcanvas, userRole } = useContext(CarDataContext);
+
+    console.log(userRole,'role')
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const role = queryParams.get("role"); // Get role from query params

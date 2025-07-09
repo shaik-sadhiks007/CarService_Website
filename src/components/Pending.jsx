@@ -15,6 +15,8 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import headerIcon from '../assets/header.png'
 import RightSidebar from "../sidebar/RightSidebar";
+import VirtualKeyboard from "./VirtualKeyboard";
+import { useRef } from "react";
 
 function Pending() {
   const {
@@ -39,6 +41,10 @@ function Pending() {
 
   const [searchText, setSearchText] = useState("");
 
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardInput, setKeyboardInput] = useState("");
+  const [activeInput, setActiveInput] = useState(null);
+  const activeInputRef = useRef(null);
 
 
   const excelData = {
@@ -213,6 +219,23 @@ function Pending() {
       month: "short",
       year: "numeric",
     }).format(new Date(dateString));
+  };
+
+  const handleInputFocus = (field, value, ref) => {
+    setActiveInput(field);
+    setShowKeyboard(true);
+    setKeyboardInput(value || "");
+    if (ref) activeInputRef.current = ref;
+  };
+  const handleKeyboardChange = (val) => {
+    setKeyboardInput(val);
+    if (activeInput === "searchText") setSearchText(val);
+    // Add more fields as needed
+  };
+  const handleKeyboardClose = () => {
+    setShowKeyboard(false);
+    setActiveInput(null);
+    if (activeInputRef.current) activeInputRef.current.blur();
   };
 
   const columns = [
@@ -782,6 +805,7 @@ function Pending() {
                           placeholder="Search by Vehicle No."
                           value={searchText}
                           onChange={(e) => setSearchText(e.target.value)}
+                          onFocus={e => handleInputFocus("searchText", searchText, e.target)}
                           className="form-control mb-3 input-dashboard text-white placeholder-white"
                         />
                       </div>
@@ -920,6 +944,13 @@ function Pending() {
           )}
         </div>
       </div>
+      {showKeyboard && (
+        <VirtualKeyboard
+          input={keyboardInput}
+          onChange={handleKeyboardChange}
+          onClose={handleKeyboardClose}
+        />
+      )}
     </div>
   );
 }

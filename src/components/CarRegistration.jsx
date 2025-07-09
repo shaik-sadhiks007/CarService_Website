@@ -23,7 +23,17 @@ function CarRegistration({
   carInfo,
   setCarPlate,
   historyData,
-  role = false
+  role = false,
+  showKeyboard,
+  setShowKeyboard,
+  keyboardInput,
+  setKeyboardInput,
+  activeInput,
+  setActiveInput,
+  handleKeyboardInput,
+  openKeyboard,
+  closeKeyboard,
+  showHistory
 }) {
   const { apiUrl, userRole, mechanics, services, setServices, logout } =
     useContext(CarDataContext);
@@ -390,15 +400,9 @@ function CarRegistration({
                               className="form-control placeholder-white py-2"
                               placeholder={labels[key]}
                               value={customerInfo[key] || ""}
-                              onChange={(e) =>
-                                setCustomerInfo({
-                                  ...customerInfo,
-                                  [key]: e.target.value,
-                                })
-                              }
-                              disabled={
-                                userRole.userRole === "mechanic" ? found : false
-                              }
+                              onChange={(e) => setCustomerInfo({ ...customerInfo, [key]: e.target.value })}
+                              onFocus={e => openKeyboard({ section: "customerInfo", key }, { current: e.target }, customerInfo[key])}
+                              disabled={userRole.userRole === "mechanic" ? found : false}
                             />
                           </>
 
@@ -510,12 +514,8 @@ function CarRegistration({
                               className="form-control placeholder-white py-2"
                               placeholder={labels[key]}
                               value={carServiceInfo[key] || ""}
-                              onChange={(e) =>
-                                setCarServiceInfo({
-                                  ...carServiceInfo,
-                                  [key]: e.target.value,
-                                })
-                              }
+                              onChange={(e) => setCarServiceInfo({ ...carServiceInfo, [key]: e.target.value })}
+                              onFocus={e => openKeyboard({ section: "carServiceInfo", key }, { current: e.target }, carServiceInfo[key])}
                             />
                           )}
                         </div>
@@ -532,12 +532,8 @@ function CarRegistration({
                           rows="4"
                           placeholder={labels["customerComplaints"]}
                           value={carServiceInfo["customerComplaints"] || ""}
-                          onChange={(e) =>
-                            setCarServiceInfo({
-                              ...carServiceInfo,
-                              customerComplaints: e.target.value,
-                            })
-                          }
+                          onChange={(e) => setCarServiceInfo({ ...carServiceInfo, customerComplaints: e.target.value })}
+                          onFocus={e => openKeyboard({ section: "carServiceInfo", key: "customerComplaints" }, { current: e.target }, carServiceInfo["customerComplaints"])}
                         ></textarea>
                       </div>
                     )}
@@ -550,12 +546,8 @@ function CarRegistration({
                           rows="4"
                           placeholder={labels["remarks"]}
                           value={carServiceInfo["remarks"] || ""}
-                          onChange={(e) =>
-                            setCarServiceInfo({
-                              ...carServiceInfo,
-                              remarks: e.target.value,
-                            })
-                          }
+                          onChange={(e) => setCarServiceInfo({ ...carServiceInfo, remarks: e.target.value })}
+                          onFocus={e => openKeyboard({ section: "carServiceInfo", key: "remarks" }, { current: e.target }, carServiceInfo["remarks"])}
                         ></textarea>
                       </div>
                     )}
@@ -572,7 +564,7 @@ function CarRegistration({
                   </button>
                 </div>
 
-                {found && <HistoryTable historyData={historyData} />}
+                {showHistory && found && <HistoryTable historyData={historyData} />}
               </div>
             </div>
           </div>

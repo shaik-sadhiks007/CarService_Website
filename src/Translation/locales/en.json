@@ -51,7 +51,8 @@
     "register": "Register",
     "addServices": "Add Services",
     "downloadData": "Download Data",
-    "adminMenu": "Administrator"
+    "adminMenu": "Administrator",
+    "manageuser" : "Manage User"
   },
   "signup": {
     "signup": "Sign Up",

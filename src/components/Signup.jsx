@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import Logout from './Logout';
 import { useTranslation } from 'react-i18next';
 import RightSidebar from '../sidebar/RightSidebar';
+import VirtualKeyboard from "./VirtualKeyboard";
+import { useRef } from "react";
 
 const Signup = () => {
   const { showOffcanvas, setShowOffcanvas, apiUrl } = useContext(CarDataContext);
@@ -16,6 +18,10 @@ const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [userRole, setUserRole] = useState('mechanic');
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardInput, setKeyboardInput] = useState("");
+  const [activeInput, setActiveInput] = useState(null);
+  const activeInputRef = useRef(null);
 
   const token = localStorage.getItem("token");
 
@@ -75,6 +81,37 @@ const Signup = () => {
     setShowOffcanvas(!showOffcanvas);
   };
 
+  const handleInputFocus = (field, value, ref) => {
+    setActiveInput(field);
+    setShowKeyboard(true);
+    setKeyboardInput(value || "");
+    if (ref) activeInputRef.current = ref;
+  };
+  const handleKeyboardChange = (val) => {
+    setKeyboardInput(val);
+    if (activeInput === "username") setUsername(val);
+    if (activeInput === "password") setPassword(val);
+  };
+  const handleKeyboardClose = () => {
+    setShowKeyboard(false);
+    setActiveInput(null);
+    if (activeInputRef.current) activeInputRef.current.blur();
+  };
+
+  const handlePhysicalKeyDown = (e) => {
+    if (showKeyboard) {
+      e.preventDefault();
+      // Only handle single character keys, space, and backspace
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+        handleKeyboardChange(keyboardInput + e.key);
+      } else if (e.key === "Backspace") {
+        handleKeyboardChange(keyboardInput.slice(0, -1));
+      } else if (e.key === " ") {
+        handleKeyboardChange(keyboardInput + " ");
+      }
+    }
+  };
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -126,6 +163,9 @@ const Signup = () => {
                     placeholder={t("signup.username")}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    onFocus={e => handleInputFocus("username", username, e.target)}
+                    readOnly={showKeyboard}
+                    onKeyDown={handlePhysicalKeyDown}
                   />
                 </div>
 
@@ -139,6 +179,9 @@ const Signup = () => {
                     placeholder={t("signup.password")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onFocus={e => handleInputFocus("password", password, e.target)}
+                    readOnly={showKeyboard}
+                    onKeyDown={handlePhysicalKeyDown}
                   />
                 </div>
 
@@ -168,6 +211,13 @@ const Signup = () => {
           </div>
         </div>
       </div>
+      {showKeyboard && (
+        <VirtualKeyboard
+          input={keyboardInput}
+          onChange={handleKeyboardChange}
+          onClose={handleKeyboardClose}
+        />
+      )}
     </div>
   );
 };

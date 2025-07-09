@@ -13,6 +13,8 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import RightSidebar from "../sidebar/RightSidebar";
+import VirtualKeyboard from "./VirtualKeyboard";
+import { useRef } from "react";
 
 function Accepted() {
   const {
@@ -50,6 +52,11 @@ function Accepted() {
 
   const [fullData, setFullData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardInput, setKeyboardInput] = useState("");
+  const [activeInput, setActiveInput] = useState(null);
+  const activeInputRef = useRef(null);
 
 
   const fetchAcceptedCars = async () => {
@@ -139,6 +146,22 @@ function Accepted() {
 
   const handleCategoryChange = (selectedCategory) => {
     setCategory(selectedCategory);
+  };
+
+  const handleInputFocus = (field, value, ref) => {
+    setActiveInput(field);
+    setShowKeyboard(true);
+    setKeyboardInput(value || "");
+    if (ref) activeInputRef.current = ref;
+  };
+  const handleKeyboardChange = (val) => {
+    setKeyboardInput(val);
+    if (activeInput === "searchText") setSearchText(val);
+  };
+  const handleKeyboardClose = () => {
+    setShowKeyboard(false);
+    setActiveInput(null);
+    if (activeInputRef.current) activeInputRef.current.blur();
   };
 
 
@@ -532,11 +555,19 @@ function Accepted() {
                           value={searchText}
                           onChange={(e) => setSearchText(e.target.value)}
                           className="form-control mb-3 input-dashboard text-white placeholder-white"
+                          onFocus={e => handleInputFocus("searchText", searchText, e.target)}
                         />
                       </div>
                     </div>
 
                   </div>
+                  {showKeyboard && (
+                    <VirtualKeyboard
+                      input={keyboardInput}
+                      onChange={handleKeyboardChange}
+                      onClose={handleKeyboardClose}
+                    />
+                  )}
                   <div className="row g-2 my-2">
                     <div className="col-6 col-sm-4 col-md-auto">
                       <button className={`btn w-100 ${category === 'all' ? 'btn-warning' : 'btn-outline-warning'}`} onClick={() => handleCategoryChange('all')}>

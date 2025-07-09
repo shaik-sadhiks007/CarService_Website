@@ -10,6 +10,8 @@ import RightSidebar from "../sidebar/RightSidebar";
 import axios from "axios";
 import Lottie from "lottie-react";
 import carLoader from "../assets/car-loader.json";
+import VirtualKeyboard from "../components/VirtualKeyboard";
+import { useRef } from "react";
 
 
 function PendingCars() {
@@ -37,6 +39,12 @@ function PendingCars() {
     const [loading, setLoading] = useState(false);
 
     const token = localStorage.getItem("token");
+
+    const [showKeyboard, setShowKeyboard] = useState(false);
+    const [keyboardInput, setKeyboardInput] = useState("");
+    const [activeInput, setActiveInput] = useState(null);
+    const activeInputRef = useRef(null);
+
 
     const fetchPendingCars = async () => {
         try {
@@ -136,6 +144,21 @@ function PendingCars() {
         }).format(new Date(dateString));
     };
 
+    const handleInputFocus = (field, value, ref) => {
+        setActiveInput(field);
+        setShowKeyboard(true);
+        setKeyboardInput(value || "");
+        if (ref) activeInputRef.current = ref;
+    };
+    const handleKeyboardChange = (val) => {
+        setKeyboardInput(val);
+        if (activeInput === "searchText") setSearchText(val);
+    };
+    const handleKeyboardClose = () => {
+        setShowKeyboard(false);
+        setActiveInput(null);
+        if (activeInputRef.current) activeInputRef.current.blur();
+    };
 
 
     const columns = [
@@ -381,12 +404,21 @@ function PendingCars() {
                                             value={searchText}
                                             onChange={(e) => setSearchText(e.target.value)}
                                             className="form-control mb-3 input-dashboard text-white placeholder-white"
+                                            onFocus={e => handleInputFocus("searchText", searchText, e.target)}
                                         />
                                     </div>
                                 </div>
 
                             </div>
                             
+                            {showKeyboard && (
+                                <VirtualKeyboard
+                                    input={keyboardInput}
+                                    onChange={handleKeyboardChange}
+                                    onClose={handleKeyboardClose}
+                                />
+                            )}
+
                             <DataTable
                                 columns={columns}
                                 data={tableData.filter((row) =>

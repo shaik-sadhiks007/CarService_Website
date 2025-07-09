@@ -36,7 +36,7 @@ function Sidebar() {
 
   const adminItems = [
     { path: "/register", iconclassName: "bi bi-person-plus-fill", label: t("admin.register") },
-    // { path: "/services", iconclassName: "bi bi-tools", label: t("admin.addServices") },
+    { path: "/manage-user", iconclassName: "bi bi-tools", label: t("admin.manageuser") },
   ];
 
   const accountantItems = [

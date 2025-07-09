@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { CarDataContext } from "./CarDataContext";
 import "./style.css";
 import { toast } from "react-toastify";
+import VirtualKeyboard from "./VirtualKeyboard";
+import { FaKeyboard } from "react-icons/fa";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -13,6 +15,12 @@ const Login = () => {
 
   const { userRole, logout, apiUrl, initializeUser, initializeUser2 } =
     useContext(CarDataContext);
+
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardInput, setKeyboardInput] = useState("");
+  const [activeInput, setActiveInput] = useState(null); // "username" or "password"
+
+  const formRef = useRef();
 
   const isTokenExpired = (token) => {
     try {
@@ -121,9 +129,32 @@ const Login = () => {
     }
   };
 
+  const handleKeyboardInput = (input) => {
+    setKeyboardInput(input);
+    if (activeInput === "username") setUsername(input);
+    if (activeInput === "password") setPassword(input);
+  };
+
+  const openKeyboard = (inputName) => {
+    setActiveInput(inputName);
+    setShowKeyboard(true);
+    setKeyboardInput(inputName === "username" ? username : password);
+  };
+
+  const closeKeyboard = () => {
+    setShowKeyboard(false);
+    setActiveInput(null);
+  };
+
+  const handleEnter = () => {
+    if (formRef.current) {
+      formRef.current.requestSubmit();
+    }
+  };
+
   return (
     <div className="container-fluid login-container d-flex align-items-center justify-content-center">
-      <form className="form-box" onSubmit={handleSubmit}>
+      <form className="form-box" onSubmit={handleSubmit} ref={formRef}>
         <h3 className="text-center mb-4">Login</h3>
         <div className="mb-3">
           <input
@@ -133,7 +164,10 @@ const Login = () => {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            onFocus={() => openKeyboard("username")}
+            // readOnly={showKeyboard}
           />
+          <span style={{ position: "absolute", right: 40, top: 10, cursor: "pointer" }} onClick={() => openKeyboard("username")}> <FaKeyboard /> </span>
         </div>
         <div className="mb-3">
           <input
@@ -143,7 +177,10 @@ const Login = () => {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onFocus={() => openKeyboard("password")}
+            // readOnly={showKeyboard}
           />
+          <span style={{ position: "absolute", right: 40, top: 10, cursor: "pointer" }} onClick={() => openKeyboard("password")}> <FaKeyboard /> </span>
         </div>
         <button
           type="submit"
@@ -152,6 +189,14 @@ const Login = () => {
           Login
         </button>
       </form>
+      {showKeyboard && (
+        <VirtualKeyboard
+          input={keyboardInput}
+          onChange={handleKeyboardInput}
+          onClose={closeKeyboard}
+          onEnter={handleEnter}
+        />
+      )}
     </div>
   );
 };

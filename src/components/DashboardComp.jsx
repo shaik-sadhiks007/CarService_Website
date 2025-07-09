@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import CarRegistration from "./CarRegistration";
 import { useTranslation } from "react-i18next";
 import RightSidebar from "../sidebar/RightSidebar";
+import VirtualKeyboard from "./VirtualKeyboard";
+import { FaKeyboard } from "react-icons/fa";
 
 function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role = "mechanic" }) {
   const [carPlate, setCarPlate] = useState("");
@@ -65,6 +67,11 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
   const [carServiceInfo, setCarServiceInfo] = useState(carInfo);
 
   const token = localStorage.getItem("token");
+
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardInput, setKeyboardInput] = useState("");
+  const [activeInput, setActiveInput] = useState(null);
+  const [activeInputRef, setActiveInputRef] = useState(null);
 
 
   const handleSearch = async () => {
@@ -158,6 +165,32 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
     }
   };
 
+  const handleKeyboardInput = (input) => {
+    setKeyboardInput(input);
+    if (activeInput === "carPlate") setCarPlate(input);
+    if (activeInput && typeof activeInput === "object" && activeInput.section && activeInput.key) {
+      if (activeInput.section === "customerInfo") {
+        setCustomerInfo((prev) => ({ ...prev, [activeInput.key]: input }));
+      } else if (activeInput.section === "carServiceInfo") {
+        setCarServiceInfo((prev) => ({ ...prev, [activeInput.key]: input }));
+      }
+    }
+  };
+  const openKeyboard = (inputName, ref = null, value = "") => {
+    setActiveInput(inputName);
+    setShowKeyboard(true);
+    setKeyboardInput(value);
+    if (ref) setActiveInputRef(ref);
+  };
+  const closeKeyboard = () => {
+    setShowKeyboard(false);
+    setActiveInput(null);
+    if (activeInputRef && activeInputRef.current) activeInputRef.current.blur();
+  };
+  const handleEnter = () => {
+    if (activeInput === "carPlate") handleSearch();
+  };
+
 
   return (
     <div className="container-fluid">
@@ -184,17 +217,30 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
               placeholder={t("carRegNo")}
               value={carPlate}
               onChange={(e) => setCarPlate(e.target.value)}
+              onFocus={e => openKeyboard("carPlate", { current: e.target }, carPlate)}
+              readOnly={showKeyboard}
             />
-            <button
-              className="bg-warning border-0 border-warning rounded text-white px-3 py-2 ms-3"
-              onClick={handleSearch}
-              disabled={loading}
-            >
-              {t("search")}
-            </button>
+            {["admin", "super_admin", "mechanic"].includes((userRole?.userRole || "").toLowerCase()) && (
+              <button
+                className="bg-warning border-0 border-warning rounded text-white px-3 py-2 ms-3"
+                onClick={handleSearch}
+                disabled={loading}
+              >
+                {t("search")}
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {showKeyboard && (
+        <VirtualKeyboard
+          input={keyboardInput}
+          onChange={handleKeyboardInput}
+          onClose={closeKeyboard}
+          onEnter={handleEnter}
+        />
+      )}
 
       <CarRegistration
         carPlate={carPlate}
@@ -210,6 +256,16 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
         setCarPlate={setCarPlate}
         historyData={historyData}
         role={role}
+        showKeyboard={showKeyboard}
+        setShowKeyboard={setShowKeyboard}
+        keyboardInput={keyboardInput}
+        setKeyboardInput={setKeyboardInput}
+        activeInput={activeInput}
+        setActiveInput={setActiveInput}
+        handleKeyboardInput={handleKeyboardInput}
+        openKeyboard={openKeyboard}
+        closeKeyboard={closeKeyboard}
+        showHistory={['admin','super_admin','mechanic'].includes((userRole?.userRole||'').toLowerCase())}
       />
     </div>
   );
