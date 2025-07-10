@@ -25,7 +25,7 @@ import ManageUser from "./adminComponents/ManageUser";
 function App() {
 
   return (
-    <Router basename="/">
+    <Router basename="/CarServiceUi/">
       <ToastContainer />
       <OfflineIndicator />
       <Routes>
