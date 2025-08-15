@@ -1,0 +1,28 @@
+{
+  "rewrites": [
+    { "source": "/CarServiceUI/:path*", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
+    },
+    {
+      "source": "/CarServiceUI/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ],
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "env": {
+    "VITE_BASE_PATH": "/CarServiceUI"
+  }
+}

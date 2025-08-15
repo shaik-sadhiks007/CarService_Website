@@ -6,11 +6,16 @@
   "description": "Professional car service management PWA for Icon Technik",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run copy-pwa-files",
     "preview": "vite preview",
     "lint": "eslint .",
     "pwa:build": "npm run build && npm run pwa:generate-assets",
-    "pwa:generate-assets": "echo 'PWA assets generated'"
+    "pwa:generate-assets": "echo 'PWA assets generated'",
+    "netlify-build": "VITE_BASE_PATH=/CarServiceUI vite build && npm run copy-pwa-files",
+    "vercel-build": "VITE_BASE_PATH=/CarServiceUI vite build && npm run copy-pwa-files",
+    "copy-redirects": "powershell -Command \"Copy-Item -Path ./public/_redirects -Destination ./dist/_redirects -Force\"",
+    "copy-sw": "powershell -Command \"Copy-Item -Path ./public/sw.js -Destination ./dist/sw.js -Force\"",
+    "copy-pwa-files": "npm run copy-redirects && npm run copy-sw"
   },
   "dependencies": {
     "axios": "^1.7.9",

@@ -55,14 +55,22 @@ const closeBtnStyle = {
   fontSize: 18,
   cursor: "pointer",
   color: "#888",
-  marginLeft: 8
+  marginLeft: 8,
+  padding: "8px",
+  minWidth: "44px",
+  minHeight: "44px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  touchAction: "manipulation"
 };
 
-const VirtualKeyboard = ({ input, onChange, onClose }) => {
+const VirtualKeyboard = ({ input, onChange, onClose, onEnter }) => {
   // Use original desktop/tablet size
   const [layoutName, setLayoutName] = useState("default");
   const [size, setSize] = useState({ width: 500, height: 320 });
   const keyboardRef = useRef(null);
+  const nodeRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -88,7 +96,9 @@ const VirtualKeyboard = ({ input, onChange, onClose }) => {
   };
 
   // The close button calls this, and parent should hide the keyboard when onClose is called
-  const handleClose = () => {
+  const handleClose = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log("VirtualKeyboard: handleClose called"); // Debug log
     if (onClose) onClose();
   };
@@ -115,7 +125,14 @@ const VirtualKeyboard = ({ input, onChange, onClose }) => {
     >
       <div className="keyboard-drag-handle" style={dragHandleStyle}>
         <span>Drag Keyboard</span>
-        <button onClick={handleClose} style={closeBtnStyle} title="Close">✕</button>
+        <button 
+          onClick={handleClose} 
+          onTouchEnd={handleClose}
+          style={closeBtnStyle} 
+          title="Close"
+        >
+          ✕
+        </button>
       </div>
       <div style={{ flex: 1, padding: 6 }}>
         <Keyboard
@@ -132,17 +149,19 @@ const VirtualKeyboard = ({ input, onChange, onClose }) => {
   return (
     <>
       <style>{responsiveStyle}</style>
-      {isMobile ? (
-        // Not draggable on mobile
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {/* Allow dragging on mobile as well */}
+      <Draggable handle=".keyboard-drag-handle" nodeRef={nodeRef}>
+        <div ref={nodeRef} style={{ 
+          position: "fixed", 
+          bottom: "20px", 
+          left: "50%", 
+          transform: "translateX(-50%)", 
+          zIndex: 9999, 
+          pointerEvents: "auto"
+        }}>
           {keyboardContent}
         </div>
-      ) : (
-        // Draggable on desktop/tablet
-        <Draggable handle=".keyboard-drag-handle">
-          {keyboardContent}
-        </Draggable>
-      )}
+      </Draggable>
     </>
   );
 };

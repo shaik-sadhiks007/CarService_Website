@@ -17,8 +17,9 @@ const Login = () => {
     useContext(CarDataContext);
 
   const [showKeyboard, setShowKeyboard] = useState(false);
-  const [keyboardInput, setKeyboardInput] = useState("");
   const [activeInput, setActiveInput] = useState(null); // "username" or "password"
+
+  console.log(activeInput, "activeInput")
 
   const formRef = useRef();
 
@@ -130,7 +131,6 @@ const Login = () => {
   };
 
   const handleKeyboardInput = (input) => {
-    setKeyboardInput(input);
     if (activeInput === "username") setUsername(input);
     if (activeInput === "password") setPassword(input);
   };
@@ -138,7 +138,6 @@ const Login = () => {
   const openKeyboard = (inputName) => {
     setActiveInput(inputName);
     setShowKeyboard(true);
-    setKeyboardInput(inputName === "username" ? username : password);
   };
 
   const closeKeyboard = () => {
@@ -154,33 +153,36 @@ const Login = () => {
 
   return (
     <div className="container-fluid login-container d-flex align-items-center justify-content-center">
-      <form className="form-box" onSubmit={handleSubmit} ref={formRef}>
+      <form className="form-box" onSubmit={handleSubmit} ref={formRef} style={{ position: 'relative' }}>
+        <div onClick={() => setShowKeyboard(!showKeyboard)} style={{ position: 'absolute', top: 15, right: 25, cursor: 'pointer' }}>
+          <FaKeyboard size={24} />
+        </div>
         <h3 className="text-center mb-4">Login</h3>
-        <div className="mb-3">
+        <div className="mb-3" style={{ position: "relative" }}>
           <input
             type="text"
             name="username"
             className="form-control input-box rounded-pill px-3 py-2 fs-5"
             placeholder="Username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onFocus={() => openKeyboard("username")}
-            // readOnly={showKeyboard}
+            onFocus={() => setActiveInput("username")}
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
           />
-          <span style={{ position: "absolute", right: 40, top: 10, cursor: "pointer" }} onClick={() => openKeyboard("username")}> <FaKeyboard /> </span>
         </div>
-        <div className="mb-3">
+        <div className="mb-3" style={{ position: "relative" }}>
           <input
             type="password"
             name="password"
             className="form-control input-box rounded-pill px-3 py-2 fs-5"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onFocus={() => openKeyboard("password")}
-            // readOnly={showKeyboard}
+            onFocus={() => setActiveInput("password")}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
           />
-          <span style={{ position: "absolute", right: 40, top: 10, cursor: "pointer" }} onClick={() => openKeyboard("password")}> <FaKeyboard /> </span>
         </div>
         <button
           type="submit"
@@ -189,9 +191,10 @@ const Login = () => {
           Login
         </button>
       </form>
-      {showKeyboard && (
+      {showKeyboard && activeInput && (
         <VirtualKeyboard
-          input={keyboardInput}
+          key={activeInput}
+          input={activeInput === "username" ? username : password}
           onChange={handleKeyboardInput}
           onClose={closeKeyboard}
           onEnter={handleEnter}

@@ -197,9 +197,19 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
 
       <RightSidebar />
 
-      <div>
-        <h1 className="text-white mb-4">{t("menu.carServiceEntry")}</h1>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="text-white">{t("menu.carServiceEntry")}</h1>
+        <div className="d-flex justify-content-end">
+          <div
+            onClick={() => openKeyboard("carPlate", null, carPlate)}
+            style={{ cursor: 'pointer' }}
+            title="Open Virtual Keyboard"
+          >
+            <FaKeyboard size={20} className="text-warning" />
+          </div>
+        </div>
       </div>
+
 
       <div
         className="text-white w-100 p-4 rounded-2"
@@ -217,7 +227,6 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
               placeholder={t("carRegNo")}
               value={carPlate}
               onChange={(e) => setCarPlate(e.target.value)}
-              onFocus={e => openKeyboard("carPlate", { current: e.target }, carPlate)}
               readOnly={showKeyboard}
             />
             {["admin", "super_admin", "mechanic"].includes((userRole?.userRole || "").toLowerCase()) && (
@@ -265,7 +274,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
         handleKeyboardInput={handleKeyboardInput}
         openKeyboard={openKeyboard}
         closeKeyboard={closeKeyboard}
-        showHistory={['admin','super_admin','mechanic'].includes((userRole?.userRole||'').toLowerCase())}
+        showHistory={['admin', 'super_admin', 'mechanic'].includes((userRole?.userRole || '').toLowerCase())}
       />
     </div>
   );

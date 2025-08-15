@@ -1,9 +1,10 @@
 const CACHE_NAME = 'car-service-v1';
+const BASE_PATH = '/CarServiceUI';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/logo.png',
+  BASE_PATH + '/',
+  BASE_PATH + '/index.html',
+  BASE_PATH + '/manifest.json',
+  BASE_PATH + '/logo.png',
   'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css'
 ];
 
@@ -47,7 +48,7 @@ self.addEventListener('fetch', (event) => {
           .catch(() => {
             // Return offline page for navigation requests
             if (event.request.mode === 'navigate') {
-              return caches.match('/index.html');
+              return caches.match(BASE_PATH + '/index.html');
             }
           });
       })
@@ -81,8 +82,8 @@ self.addEventListener('sync', (event) => {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'New car service update!',
-    icon: '/logo.png',
-    badge: '/logo.png',
+    icon: BASE_PATH + '/logo.png',
+    badge: BASE_PATH + '/logo.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -92,12 +93,12 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'View Details',
-        icon: '/logo.png'
+        icon: BASE_PATH + '/logo.png'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/logo.png'
+        icon: BASE_PATH + '/logo.png'
       }
     ]
   };
@@ -113,7 +114,7 @@ self.addEventListener('notificationclick', (event) => {
 
   if (event.action === 'explore') {
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow(BASE_PATH + '/')
     );
   }
 });
@@ -130,4 +131,4 @@ self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-}); 
+});
