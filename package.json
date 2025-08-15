@@ -12,9 +12,10 @@
     "pwa:build": "npm run build && npm run pwa:generate-assets",
     "pwa:generate-assets": "echo 'PWA assets generated'",
     "netlify-build": "VITE_BASE_PATH=/CarServiceUI vite build && npm run copy-pwa-files",
-    "vercel-build": "VITE_BASE_PATH=/CarServiceUI vite build && npm run copy-pwa-files",
-    "copy-redirects": "powershell -Command \"Copy-Item -Path ./public/_redirects -Destination ./dist/_redirects -Force\"",
-    "copy-sw": "powershell -Command \"Copy-Item -Path ./public/sw.js -Destination ./dist/sw.js -Force\"",
+    "vercel-build": "cross-env VITE_BASE_PATH=/CarServiceUI vite build && npm run copy-pwa-files",
+    "ensure-dist": "node -e \"if (!require('fs').existsSync('./dist')) { require('fs').mkdirSync('./dist', { recursive: true }); }\"",
+    "copy-redirects": "npm run ensure-dist && node -e \"require('fs').copyFileSync('./public/_redirects', './dist/_redirects')\"",
+    "copy-sw": "npm run ensure-dist && node -e \"require('fs').copyFileSync('./public/sw.js', './dist/sw.js')\"",
     "copy-pwa-files": "npm run copy-redirects && npm run copy-sw"
   },
   "dependencies": {
@@ -49,6 +50,7 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "cross-env": "^7.0.3",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
