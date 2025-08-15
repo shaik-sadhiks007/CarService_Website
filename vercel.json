@@ -22,7 +22,6 @@
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "rootDirectory": ".",
   "env": {
     "VITE_BASE_PATH": "/CarServiceUI"
   }
