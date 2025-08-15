@@ -12,44 +12,44 @@
   "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
-      "src": "/CarServiceUI/logo.png",
+      "src": "/CarServiceUI/logo.jpeg",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/CarServiceUI/logo.png",
+      "src": "/CarServiceUI/logo.jpeg",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/CarServiceUI/logo.png",
+      "src": "/CarServiceUI/logo.jpeg",
       "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "/CarServiceUI/logo.png",
+      "src": "/CarServiceUI/logo.jpeg",
       "sizes": "96x96",
       "type": "image/png"
     },
     {
-      "src": "/CarServiceUI/logo.png",
+      "src": "/CarServiceUI/logo.jpeg",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "/CarServiceUI/logo.png",
+      "src": "/CarServiceUI/logo.jpeg",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "/CarServiceUI/logo.png",
+      "src": "/CarServiceUI/logo.jpeg",
       "sizes": "152x152",
       "type": "image/png"
     },
     {
-      "src": "/logo.png",
+      "src": "/logo.jpeg",
       "sizes": "384x384",
       "type": "image/png"
     }
@@ -62,7 +62,7 @@
       "url": "/pending",
       "icons": [
         {
-          "src": "/logo.png",
+          "src": "/logo.jpeg",
           "sizes": "96x96"
         }
       ]
@@ -74,7 +74,7 @@
       "url": "/accepted",
       "icons": [
         {
-          "src": "/logo.png",
+          "src": "/logo.jpeg",
           "sizes": "96x96"
         }
       ]
@@ -86,7 +86,7 @@
       "url": "/completed",
       "icons": [
         {
-          "src": "/logo.png",
+          "src": "/logo.jpeg",
           "sizes": "96x96"
         }
       ]
@@ -94,13 +94,13 @@
   ],
   "screenshots": [
     {
-      "src": "/logo.png",
+      "src": "/logo.jpeg",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide"
     },
     {
-      "src": "/logo.png",
+      "src": "/logo.jpeg",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow"

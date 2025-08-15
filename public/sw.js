@@ -4,7 +4,7 @@ const urlsToCache = [
   BASE_PATH + '/',
   BASE_PATH + '/index.html',
   BASE_PATH + '/manifest.json',
-  BASE_PATH + '/logo.png',
+  BASE_PATH + '/logo.jpeg',
   'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css'
 ];
 
@@ -82,8 +82,8 @@ self.addEventListener('sync', (event) => {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'New car service update!',
-    icon: BASE_PATH + '/logo.png',
-    badge: BASE_PATH + '/logo.png',
+    icon: BASE_PATH + '/logo.jpeg',
+    badge: BASE_PATH + '/logo.jpeg',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -93,12 +93,12 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'View Details',
-        icon: BASE_PATH + '/logo.png'
+        icon: BASE_PATH + '/logo.jpeg'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: BASE_PATH + '/logo.png'
+        icon: BASE_PATH + '/logo.jpeg'
       }
     ]
   };

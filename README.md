@@ -82,7 +82,7 @@ src/
 public/
 ├── manifest.json       # PWA manifest
 ├── sw.js              # Service worker
-└── logo.png           # App icons
+└── logo.jpeg           # App icons
 ```
 
 ### PWA Configuration
