@@ -6,6 +6,8 @@ import Sidebar from "../components/Sidebar";
 import RightSidebar from "../sidebar/RightSidebar";
 import { CarDataContext } from '../components/CarDataContext';
 import { toast } from 'react-toastify';
+import { FaKeyboard } from "react-icons/fa";
+import moment from 'moment-timezone';
 
 function ManageUser() {
 
@@ -13,6 +15,7 @@ function ManageUser() {
         userRole,
         apiUrl,
         showOffcanvas,
+        userRole: currentUserRole
     } = useContext(CarDataContext);
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
@@ -20,7 +23,7 @@ function ManageUser() {
     const [loading, setLoading] = useState(false);
     const [showKeyboard, setShowKeyboard] = useState(false);
     const [keyboardInput, setKeyboardInput] = useState('');
-    const [activeInput, setActiveInput] = useState(null);
+    const [activeInput, setActiveInput] = useState('searchText');
     const activeInputRef = useRef(null);
     const token = localStorage.getItem("token");
 
@@ -78,32 +81,37 @@ function ManageUser() {
         }
     };
 
-    const handleInputFocus = (field, value, ref) => {
-        setActiveInput(field);
+    const handleKeyboardInput = (input) => {
+        setKeyboardInput(input);
+        if (activeInput === 'searchText') {
+            setSearchText(input);
+        }
+    };
+
+    const openKeyboard = (inputName, ref = null, value = "") => {
+        setActiveInput(inputName);
         setShowKeyboard(true);
-        setKeyboardInput(value || '');
+        setKeyboardInput(value);
         if (ref) activeInputRef.current = ref;
     };
-    const handleKeyboardChange = (val) => {
-        setKeyboardInput(val);
-        if (activeInput === 'searchText') setSearchText(val);
-    };
-    const handleKeyboardClose = () => {
+
+    const closeKeyboard = () => {
         setShowKeyboard(false);
         setActiveInput(null);
-        if (activeInputRef.current) activeInputRef.current.blur();
+        if (activeInputRef && activeInputRef.current) activeInputRef.current.blur();
     };
-    const handlePhysicalKeyDown = (e) => {
-        if (showKeyboard) {
-            e.preventDefault();
-            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
-                handleKeyboardChange(keyboardInput + e.key);
-            } else if (e.key === 'Backspace') {
-                handleKeyboardChange(keyboardInput.slice(0, -1));
-            } else if (e.key === ' ') {
-                handleKeyboardChange(keyboardInput + ' ');
-            }
+
+    const handleEnter = () => {
+        if (activeInput === 'searchText') {
+            // For search input, just close the keyboard when Enter is pressed
+            closeKeyboard();
         }
+    };
+
+    // Function to handle when form inputs are focused
+    const handleFormInputFocus = (section, key, currentValue) => {
+        setActiveInput({ section, key });
+        setKeyboardInput(currentValue || "");
     };
 
     const [showModal, setShowModal] = useState(false);
@@ -122,10 +130,18 @@ function ManageUser() {
     };
     const handleModalConfirm = async () => {
         if (!modalUser) return;
+        
+        // Get current date and time in Singapore timezone using moment.js
+        const singaporeTime = moment().tz('Asia/Singapore');
+        const createdDateTime = singaporeTime.format('YYYY-MM-DDTHH:mm:ss');
+        
         const updatedUser = {
             ...modalUser,
             active: modalActiveValue,
+            modifiedBy: currentUserRole?.username || 'Unknown',
+            modifiedDate: createdDateTime,
         };
+        
         try {
             await axios.post(
                 'https://icontechnik.com/CarServiceMaintenance/api/register/update-user',
@@ -243,24 +259,35 @@ function ManageUser() {
                 </div>
                 <div className="col-12 col-md-9 col-lg-10 p-3">
                     <RightSidebar />
-                    <h2 className="my-3 text-white">Manage Users</h2>
-                    <div className="mb-3" style={{ maxWidth: 400 }}>
-                        <input
-                            type="text"
-                            className="form-control mb-3 input-dashboard text-white placeholder-white"
-                            placeholder="Search by username"
-                            value={searchText}
-                            onChange={e => setSearchText(e.target.value)}
-                            onFocus={e => handleInputFocus('searchText', searchText, e.target)}
-                            readOnly={showKeyboard}
-                            onKeyDown={handlePhysicalKeyDown}
-                        />
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h2 className="my-3 text-white">Manage Users</h2>
+                        <div
+                            onClick={() => setShowKeyboard(!showKeyboard)}
+                            style={{ cursor: 'pointer' }}
+                            title="Open Virtual Keyboard"
+                        >
+                            <FaKeyboard size={20} className="text-warning" />
+                        </div>
                     </div>
-                    {showKeyboard && (
+                    <div className="mb-3" style={{ maxWidth: 400 }}>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <input
+                                type="text"
+                                className="form-control mb-3 input-dashboard text-white placeholder-white me-2"
+                                placeholder="Search by username"
+                                value={searchText}
+                                onChange={e => setSearchText(e.target.value)}
+                                onFocus={() => setActiveInput('searchText')}
+                                readOnly={showKeyboard}
+                            />
+                        </div>
+                    </div>
+                    {showKeyboard && activeInput && (
                         <VirtualKeyboard
                             input={keyboardInput}
-                            onChange={handleKeyboardChange}
-                            onClose={handleKeyboardClose}
+                            onChange={handleKeyboardInput}
+                            onClose={closeKeyboard}
+                            onEnter={handleEnter}
                         />
                     )}
                     <DataTable

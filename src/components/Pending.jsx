@@ -17,6 +17,7 @@ import headerIcon from '../assets/header.png'
 import RightSidebar from "../sidebar/RightSidebar";
 import VirtualKeyboard from "./VirtualKeyboard";
 import { useRef } from "react";
+import { FaKeyboard } from "react-icons/fa";
 
 function Pending() {
   const {
@@ -30,12 +31,13 @@ function Pending() {
 
   const [tableData, setTableData] = useState([]);
   const [selectedCarIndex, setSelectedCarIndex] = useState(null);
-  const [selectedMechanic, setSelectedMechanic] = useState("");
+  const [selectedMechanic, setSelectedMechanic] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [clicked, setClicked] = useState({
     click: false,
     data: {},
   });
+
 
   const [category, setCategory] = useState("all")
 
@@ -44,7 +46,7 @@ function Pending() {
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [keyboardInput, setKeyboardInput] = useState("");
   const [activeInput, setActiveInput] = useState(null);
-  const activeInputRef = useRef(null);
+  const [activeInputRef, setActiveInputRef] = useState(null);
 
 
   const excelData = {
@@ -80,13 +82,13 @@ function Pending() {
 
       setFullData(response.data);
 
-      if (userRole.userRole?.toLowerCase() === "super_admin") {
-        console.log("hi admin")
-        const customerData = response.data.custInformationList || [];
-        const serviceData = response.data.carServiceInfromationList || [];
 
+      if (userRole.userRole?.toLowerCase() === "super_admin") {
+        const customerData = response.data.custInformationList || [];
+        const serviceData = response.data.carServiceInformationList || [];
+        
         const filteredServiceData = serviceData.filter((service) =>
-          ["P", "R"].includes(service.status)
+          ["p", "r"].includes(service.status.toLowerCase())
         );
 
         const combinedData = filteredServiceData.map((service) => {
@@ -106,7 +108,7 @@ function Pending() {
         // setSortedData(sortByDate(combinedData, "desc"));
       } else {
         const customerData = response.data.custInformationList || [];
-        const serviceData = response.data.carServiceInfromationList || [];
+        const serviceData = response.data.carServiceInformationList || [];
         const filteredServiceData = serviceData.filter((service) => {
 
           return (
@@ -170,13 +172,17 @@ function Pending() {
       const cuInfo = fullData.custInformationList.find(
         (item) => item.vehicleRegNo === selectedCarIndex
       );
-      const carInfo = fullData.carServiceInfromationList.find(
+      const carInfo = fullData.carServiceInformationList.find(
         (item) => item.vehicleRegNo === selectedCarIndex
       );
 
       const data = {
         custInformation: cuInfo,
-        carServiceInfromation: { ...carInfo, technitionName: selectedMechanic },
+        carServiceInformation: { 
+          ...carInfo, 
+          technitionId: selectedMechanic.userId,
+          technitionName: selectedMechanic.username 
+        },
       };
 
       try {
@@ -192,7 +198,7 @@ function Pending() {
         );
 
         fetchPendingCars();
-        setSelectedMechanic("");
+        setSelectedMechanic(null);
         setShowModal(false);
         toast.success("Assigned successfully!");
       } catch (error) {
@@ -202,7 +208,7 @@ function Pending() {
     } else {
       // User is offline, store in localStorage
       localStorage.setItem("pendingRequest", JSON.stringify(data));
-      setSelectedMechanic("");
+      setSelectedMechanic(null);
       setShowModal(false);
       toast.info("You are offline. The request will be sent when you're online.");
     }
@@ -221,21 +227,37 @@ function Pending() {
     }).format(new Date(dateString));
   };
 
-  const handleInputFocus = (field, value, ref) => {
-    setActiveInput(field);
+  const handleKeyboardInput = (input) => {
+    setKeyboardInput(input);
+    if (activeInput === "searchText") {
+      setSearchText(input);
+    }
+  };
+
+  const openKeyboard = (inputName, ref = null, value = "") => {
+    setActiveInput(inputName);
     setShowKeyboard(true);
-    setKeyboardInput(value || "");
-    if (ref) activeInputRef.current = ref;
+    setKeyboardInput(value);
+    if (ref) setActiveInputRef(ref);
   };
-  const handleKeyboardChange = (val) => {
-    setKeyboardInput(val);
-    if (activeInput === "searchText") setSearchText(val);
-    // Add more fields as needed
-  };
-  const handleKeyboardClose = () => {
+
+  const closeKeyboard = () => {
     setShowKeyboard(false);
     setActiveInput(null);
-    if (activeInputRef.current) activeInputRef.current.blur();
+    if (activeInputRef && activeInputRef.current) activeInputRef.current.blur();
+  };
+
+  const handleEnter = () => {
+    if (activeInput === "searchText") {
+      // For search input, just close the keyboard when Enter is pressed
+      closeKeyboard();
+    }
+  };
+
+  // Function to handle when form inputs are focused
+  const handleFormInputFocus = (section, key, currentValue) => {
+    setActiveInput({ section, key });
+    setKeyboardInput(currentValue || "");
   };
 
   const columns = [
@@ -400,13 +422,18 @@ function Pending() {
     const cuInfo = fullData.custInformationList.find(
       (item) => item.vehicleRegNo === vehicle
     );
-    const carInfo = fullData.carServiceInfromationList.find(
+    const carInfo = fullData.carServiceInformationList.find(
       (item) => item.vehicleRegNo === vehicle
     );
 
     const data = {
       custInformation: cuInfo,
-      carServiceInfromation: { ...carInfo, status: "A", technitionName: userRole.username },
+      carServiceInformation: { 
+        ...carInfo, 
+        status: "I", 
+        technitionName: userRole.username,
+        technitionId: userRole.userId 
+      },
     };
 
     try {
@@ -432,13 +459,13 @@ function Pending() {
     const cuInfo = fullData.custInformationList.find(
       (item) => item.vehicleRegNo === vehicle
     );
-    const carInfo = fullData.carServiceInfromationList.find(
+    const carInfo = fullData.carServiceInformationList.find(
       (item) => item.vehicleRegNo === vehicle
     );
 
     const data = {
       custInformation: cuInfo,
-      carServiceInfromation: { ...carInfo, status: "R" },
+      carServiceInformation: { ...carInfo, status: "R" },
     };
 
     try {
@@ -516,38 +543,6 @@ function Pending() {
 
   const exportToExcel = () => {
     // Format data according to excelData mapping
-
-    // const keyMapping = {
-    //   // Customer Info
-    //   customerId: "Customer Id",
-    //   custName: "Customer Name",
-    //   vehicleRegNo: "Vehicle No.",
-    //   dateIn: "Date In",
-    //   custContactNo: "Phone Number",
-    //   email: "Email",
-    //   address: "Address",
-    //   vehicleModel: "Vehicle Model",
-    //   manufactureYear: "Manufacture Year",
-    //   vehicleColor: "Vehicle Color",
-    //   engineNo: "Engine No.",
-    //   chasisNo: "Chasis No.",
-
-    //   // Car Service Info
-    //   entryType: "Entry Type",
-    //   mileage: "Mileage",
-    //   fuelLevel: "Fuel Level",
-    //   fuelLevelImage: "Fuel Level Image",
-    //   carImage: "Car Image",
-    //   technitionName: "Technician Name",
-    //   managerName: "Manager Name",
-    //   remarks: "Remarks",
-    //   serviceTypes: "Service Types",
-    //   createdBy: "Created By",
-    //   createdDate: "Created Date",
-    //   modifiedBy: "Modified By",
-    //   modifiedDate: "Modified Date",
-    // };
-
     const keyMapping = {
       // Customer Info
       customerId: "Customer Id",
@@ -629,73 +624,6 @@ function Pending() {
   const handleCategoryChange = (selectedCategory) => {
     setCategory(selectedCategory);
   };
-
-  // const exportToPDF = async () => {
-  //   const doc = new jsPDF();
-
-  //   // Helper function to convert an image to Base64
-  //   const getBase64ImageFromURL = (url) => {
-  //     return new Promise((resolve, reject) => {
-  //       const img = new Image();
-  //       img.crossOrigin = "Anonymous";
-  //       img.onload = () => {
-  //         const canvas = document.createElement("canvas");
-  //         canvas.width = img.width;
-  //         canvas.height = img.height;
-  //         const ctx = canvas.getContext("2d");
-  //         ctx.drawImage(img, 0, 0);
-  //         resolve(canvas.toDataURL("image/png"));
-  //       };
-  //       img.onerror = (error) => reject(error);
-  //       img.src = url;
-  //     });
-  //   };
-
-  //   try {
-  //     // Load header and footer images
-  //     const headerImage = await getBase64ImageFromURL(headerIcon);
-  //     const footerImage = await getBase64ImageFromURL(headerIcon);
-
-  //     // Add header image
-  //     doc.addImage(headerImage, "PNG", 0, 0, 210, 50); // Adjust dimensions as needed
-
-  //     // Adjust starting Y position to account for the header
-  //     const tableStartY = 60;
-
-  //     // Extract column headers from 'columns'
-  //     const tableColumn = columns.map(col => col.name);
-
-  //     // Map table rows to match columns' selectors
-  //     const tableRows = tableData.map(row =>
-  //       columns.map(col => {
-  //         const value = row[col.key];
-  //         // Ensure the value is not null or undefined before calling toString()
-  //         return value !== null && value !== undefined ? value.toString() : "";
-  //       })
-  //     );
-
-  //     // Add table or fallback content
-  //     if (tableRows.length === 0) {
-  //       doc.text("No data available", 10, tableStartY);
-  //     } else {
-  //       doc.autoTable({
-  //         head: [tableColumn], // Headers
-  //         body: tableRows,     // Data rows
-  //         startY: tableStartY, // Starting position of the table
-  //       });
-  //     }
-
-  //     // Add footer image
-  //     const pageHeight = doc.internal.pageSize.height;
-  //     doc.addImage(footerImage, "PNG", 0, pageHeight - 50, 210, 50); // Adjust dimensions as needed
-
-  //     // Save PDF
-  //     doc.save("data_with_images_and_table.pdf");
-  //   } catch (error) {
-  //     console.error("Error loading images: ", error);
-  //   }
-  // };
-
 
   const exportToPDF = async () => {
 
@@ -789,25 +717,35 @@ function Pending() {
 
               <RightSidebar />
 
+              <div className="d-flex justify-content-between align-items-center mb-3">  
+
               <h1 className="text-white">{t("menu.pending")}</h1>
-
-
+              <div
+                onClick={() => setShowKeyboard(!showKeyboard)}
+                style={{ cursor: 'pointer' }}
+                title="Open Virtual Keyboard"
+              >
+                <FaKeyboard size={20} className="text-warning" />
+              </div>
+            </div>
               {!clicked.click ? (
                 <>
-
                   <div
                     className="text-white w-100 rounded-2">
 
                     <div className="row ">
                       <div className="col-12 col-md-6 mt-2">
-                        <input
-                          type="text"
-                          placeholder="Search by Vehicle No."
-                          value={searchText}
-                          onChange={(e) => setSearchText(e.target.value)}
-                          onFocus={e => handleInputFocus("searchText", searchText, e.target)}
-                          className="form-control mb-3 input-dashboard text-white placeholder-white"
-                        />
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <input
+                            type="text"
+                            placeholder="Search by Vehicle No."
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onFocus={() => setActiveInput("searchText")}
+                            readOnly={showKeyboard}
+                            className="form-control input-dashboard text-white placeholder-white me-2"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -848,7 +786,7 @@ function Pending() {
                     defaultSortAsc={false}
                     pagination
                     onSort={(column, direction) => {
-                      console.log(column, direction);
+                      // console.log(column, direction);
                     }}
                     theme="dark"
                     customStyles={customStyles}
@@ -904,15 +842,22 @@ function Pending() {
                       <div className="modal-body">
                         <select
                           className="form-select"
-                          value={selectedMechanic}
-                          onChange={(e) => setSelectedMechanic(e.target.value)}
+                          value={selectedMechanic?.username || ""}
+                          onChange={(e) => {
+                            const mechanic = mechanics.find(
+                              (m) => m.username === e.target.value
+                            );
+                            setSelectedMechanic(mechanic);
+                          }}
                         >
                           <option value="">Select Mechanic</option>
-                          {mechanics.map((mechanic, index) => (
-                            <option key={index} value={mechanic.username}>
-                              {mechanic.username}
-                            </option>
-                          ))}
+                          {mechanics
+                            .filter((mechanic) => mechanic.active)
+                            .map((mechanic, index) => (
+                              <option key={index} value={mechanic.username}>
+                                {mechanic.username}
+                              </option>
+                            ))}
                         </select>
                       </div>
                       <div className="modal-footer">
@@ -944,11 +889,12 @@ function Pending() {
           )}
         </div>
       </div>
-      {showKeyboard && (
+      {showKeyboard && activeInput && (
         <VirtualKeyboard
           input={keyboardInput}
-          onChange={handleKeyboardChange}
-          onClose={handleKeyboardClose}
+          onChange={handleKeyboardInput}
+          onClose={closeKeyboard}
+          onEnter={handleEnter}
         />
       )}
     </div>

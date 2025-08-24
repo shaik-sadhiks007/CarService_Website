@@ -6,11 +6,12 @@ import { CarDataContext } from "./CarDataContext";
 import "./style.css";
 import { toast } from "react-toastify";
 import VirtualKeyboard from "./VirtualKeyboard";
-import { FaKeyboard } from "react-icons/fa";
+import { FaKeyboard, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const { userRole, logout, apiUrl, initializeUser, initializeUser2 } =
@@ -173,9 +174,9 @@ const Login = () => {
         </div>
         <div className="mb-3" style={{ position: "relative" }}>
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
-            className="form-control input-box rounded-pill px-3 py-2 fs-5"
+            className="form-control input-box rounded-pill px-3 py-2 fs-5 pe-5"
             placeholder="Password"
             value={password}
             onFocus={() => setActiveInput("password")}
@@ -183,6 +184,14 @@ const Login = () => {
               setPassword(e.target.value);
             }}
           />
+          <span
+            className="position-absolute top-50 end-0 translate-middle-y pe-3"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{ cursor: "pointer", zIndex: 10 }}
+            title={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <FaEyeSlash className="text-warning" /> : <FaEye className="text-warning" />}
+          </span>
         </div>
         <button
           type="submit"

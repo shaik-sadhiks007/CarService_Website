@@ -2,20 +2,16 @@ import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { CarDataContext } from "./CarDataContext";
-import Logout from "./Logout";
 import RightSidebar from "../sidebar/RightSidebar";
 import { useTranslation } from "react-i18next";
 
 function GuestLogin() {
-    const { showOffcanvas, setShowOffcanvas } = useContext(CarDataContext);
+    const { showOffcanvas } = useContext(CarDataContext);
 
     const navigate = useNavigate();
 
     const { t } = useTranslation()
 
-    const toggleOffcanvas = () => {
-        setShowOffcanvas(!showOffcanvas);
-    };
 
     const handleCardClick = (role) => {
         navigate(`/form-filling?role=${role}`);
@@ -33,7 +29,7 @@ function GuestLogin() {
         <div className="container-fluid">
             <div className="row">
                 <div
-                    className={`col-2 col-md-3 col-lg-2 p-3 ${showOffcanvas ? "d-block" : "d-none d-md-block"}`}
+                    className={`col-2 col-md-3 col-lg-2 p-3 `}
                     style={{
                         height: "auto",
                         minHeight: "100vh",

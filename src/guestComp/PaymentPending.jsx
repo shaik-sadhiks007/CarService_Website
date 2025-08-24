@@ -68,21 +68,21 @@ function PaymentPending() {
                     );
 
                     const custInformationList = responses.flatMap(response => response.data.custInformationList);
-                    const carServiceInfromationList = responses.flatMap(response => response.data.carServiceInfromationList);
+                    const carServiceInformationList = responses.flatMap(response => response.data.carServiceInformationList);
 
                     const data = {
                         custInformationList: [...custInformationList],
-                        carServiceInfromationList: [...carServiceInfromationList]
+                        carServiceInformationList: [...carServiceInformationList]
                     }
 
                     setFullData(data)
 
                     console.log("Merged Customer Information List:", custInformationList);
-                    console.log("Merged Car Service Information List:", carServiceInfromationList);
+                    console.log("Merged Car Service Information List:", carServiceInformationList);
                     console.log(data, "full data")
 
 
-                    const filteredServiceData = carServiceInfromationList.filter(
+                    const filteredServiceData = carServiceInformationList.filter(
                         (service) => service.paymentStatus?.toLowerCase() == "p"
                     );
 

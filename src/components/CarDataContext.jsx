@@ -55,7 +55,7 @@ export const CarDataProvider = ({ children }) => {
         },
       });
 
-      const mech = response.data.filter((user) => user.userRole === "mechanic");
+      const mech = response.data.filter((user) => user.userRole === "mechanic" && user.active === true);
       setMechanics(mech);
     } catch (error) {
       console.error("Error fetching mechanics:", error);

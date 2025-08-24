@@ -95,7 +95,8 @@
     "createdBy": "创建者",
     "createdDate": "创建日期",
     "modifiedBy": "修改者",
-    "modifiedDate": "修改日期"
+    "modifiedDate": "修改日期",
+    "serviceStatus": "服务状态"
   },
   "back": "返回",
   "edit": "编辑",

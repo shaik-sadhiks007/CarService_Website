@@ -112,22 +112,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
           modifiedDate: response.data.custInformationList[0].modifiedDate,
         });
 
-        // setCarServiceInfo({
-        //   ...carServiceInfo,
-        //   vehicleRegNo: response.data.carServiceInfromationList[0].vehicleRegNo,
-        //   dateIn: response.data.carServiceInfromationList[0].dateIn,
-        //   entryType: response.data.carServiceInfromationList[0].entryType,
-        //   mileage: response.data.carServiceInfromationList[0].mileage,
-        //   serviceTypes: response.data.carServiceInfromationList[0].serviceTypes
-        //     ? response.data.carServiceInfromationList[0].serviceTypes.split(',')
-        //     : [],
-        //   paymentStatus: response.data.carServiceInfromationList[0].paymentStatus,
-        //   customerComplaints: response.data.carServiceInfromationList[0].customerComplaints,
-        //   createdBy: response.data.carServiceInfromationList[0].createdBy,
-        //   createdDate: response.data.carServiceInfromationList[0].createdDate,
-        //   modifiedBy: response.data.carServiceInfromationList[0].modifiedBy,
-        //   modifiedDate: response.data.carServiceInfromationList[0].modifiedDate,
-        // });
+       
 
         toast.success("Customer information found!");
 
@@ -176,19 +161,33 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
       }
     }
   };
+
   const openKeyboard = (inputName, ref = null, value = "") => {
     setActiveInput(inputName);
     setShowKeyboard(true);
     setKeyboardInput(value);
     if (ref) setActiveInputRef(ref);
   };
+
   const closeKeyboard = () => {
     setShowKeyboard(false);
     setActiveInput(null);
     if (activeInputRef && activeInputRef.current) activeInputRef.current.blur();
   };
+
   const handleEnter = () => {
-    if (activeInput === "carPlate") handleSearch();
+    if (activeInput === "carPlate") {
+      handleSearch();
+    } else if (activeInput && typeof activeInput === "object" && activeInput.section && activeInput.key) {
+      // For form fields, just close the keyboard when Enter is pressed
+      closeKeyboard();
+    }
+  };
+
+  // Function to handle when form inputs are focused
+  const handleFormInputFocus = (section, key, currentValue) => {
+    setActiveInput({ section, key });
+    setKeyboardInput(currentValue || "");
   };
 
 
@@ -201,7 +200,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
         <h1 className="text-white">{t("menu.carServiceEntry")}</h1>
         <div className="d-flex justify-content-end">
           <div
-            onClick={() => openKeyboard("carPlate", null, carPlate)}
+            onClick={() => setShowKeyboard(!showKeyboard)}
             style={{ cursor: 'pointer' }}
             title="Open Virtual Keyboard"
           >
@@ -227,7 +226,8 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
               placeholder={t("carRegNo")}
               value={carPlate}
               onChange={(e) => setCarPlate(e.target.value)}
-              readOnly={showKeyboard}
+              onFocus={() => setActiveInput("carPlate")}
+              // readOnly={showKeyboard}
             />
             {["admin", "super_admin", "mechanic"].includes((userRole?.userRole || "").toLowerCase()) && (
               <button
@@ -242,7 +242,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
         </div>
       </div>
 
-      {showKeyboard && (
+      {showKeyboard && activeInput && (
         <VirtualKeyboard
           input={keyboardInput}
           onChange={handleKeyboardInput}
@@ -274,6 +274,7 @@ function DashboardComp({ apiUrl, showOffcanvas, setShowOffcanvas, userRole, role
         handleKeyboardInput={handleKeyboardInput}
         openKeyboard={openKeyboard}
         closeKeyboard={closeKeyboard}
+        handleFormInputFocus={handleFormInputFocus}
         showHistory={['admin', 'super_admin', 'mechanic'].includes((userRole?.userRole || '').toLowerCase())}
       />
     </div>

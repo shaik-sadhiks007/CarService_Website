@@ -11,6 +11,8 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
 
   const { t } = useTranslation()
 
+  console.log(historyData,'historyData in the table one')
+
   const [editableData, setEditableData] = useState({
     vehicleRegNo: historyData?.vehicleRegNo || "",
     custName: historyData?.custName || "",
@@ -56,6 +58,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     // carImage: t("TableMapping.carImage"),
     // technitionName: t("TableMapping.technitionName"),
     // managerName: t("TableMapping.managerName"),
+    status: t("TableMapping.serviceStatus"),
     serviceTypes: t("TableMapping.serviceTypes"),
     paymentStatus: t("account_admin.paymentStatus"),
     customerComplaints: t("TableMapping.customerComplaints"),
@@ -188,7 +191,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     if (
       isEditing &&
       userRole.userRole === "super_admin" &&
-      ["vehicleRegNo", "custName", "customerComplaints", "custContactNo", "vehicleModel", "fuelLevel", "email"].includes(key)
+      ["vehicleRegNo", "custName", "custContactNo", "vehicleModel", "fuelLevel", "email"].includes(key)
     ) {
       return (
         <input
@@ -216,21 +219,28 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
       )
     }
 
-    // if (isEditing && (userRole?.userRole == "super_admin") && key === "technitionName") {
-    //   return (
-    //     <>
-         
-    //     </>
-    //   )
-    // }
+    if (isEditing && (userRole?.userRole == "super_admin") && key === "customerComplaints") {
+      return (
+        <textarea
+          name="customerComplaints"
+          value={editableData.customerComplaints}
+          onChange={handleInputChange}
+          className="form-control placeholder-white"
+          rows="4"
+          placeholder="Enter customer complaints..."
+        />
+      );
+    }
+
     if (isEditing && (userRole?.userRole == "mechanic" || userRole?.userRole == "super_admin") && key === "remarks") {
       return (
-        <input
-          type="text"
+        <textarea
           name="remarks"
           value={editableData.remarks}
           onChange={handleInputChange}
           className="form-control placeholder-white"
+          rows="4"
+          placeholder="Enter mechanic remarks..."
         />
       );
     }
@@ -299,9 +309,56 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
       return value || "N/A";
     }
 
+    // Display service status with proper labels when not editing
+    if (key === "status" && !isEditing) {
+      const statusMap = {
+        "P": { label: "Pending", className: "bg-warning text-dark" },
+        "C": { label: "Completed", className: "bg-success" },
+        "A": { label: "Assigned", className: "bg-info" },
+        "I": { label: "In Progress", className: "bg-primary" },
+        "R": { label: "Rejected", className: "bg-danger" }
+      };
+      const status = statusMap[value];
+      if (status) {
+        return <span className={`badge ${status.className}`}>{status.label}</span>;
+      }
+      return value || "N/A";
+    }
+
     if (key === "createdDate" || key === "modifiedDate" || key === "dateIn") {
       return formatDate(value);
     }
+
+    if (key === "customerComplaints" && value && !isEditing) {
+      const complaints = value.split('\n').filter(complaint => complaint.trim());
+      if (complaints.length > 0) {
+        return (
+          <ul className="mb-0 ps-3">
+            {complaints.map((complaint, index) => (
+              <li key={index} className="text-start">
+                {complaint.trim()}
+              </li>
+            ))}
+          </ul>
+        );
+      }
+    }
+
+    if (key === "remarks" && value && !isEditing) {
+      const remarks = value.split('\n').filter(remark => remark.trim());
+      if (remarks.length > 0) {
+        return (
+          <ul className="mb-0 ps-3">
+            {remarks.map((remark, index) => (
+              <li key={index} className="text-start">
+                {remark.trim()}
+              </li>
+            ))}
+          </ul>
+        );
+      }
+    }
+
     if ((key === "fuelLevelImage" || key === "carImage") && value) {
       const mimeType = getMimeType(value);
       return (
@@ -339,6 +396,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
         remarks: editableData.remarks,
         serviceTypes: serviceString,
         paymentStatus: editableData.paymentStatus,
+        customerComplaints: editableData.customerComplaints,
         modifiedBy: userRole.username,
         modifiedDate: moment().tz("Asia/Singapore").toISOString(),
       },
@@ -347,7 +405,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     const cuInfo = fullData.custInformationList.find(
       (item) => item.vehicleRegNo === vehicle
     );
-    const carInfo = fullData.carServiceInfromationList.find(
+    const carInfo = fullData.carServiceInformationList.find(
       (item) => item.vehicleRegNo === vehicle
     );
 
@@ -363,11 +421,12 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
         modifiedDate: moment().tz("Asia/Singapore").toISOString(),
 
       },
-      carServiceInfromation: {
+      carServiceInformation: {
         ...carInfo,
         vehicleRegNo: editableData.vehicleRegNo,
         remarks: editableData.remarks,
         serviceTypes: serviceString,
+        customerComplaints: editableData.customerComplaints,
         paymentStatus: editableData.paymentStatus,
         modifiedBy: userRole.username,
         modifiedDate: moment().tz("Asia/Singapore").toISOString(),

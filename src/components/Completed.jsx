@@ -15,6 +15,7 @@ import "jspdf-autotable";
 import RightSidebar from "../sidebar/RightSidebar";
 import VirtualKeyboard from "./VirtualKeyboard";
 import { useRef } from "react";
+import { FaKeyboard } from "react-icons/fa";
 
 function Completed() {
   const {
@@ -39,7 +40,7 @@ function Completed() {
 
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [keyboardInput, setKeyboardInput] = useState("");
-  const [activeInput, setActiveInput] = useState(null);
+  const [activeInput, setActiveInput] = useState("searchText");
   const activeInputRef = useRef(null);
 
 
@@ -64,8 +65,8 @@ function Completed() {
 
       const url =
         userRole.userRole === "super_admin"
-          ? `${apiUrl}/api/v1/carService/getAllCompleted`
-          : `${apiUrl}/api/v1/carService/getAllPendingCarServiceforUser?technitionName=${userRole.username}`;
+          ? `${apiUrl}/api/v1/carService/getAllCompleted?technitionName=null`
+          : `${apiUrl}/api/v1/carService/getAllCompleted?technitionName=${userRole.username}`;
 
       const response = await axios.get(url, {
         headers: {
@@ -77,7 +78,7 @@ function Completed() {
 
 
       const customerData = response.data.custInformationList || [];
-      const serviceData = response.data.carServiceInfromationList || [];
+      const serviceData = response.data.carServiceInformationList || [];
 
       const filteredServiceData = serviceData.filter(
         (service) => service.status === "C"
@@ -122,20 +123,37 @@ function Completed() {
     setShowOffcanvas(!showOffcanvas);
   };
 
-  const handleInputFocus = (field, value, ref) => {
-    setActiveInput(field);
+  const handleKeyboardInput = (input) => {
+    setKeyboardInput(input);
+    if (activeInput === "searchText") {
+      setSearchText(input);
+    }
+  };
+
+  const openKeyboard = (inputName, ref = null, value = "") => {
+    setActiveInput(inputName);
     setShowKeyboard(true);
-    setKeyboardInput(value || "");
+    setKeyboardInput(value);
     if (ref) activeInputRef.current = ref;
   };
-  const handleKeyboardChange = (val) => {
-    setKeyboardInput(val);
-    if (activeInput === "searchText") setSearchText(val);
-  };
-  const handleKeyboardClose = () => {
+
+  const closeKeyboard = () => {
     setShowKeyboard(false);
     setActiveInput(null);
-    if (activeInputRef.current) activeInputRef.current.blur();
+    if (activeInputRef && activeInputRef.current) activeInputRef.current.blur();
+  };
+
+  const handleEnter = () => {
+    if (activeInput === "searchText") {
+      // For search input, just close the keyboard when Enter is pressed
+      closeKeyboard();
+    }
+  };
+
+  // Function to handle when form inputs are focused
+  const handleFormInputFocus = (section, key, currentValue) => {
+    setActiveInput({ section, key });
+    setKeyboardInput(currentValue || "");
   };
 
   const columns = [
@@ -526,7 +544,17 @@ function Completed() {
 
               <RightSidebar />
 
+              <div className="d-flex justify-content-between align-items-center mb-3">  
+
               <h1 className="text-white">{t("menu.completed")}</h1>
+              <div
+                onClick={() => setShowKeyboard(!showKeyboard)}
+                style={{ cursor: 'pointer' }}
+                title="Open Virtual Keyboard"
+              >
+                <FaKeyboard size={20} className="text-warning" />
+              </div>
+            </div>
 
               {!clicked.click ? (
                 <>
@@ -536,14 +564,17 @@ function Completed() {
 
                     <div className="row ">
                       <div className="col-12 col-md-6 mt-2">
-                        <input
-                          type="text"
-                          placeholder="Search by Vehicle No."
-                          value={searchText}
-                          onChange={(e) => setSearchText(e.target.value)}
-                          className="form-control mb-3 input-dashboard text-white placeholder-white"
-                          onFocus={e => handleInputFocus("searchText", searchText, e.target)}
-                        />
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <input
+                            type="text"
+                            placeholder="Search by Vehicle No."
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onFocus={() => setActiveInput("searchText")}
+                            readOnly={showKeyboard}
+                            className="form-control input-dashboard text-white placeholder-white me-2"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -633,11 +664,12 @@ function Completed() {
           )}
         </div>
       </div>
-      {showKeyboard && (
+      {showKeyboard && activeInput && (
         <VirtualKeyboard
           input={keyboardInput}
-          onChange={handleKeyboardChange}
-          onClose={handleKeyboardClose}
+          onChange={handleKeyboardInput}
+          onClose={closeKeyboard}
+          onEnter={handleEnter}
         />
       )}
     </div>

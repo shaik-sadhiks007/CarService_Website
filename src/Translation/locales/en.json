@@ -95,7 +95,8 @@
     "createdBy": "Created By",
     "createdDate": "Created Date",
     "modifiedBy": "Modified By",
-    "modifiedDate": "Modified Date"
+    "modifiedDate": "Modified Date",
+    "serviceStatus": "Service Status"
   },
   "back": "Back",
   "edit": "Edit",

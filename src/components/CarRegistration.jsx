@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import HistoryTable from "../subcomponents/HistoryTable";
 import { useTranslation } from "react-i18next";
-import Logout from "./Logout";
 import { useNavigate } from "react-router-dom";
 import moment from "moment-timezone";
 
@@ -33,6 +32,7 @@ function CarRegistration({
   handleKeyboardInput,
   openKeyboard,
   closeKeyboard,
+  handleFormInputFocus,
   showHistory
 }) {
   const { apiUrl, userRole, mechanics, services, setServices, logout } =
@@ -216,7 +216,7 @@ function CarRegistration({
               createdDate: new Date().toISOString(),
             }),
         },
-        carServiceInfromation: {
+        carServiceInformation: {
           ...carServiceInfo,
           // fuelLevelImage: images.fuelLevelImage,
           // carImage: images.carImage,
@@ -378,7 +378,7 @@ function CarRegistration({
           >
             {/* Customer Information */}
             <div className="mb-4">
-              
+
               <h4>
 
                 {`${t(`guest.${role === 'mechanic' ? 'customer' : role}`) || `guest.${role}`} ${t('guest.Information')}`}
@@ -401,7 +401,8 @@ function CarRegistration({
                               placeholder={labels[key]}
                               value={customerInfo[key] || ""}
                               onChange={(e) => setCustomerInfo({ ...customerInfo, [key]: e.target.value })}
-                              onFocus={e => openKeyboard({ section: "customerInfo", key }, { current: e.target }, customerInfo[key])}
+                              onFocus={() => handleFormInputFocus("customerInfo", key, customerInfo[key])}
+                              readOnly={showKeyboard}
                               disabled={userRole.userRole === "mechanic" ? found : false}
                             />
                           </>
@@ -515,7 +516,8 @@ function CarRegistration({
                               placeholder={labels[key]}
                               value={carServiceInfo[key] || ""}
                               onChange={(e) => setCarServiceInfo({ ...carServiceInfo, [key]: e.target.value })}
-                              onFocus={e => openKeyboard({ section: "carServiceInfo", key }, { current: e.target }, carServiceInfo[key])}
+                              onFocus={() => handleFormInputFocus("carServiceInfo", key, carServiceInfo[key])}
+                              readOnly={showKeyboard}
                             />
                           )}
                         </div>
@@ -533,7 +535,8 @@ function CarRegistration({
                           placeholder={labels["customerComplaints"]}
                           value={carServiceInfo["customerComplaints"] || ""}
                           onChange={(e) => setCarServiceInfo({ ...carServiceInfo, customerComplaints: e.target.value })}
-                          onFocus={e => openKeyboard({ section: "carServiceInfo", key: "customerComplaints" }, { current: e.target }, carServiceInfo["customerComplaints"])}
+                          onFocus={() => handleFormInputFocus("carServiceInfo", "customerComplaints", carServiceInfo["customerComplaints"])}
+                          readOnly={showKeyboard}
                         ></textarea>
                       </div>
                     )}
@@ -547,7 +550,8 @@ function CarRegistration({
                           placeholder={labels["remarks"]}
                           value={carServiceInfo["remarks"] || ""}
                           onChange={(e) => setCarServiceInfo({ ...carServiceInfo, remarks: e.target.value })}
-                          onFocus={e => openKeyboard({ section: "carServiceInfo", key: "remarks" }, { current: e.target }, carServiceInfo["remarks"])}
+                          onFocus={() => handleFormInputFocus("carServiceInfo", "remarks", carServiceInfo["remarks"])}
+                          readOnly={showKeyboard}
                         ></textarea>
                       </div>
                     )}

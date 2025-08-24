@@ -9,10 +9,13 @@ import { useTranslation } from 'react-i18next';
 import RightSidebar from '../sidebar/RightSidebar';
 import VirtualKeyboard from "./VirtualKeyboard";
 import { useRef } from "react";
+import { FaKeyboard, FaEye, FaEyeSlash } from "react-icons/fa";
+import moment from 'moment-timezone';
 
 const Signup = () => {
-  const { showOffcanvas, setShowOffcanvas, apiUrl } = useContext(CarDataContext);
+  const { showOffcanvas, setShowOffcanvas, apiUrl, userRole: currentUserRole } = useContext(CarDataContext);
 
+  console.log(currentUserRole, "currentUserRole in signup");
   const { t } = useTranslation()
   // State to manage form fields
   const [username, setUsername] = useState('');
@@ -20,7 +23,8 @@ const Signup = () => {
   const [userRole, setUserRole] = useState('mechanic');
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [keyboardInput, setKeyboardInput] = useState("");
-  const [activeInput, setActiveInput] = useState(null);
+  const [activeInput, setActiveInput] = useState("username");
+  const [showPassword, setShowPassword] = useState(false);
   const activeInputRef = useRef(null);
 
   const token = localStorage.getItem("token");
@@ -40,6 +44,10 @@ const Signup = () => {
       return;
     }
 
+    // Get current date and time in Singapore timezone using moment.js
+    const singaporeTime = moment().tz('Asia/Singapore');
+    const createdDateTime = singaporeTime.format('YYYY-MM-DDTHH:mm:ss');
+
     try {
       const response = await axios.post(
         `${apiUrl}/api/register/new-user`,
@@ -47,6 +55,9 @@ const Signup = () => {
           username: trimmedUsername,
           password: trimmedPassword,
           userRole: trimmedUserRole,
+          active: true,
+          createdBy: currentUserRole.username || 'Unknown',
+          createdDateTime: createdDateTime,
         },
         {
           headers: {
@@ -81,21 +92,39 @@ const Signup = () => {
     setShowOffcanvas(!showOffcanvas);
   };
 
-  const handleInputFocus = (field, value, ref) => {
-    setActiveInput(field);
+  const handleKeyboardInput = (input) => {
+    setKeyboardInput(input);
+    if (activeInput === "username") {
+      setUsername(input);
+    } else if (activeInput === "password") {
+      setPassword(input);
+    }
+  };
+
+  const openKeyboard = (inputName, ref = null, value = "") => {
+    setActiveInput(inputName);
     setShowKeyboard(true);
-    setKeyboardInput(value || "");
+    setKeyboardInput(value);
     if (ref) activeInputRef.current = ref;
   };
-  const handleKeyboardChange = (val) => {
-    setKeyboardInput(val);
-    if (activeInput === "username") setUsername(val);
-    if (activeInput === "password") setPassword(val);
-  };
-  const handleKeyboardClose = () => {
+
+  const closeKeyboard = () => {
     setShowKeyboard(false);
     setActiveInput(null);
-    if (activeInputRef.current) activeInputRef.current.blur();
+    if (activeInputRef && activeInputRef.current) activeInputRef.current.blur();
+  };
+
+  const handleEnter = () => {
+    if (activeInput === "username" || activeInput === "password") {
+      // For form inputs, just close the keyboard when Enter is pressed
+      closeKeyboard();
+    }
+  };
+
+  // Function to handle when form inputs are focused
+  const handleFormInputFocus = (section, key, currentValue) => {
+    setActiveInput({ section, key });
+    setKeyboardInput(currentValue || "");
   };
 
   const handlePhysicalKeyDown = (e) => {
@@ -103,11 +132,11 @@ const Signup = () => {
       e.preventDefault();
       // Only handle single character keys, space, and backspace
       if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
-        handleKeyboardChange(keyboardInput + e.key);
+        handleKeyboardInput(keyboardInput + e.key);
       } else if (e.key === "Backspace") {
-        handleKeyboardChange(keyboardInput.slice(0, -1));
+        handleKeyboardInput(keyboardInput.slice(0, -1));
       } else if (e.key === " ") {
-        handleKeyboardChange(keyboardInput + " ");
+        handleKeyboardInput(keyboardInput + " ");
       }
     }
   };
@@ -145,7 +174,16 @@ const Signup = () => {
 
             <RightSidebar/>
 
-            
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h1 className="text-white">{t("menus.userRegistration")}</h1>
+              <div
+                onClick={() => setShowKeyboard(!showKeyboard)}
+                style={{ cursor: 'pointer' }}
+                title="Open Virtual Keyboard"
+              >
+                <FaKeyboard size={20} className="text-warning" />
+              </div>
+            </div>
 
             <div className="text-white col-12 col-lg-6 p-4 rounded-2"
               style={{ backgroundColor: "#212632" }}
@@ -156,33 +194,49 @@ const Signup = () => {
                 {/* Username input with label */}
                 <div className="mb-3">
                   <label htmlFor="username" className="form-label text-white">{t("signup.username")}</label>
-                  <input
-                    type="text"
-                    className="form-control input-dashboard text-white placeholder-white"
-                    id="username"
-                    placeholder={t("signup.username")}
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    onFocus={e => handleInputFocus("username", username, e.target)}
-                    readOnly={showKeyboard}
-                    onKeyDown={handlePhysicalKeyDown}
-                  />
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <input
+                      type="text"
+                      className="form-control input-dashboard text-white placeholder-white me-2"
+                      id="username"
+                      placeholder={t("signup.username")}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      onFocus={() => {
+                        setActiveInput("username");
+                        setKeyboardInput(username);
+                      }}
+                      readOnly={showKeyboard}
+                    />
+                  </div>
                 </div>
 
                 {/* Password input with label */}
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label text-white">{t("signup.password")}</label>
-                  <input
-                    type="password"
-                    className="form-control input-dashboard text-white placeholder-white"
-                    id="password"
-                    placeholder={t("signup.password")}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onFocus={e => handleInputFocus("password", password, e.target)}
-                    readOnly={showKeyboard}
-                    onKeyDown={handlePhysicalKeyDown}
-                  />
+                  <div className="position-relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      className="form-control input-dashboard text-white placeholder-white pe-5"
+                      id="password"
+                      placeholder={t("signup.password")}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onFocus={() => {
+                        setActiveInput("password");
+                        setKeyboardInput(password);
+                      }}
+                      readOnly={showKeyboard}
+                    />
+                    <span
+                      className="position-absolute top-50 end-0 translate-middle-y pe-3"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{ cursor: "pointer", zIndex: 10 }}
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <FaEyeSlash className="text-warning" /> : <FaEye className="text-warning" />}
+                    </span>
+                  </div>
                 </div>
 
                 {/* User Role input with label */}
@@ -211,11 +265,12 @@ const Signup = () => {
           </div>
         </div>
       </div>
-      {showKeyboard && (
+      {showKeyboard && activeInput && (
         <VirtualKeyboard
           input={keyboardInput}
-          onChange={handleKeyboardChange}
-          onClose={handleKeyboardClose}
+          onChange={handleKeyboardInput}
+          onClose={closeKeyboard}
+          onEnter={handleEnter}
         />
       )}
     </div>
