@@ -30,8 +30,10 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
 
   });
 
-  const { services, setServices, apiUrl, userRole } =
+  const { services, setServices, apiUrl, userRole, mechanics, fetchMechanics } =
     useContext(CarDataContext);
+
+  const [selectedMechanic, setSelectedMechanic] = useState(null);
 
   const [availableServices, setAvailableServices] = useState([]);
 
@@ -43,6 +45,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     dateIn: t("TableMapping.dateIn"),
     custContactNo: t("TableMapping.custContactNo"),
     email: t("TableMapping.email"),
+    custType: "Type",
     // address: t("TableMapping.address"),
     vehicleModel: t("TableMapping.vehicleModel"),
     // manufactureYear: t("TableMapping.manufactureYear"),
@@ -56,7 +59,7 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     // fuelLevel: t("TableMapping.fuelLevel"),
     // fuelLevelImage: t("TableMapping.fuelLevelImage"),
     // carImage: t("TableMapping.carImage"),
-    // technitionName: t("TableMapping.technitionName"),
+    technitionName: "Mechanic",
     // managerName: t("TableMapping.managerName"),
     status: t("TableMapping.serviceStatus"),
     serviceTypes: t("TableMapping.serviceTypes"),
@@ -164,6 +167,25 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
     }
   }, [isEditing, services]);
 
+  useEffect(() => {
+    if (userRole?.userRole == "super_admin" && mechanics?.length === 0) {
+      fetchMechanics && fetchMechanics();
+    }
+  }, [userRole, mechanics]);
+
+  useEffect(() => {
+    if (isEditing && userRole?.userRole == "super_admin") {
+      if (editableData.technitionName) {
+        const mech = mechanics?.find(
+          (m) => m.username === editableData.technitionName
+        );
+        if (mech) {
+          setSelectedMechanic(mech);
+        }
+      }
+    }
+  }, [isEditing, userRole, editableData.technitionName, mechanics]);
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return dayjs(dateString).format("DD-MM-YYYY HH:mm:ss");
@@ -186,6 +208,18 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
   };
 
   const renderValue = (key, value) => {
+    if (key === "custType") {
+      const typeMap = {
+        c: { label: "customer", className: "badge bg-secondary" },
+        d: { label: "dealer", className: "badge bg-info" },
+        t: { label: "towing", className: "badge bg-warning text-dark" },
+        r: { label: "rental", className: "badge bg-light text-dark" },
+      };
+      const code = (value || '').toLowerCase();
+      const t = typeMap[code];
+      if (t) return <span className={t.className}>{t.label}</span>;
+      return value || "N/A";
+    }
 
 
     if (
@@ -201,6 +235,25 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
           onChange={handleInputChange}
           className="form-control placeholder-white"
         />
+      );
+    }
+
+    if (key === "status" && isEditing && userRole?.userRole == "super_admin") {
+      return (
+        <select
+          className="form-select"
+          name="status"
+          value={(editableData.status || "").toUpperCase()}
+          onChange={(e) =>
+            setEditableData((prev) => ({ ...prev, status: e.target.value }))
+          }
+        >
+          <option value="P">Pending</option>
+          <option value="I">In Progress</option>
+          <option value="A">Assigned</option>
+          <option value="C">Completed</option>
+          <option value="R">Rejected</option>
+        </select>
       );
     }
 
@@ -243,6 +296,35 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
           placeholder="Enter mechanic remarks..."
         />
       );
+    }
+
+    if (key === "technitionName") {
+      if (userRole?.userRole !== "super_admin") {
+        return null;
+      }
+      if (isEditing) {
+        return (
+          <select
+            className="form-select"
+            value={selectedMechanic?.username || ""}
+            onChange={(e) => {
+              const mechanic = mechanics.find((m) => m.username === e.target.value);
+              setSelectedMechanic(mechanic || null);
+              setEditableData((prev) => ({ ...prev, technitionName: mechanic ? mechanic.username : "" }));
+            }}
+          >
+            <option value="">Select Mechanic</option>
+            {mechanics
+              ?.filter((m) => m.active)
+              .map((m, index) => (
+                <option key={index} value={m.username}>
+                  {m.username}
+                </option>
+              ))}
+          </select>
+        );
+      }
+      return value && value.trim() !== "" ? value : "Not assigned";
     }
 
     if (isEditing && (userRole?.userRole == "mechanic" || userRole?.userRole == "super_admin") && key === "serviceTypes") {
@@ -397,6 +479,8 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
         serviceTypes: serviceString,
         paymentStatus: editableData.paymentStatus,
         customerComplaints: editableData.customerComplaints,
+        status: editableData.status,
+        technitionName: userRole?.userRole == "super_admin" ? (selectedMechanic?.username || editableData.technitionName || "") : historyData.technitionName,
         modifiedBy: userRole.username,
         modifiedDate: moment().tz("Asia/Singapore").toISOString(),
       },
@@ -428,6 +512,9 @@ function TableOne({ historyData, edit, setClicked, fullData, refresh }) {
         serviceTypes: serviceString,
         customerComplaints: editableData.customerComplaints,
         paymentStatus: editableData.paymentStatus,
+        status: editableData.status,
+        technitionName: userRole?.userRole == "super_admin" ? (selectedMechanic?.username || editableData.technitionName || carInfo.technitionName) : carInfo.technitionName,
+        technitionId: userRole?.userRole == "super_admin" ? (selectedMechanic?.userId || carInfo.technitionId) : carInfo.technitionId,
         modifiedBy: userRole.username,
         modifiedDate: moment().tz("Asia/Singapore").toISOString(),
       },

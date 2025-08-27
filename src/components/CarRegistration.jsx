@@ -568,7 +568,9 @@ function CarRegistration({
                   </button>
                 </div>
 
-                {showHistory && found && <HistoryTable historyData={historyData} />}
+                {(found && (showHistory || userRole.userRole === "mechanic" || userRole.userRole === "super_admin") && Array.isArray(historyData) && historyData.length > 0) && (
+                  <HistoryTable historyData={historyData} />
+                )}
               </div>
             </div>
           </div>

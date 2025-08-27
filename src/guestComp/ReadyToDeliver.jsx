@@ -231,6 +231,27 @@ function ReadyToDeliver() {
             center: 'true',
         },
         {
+            name: "Type",
+            selector: (row) => row.custType,
+            key: "custType",
+            style: {
+                textAlign: "center",
+            },
+            width: '140px',
+            center: 'true',
+            cell: (item) => {
+                const typeMap = {
+                    c: { label: "customer", className: "badge bg-secondary" },
+                    d: { label: "dealer", className: "badge bg-info" },
+                    t: { label: "towing", className: "badge bg-warning text-dark" },
+                    r: { label: "rental", className: "badge bg-light text-dark" },
+                };
+                const code = (item.custType || '').toLowerCase();
+                const t = typeMap[code];
+                return t ? <span className={t.className}>{t.label}</span> : (item.custType || "N/A");
+            },
+        },
+        {
             name: t("pending.services"),
             selector: (row) => row.serviceTypes,
             key: "serviceTypes",
@@ -259,8 +280,24 @@ function ReadyToDeliver() {
             style: {
                 textAlign: "center",
             },
-            width: '90px',
+            width: '120px',
             center: 'true',
+            cell: (item) => {
+                const statusMap = {
+                    P: { label: "Pending", className: "badge bg-warning text-dark" },
+                    C: { label: "Completed", className: "badge bg-success" },
+                    A: { label: "Assigned", className: "badge bg-info" },
+                    I: { label: "In Progress", className: "badge bg-primary" },
+                    R: { label: "Rejected", className: "badge bg-danger" },
+                };
+                const code = (item.status || '').toUpperCase();
+                const status = statusMap[code];
+                return status ? (
+                    <span className={status.className}>{status.label}</span>
+                ) : (
+                    item.status || "N/A"
+                );
+            },
         },
         {
             name: t("pending.mechanic"),
