@@ -29,7 +29,8 @@ function GuestLogin() {
         <div className="container-fluid">
             <div className="row">
                 <div
-                    className={`col-2 col-md-3 col-lg-2 p-3 `}
+                    className={`col-2 col-md-3 col-lg-2 p-3 ${showOffcanvas ? "d-block" : "d-none d-md-block"
+                        }`}
                     style={{
                         height: "auto",
                         minHeight: "100vh",
